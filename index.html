@@ -50,6 +50,7 @@ main{flex-grow:1;padding-top:28px;padding-bottom:24px;display:flex;flex-directio
 .pick button{margin-top:auto;height:44px;border-radius:10px;font-size:14px;font-weight:600;background:#fff;border:1px solid #D6D8DC}
 .pick button.on{background:#E8F5EC;color:#1E6B3A;border-color:#A7D7B5}
 .note{font-size:14px;line-height:1.5;padding:10px 14px;border-radius:12px;margin-top:10px}
+.cap{font-size:12px;color:#5B6068;margin-top:8px}
 .old{border:1px dashed #C4C8CE;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:4px;font-size:14px;color:#5B6068}
 .typing{display:flex;gap:12px;align-items:center;font-size:14px;color:#5B6068}
 footer{position:sticky;bottom:0;background:#FBF6F2;border-top:1px solid #E3E5E8}
@@ -79,7 +80,7 @@ svg.r{flex-shrink:0}
 <body>
 <div class="app">
 <header><div class="wrap">
-<div class="brand"><span id="logo"></span><div><b>Mo</b><span>Your running partner · sample data</span></div></div>
+<div class="brand"><span id="logo"></span><div><b>Mo</b><span>Your running partner · prototype</span></div></div>
 <button class="ghost" id="restart" type="button">Start over</button>
 </div></header>
 <main class="wrap" id="chat" aria-live="polite"></main>
@@ -107,18 +108,18 @@ function rabbit(w,kind,cls){
   cheer:'<path d="M43 78 Q48 70 53 78" stroke="#2B1A12" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M67 78 Q72 70 77 78" stroke="#2B1A12" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M50 90 Q60 104 70 90 Z" fill="#2B1A12"/><circle cx="38" cy="90" r="5" fill="#FF9B73"/><circle cx="82" cy="90" r="5" fill="#FF9B73"/>'}[kind];
   return '<svg class="r '+(cls||'')+'" width="'+w+'" height="'+Math.round(w*130/120)+'" viewBox="0 0 120 130" aria-hidden="true">'+ears+'<circle cx="60" cy="82" r="44" fill="#F26B3A"/>'+face+'</svg>';
 }
+var AVOID='Saucony';
 var CAT={
- speed:{base:{name:'Strider Tempo',price:140,why:'Light and springy, built for tempo runs and intervals.',feel:'Firm and fast'},
-  cheaper:{name:'Pace Lite',price:105,why:'Last season’s model with the same light ride for less.',feel:'Firm and fast'},
-  cushion:{name:'Strider Tempo Max',price:155,why:'Extra foam so fast days are easier on your legs.',feel:'Soft and bouncy'},
-  alt:{name:'Northline Tempo',price:135,why:'A similar light, snappy ride from a different brand.',feel:'Firm and fast'},
-  altCushion:{name:'Northline Tempo Plus',price:150,why:'More cushion for faster days, from a different brand.',feel:'Soft and bouncy'}},
- easy:{base:{name:'Cloudfield Daily',price:130,why:'A stable, cushioned trainer for easy and long runs.',feel:'Balanced'},
-  cheaper:{name:'Cloudfield Daily 2',price:95,why:'The previous version, still great for easy miles.',feel:'Balanced'},
-  cushion:{name:'Cloudfield Max',price:160,why:'Max cushion for long, slow miles.',feel:'Very soft'}},
- race:{base:{name:'Apex Carbon',price:250,why:'Carbon plate for race day and a few key workouts.',feel:'Propulsive'},
-  cheaper:{name:'Apex Glide',price:170,why:'A nylon plate gives you most of the pop for less.',feel:'Propulsive'},
-  cushion:{name:'Apex Carbon Plush',price:260,why:'A plated racer with more foam for the late miles.',feel:'Soft and propulsive'}}
+ speed:{base:{brand:'Saucony',name:'Saucony Endorphin Speed 5',price:175,why:'A light, plated trainer that feels snappy on tempo runs and intervals.',feel:'Bouncy and fast'},
+  cheaper:{brand:'Adidas',name:'Adidas Adizero SL2',price:130,why:'A light, simple trainer that handles faster days for less.',feel:'Light and responsive'},
+  cushion:{brand:'ASICS',name:'ASICS Superblast 2',price:200,why:'A tall stack of bouncy foam, so fast days and long runs are easier on your legs.',feel:'Soft and bouncy'},
+  alt:{brand:'Adidas',name:'Adidas Adizero Evo SL',price:150,why:'A similar light, bouncy ride from Adidas, without a plate.',feel:'Bouncy and fast'}},
+ easy:{base:{brand:'Brooks',name:'Brooks Ghost 17',price:150,why:'A reliable, cushioned trainer for easy and long runs.',feel:'Balanced'},
+  cheaper:{brand:'ASICS',name:'ASICS Dynablast 5',price:120,why:'A lighter, simpler trainer that covers easy miles for less.',feel:'Light and bouncy'},
+  cushion:{brand:'Brooks',name:'Brooks Glycerin 22',price:165,why:'One of the softest daily trainers Brooks makes, for long, slow miles.',feel:'Very soft'}},
+ race:{base:{brand:'Nike',name:'Nike Vaporfly 4',price:260,why:'A very light carbon plated racer for race day and a few key workouts.',feel:'Propulsive'},
+  cheaper:{brand:'On',name:'On Cloudboom Strike 2',price:230,why:'A carbon plated racer that costs less than most.',feel:'Propulsive'},
+  cushion:{brand:'Nike',name:'Nike Alphafly 3',price:285,why:'A plated racer with more foam underfoot for the late miles.',feel:'Soft and propulsive'}}
 };
 function fresh(){return{msgs:[{id:0,who:'mo',kind:'text',text:'Hi, I’m Mo, your running partner. I’ll keep up with your training and help with the gear you need along the way.\nLet’s start with your shoe rotation. What are you training for?'}],
  stage:'race',race:null,miles:null,daily:false,flat:false,budget:null,replace:true,mode:'base',avoid:false,chosen:{},typing:false,work:0}}
@@ -139,8 +140,8 @@ function slots(){
 function picksFor(sn){
  var opt=sn.flat||sn.race==='short',top=sn.daily?'speed':'easy';
  var lab={speed:'FILLS: SPEED',easy:sn.daily?'REPLACES: EASY DAYS':'FILLS: EASY DAYS',race:opt?'RACE DAY (OPTIONAL)':'FILLS: RACE DAY'};
- return roles(sn).map(function(r){var c=CAT[r];var p=(r==='speed'&&sn.avoid)?(sn.mode==='cushion'?c.altCushion:c.alt):(c[sn.mode]||c.base);
-  return{key:r,role:lab[r],name:p.name,price:p.price,why:p.why,feel:p.feel,top:r===top}});
+ return roles(sn).map(function(r){var c=CAT[r];var p=c[sn.mode]||c.base;if(sn.avoid&&p.brand===AVOID&&c.alt)p=c.alt;
+  return{key:r,brand:p.brand,role:lab[r],name:p.name,price:p.price,why:p.why,feel:p.feel,top:r===top}});
 }
 function snap(){return{mode:S.mode,avoid:S.avoid,replace:S.replace,daily:S.daily,flat:S.flat,race:S.race,budget:S.budget}}
 function picksMsg(intro){return[msg('mo','text',{text:intro}),msg('mo','picks',{snap:snap()})]}
@@ -161,9 +162,9 @@ function answer(stage,v,label){
 }
 function refine(kind,text){
  if(S.typing)return;
- if(kind==='cheaper'){you(text||'Can you find cheaper options?');S.mode='cheaper';S.chosen={};mo(function(){return picksMsg('Here are lower priced picks. Mostly last season’s models, so the ride is nearly the same.')})}
+ if(kind==='cheaper'){you(text||'Can you find cheaper options?');S.mode='cheaper';S.chosen={};mo(function(){return picksMsg('Here are lower priced picks. They’re simpler shoes, but they cover the same jobs.')})}
  else if(kind==='cushion'){you(text||'I want more cushion.');S.mode='cushion';S.chosen={};mo(function(){return picksMsg('Got it. I swapped in softer versions for each role.')})}
- else if(kind==='brand'){you(text||'I don’t like Strider. What else?');S.avoid=true;S.chosen={};mo(function(){return picksMsg('No problem. I replaced the Strider shoe with a similar one from another brand. Everything else stays the same.')})}
+ else if(kind==='brand'){you(text||'I don’t like Saucony. What else?');var had=picksFor(snap()).some(function(p){return p.brand===AVOID});S.avoid=true;S.chosen={};mo(function(){return picksMsg(had?'No problem. I replaced the Saucony shoe with a similar one from Adidas. Everything else stays the same.':'No problem. None of these picks are Saucony, and I’ll keep it out from here on.')})}
  else if(kind==='why'){you(text||'Why these?');
   var l=['Here’s how I picked them:','Speed: you run '+S.miles+' miles a week with nothing for faster workouts. That’s your biggest gap.',
    !S.daily?'Easy days: most of your miles are easy, so you need a dedicated trainer.':(S.replace?'Easy days: your trainer is at 410 miles, and most shoes lose cushion between 300 and 500.':'Easy days: you’re keeping your trainer for now, so I left this out.'),
@@ -176,7 +177,7 @@ function replies(){
  if(S.stage==='race')return[['5K or 10K','race','short'],['Half marathon','race','half'],['Marathon','race','full']];
  if(S.stage==='miles')return[15,25,35,45].map(function(x){return[x+' miles','miles',x]});
  if(S.stage==='shoes')return[['One daily trainer, about 410 mi','shoes','one'],['A daily trainer and an old race flat','shoes','two'],['Nothing yet','shoes','none']];
- if(S.stage==='budget')return[150,300,450].map(function(x){return['$'+x,'budget',x,'Around $'+x]});
+ if(S.stage==='budget')return[200,350,500].map(function(x){return['$'+x,'budget',x,'Around $'+x]});
  if(S.stage==='replace')return[['Replace it','replace',true],['Keep it for now','replace',false]];
  if(S.stage==='done')return[['Cheaper options','r','cheaper'],['More cushion','r','cushion'],['Different brand','r','brand'],['Why these?','r','why']];
  return[];
@@ -198,7 +199,7 @@ function render(doScroll){
     if(tot<=b)t='Together these come to $'+tot+', within your $'+b+' budget.';
     else if(rc&&tot-rc.price<=b){ok=false;t='Together these come to $'+tot+', $'+(tot-b)+' over your budget. Skip the race shoe for now and you’re at $'+(tot-rc.price)+'.'}
     else{ok=false;t='Together these come to $'+tot+', $'+(tot-b)+' over your budget. Start with the top pick and add the others later.'}
-    h+='</div><div class="note '+(ok?'ok':'warn')+'">'+t+'</div></div>'}
+    h+='</div><div class="note '+(ok?'ok':'warn')+'">'+t+'</div><div class="cap">List prices from September 2026. Check retailers for current deals.</div></div>'}
    else h+='<div class="ind old"><span class="lab">EARLIER PICKS</span><span>'+ps.map(function(p){return esc(p.name)+' $'+p.price}).join(' · ')+'</span></div>'}
  });
  if(S.typing)h+='<div class="typing">'+rabbit(36,'think','pulse')+'<span>Mo is thinking…</span></div>';
@@ -209,7 +210,7 @@ function render(doScroll){
  var key=ch.map(function(p){return p.key}).join();
  if(key!==render.planKey){render.planKey=key;
   $('plan').innerHTML=ch.length?'<div class="plan"><div class="l">'+rabbit(40,'cheer','hop')+'<div><b>Your plan: '+ch.length+(ch.length===1?' shoe':' shoes')+', $'+ch.reduce(function(a,p){return a+p.price},0)+'</b><small>'+ch.map(function(p){return esc(p.name)}).join(' + ')+'</small></div></div><button type="button" id="find">Find best prices</button></div>':''}
- $('ask').placeholder={race:'Training for a half in March…',miles:'About 35 miles…',shoes:'Describe your current shoes…',budget:'Around $300…',replace:'Replace it or keep it…',done:'Ask for cheaper, softer, another brand…'}[S.stage]||'Message Mo';
+ $('ask').placeholder={race:'Training for a half in March…',miles:'About 35 miles…',shoes:'Describe your current shoes…',budget:'Around $350…',replace:'Replace it or keep it…',done:'Ask for cheaper, softer, another brand…'}[S.stage]||'Message Mo';
  if(doScroll)scroll();
 }
 function send(){
@@ -219,7 +220,7 @@ function send(){
  else if(S.stage==='shoes'){if(/nothing|none|no shoes/.test(q))return answer('shoes','none',t);if(/flat|race|two|2/.test(q))return answer('shoes','two',t);return answer('shoes','one',t)}
  else if(S.stage==='budget'&&num)return answer('budget',num,t);
  else if(S.stage==='replace')return answer('replace',!/keep|no|not/.test(q),t);
- else if(S.stage==='done'){if(/cheap|budget|price|less|afford/.test(q))return refine('cheaper',t);if(/cushion|soft|comfort|plush/.test(q))return refine('cushion',t);if(/brand|strider|nike|don.t like|hate/.test(q))return refine('brand',t);if(/why|how/.test(q))return refine('why',t);
+ else if(S.stage==='done'){if(/cheap|budget|price|less|afford/.test(q))return refine('cheaper',t);if(/cushion|soft|comfort|plush/.test(q))return refine('cushion',t);if(/brand|saucony|don.t like|hate/.test(q))return refine('brand',t);if(/why|how/.test(q))return refine('why',t);
   you(t);return mo(function(){return[msg('mo','text',{text:'In this prototype I can adjust for price, cushion or brand, or explain my picks. Try one of those.'})]})}
  you(t);mo(function(){return[msg('mo','text',{text:'Sorry, I didn’t catch that. You can tap one of the options below.'})]});
 }
