@@ -9,6 +9,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap">
 <style>
 *{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
 body{margin:0;background:#FBF6F2;font-family:'Archivo',system-ui,sans-serif;color:#2B1A12}
 button,input{font-family:inherit;color:inherit}
 button{cursor:pointer}
@@ -97,8 +99,139 @@ svg.r{flex-shrink:0}
 <div class="brand"><span id="logo"></span><div><h1>Mo</h1><span>Your running partner · prototype</span></div></div>
 <div id="hdr" class="hdr"></div>
 </div></header>
-<main class="wrap" id="chat" aria-live="polite"></main>
-<footer><div class="wrap">
+<div class="wrap" id="home" style="max-width: 960px">
+<div style="display: flex; flex-direction: column; gap: 36px; padding-bottom: 56px">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 36px 0 4px; text-align: center">
+<svg width="84" height="91" viewBox="0 0 120 130" aria-hidden="true"><rect x="36" y="4" width="18" height="50" rx="9" fill="#F26B3A"></rect><rect x="40" y="12" width="10" height="34" rx="5" fill="#FFD3BD"></rect><rect x="66" y="4" width="18" height="50" rx="9" fill="#F26B3A" transform="rotate(12 75 54)"></rect><rect x="70" y="12" width="10" height="34" rx="5" fill="#FFD3BD" transform="rotate(12 75 54)"></rect><circle cx="60" cy="82" r="44" fill="#F26B3A"></circle><rect x="44" y="70" width="8" height="12" rx="4" fill="#2B1A12"></rect><rect x="68" y="70" width="8" height="12" rx="4" fill="#2B1A12"></rect><path d="M52 92 Q60 100 68 92" stroke="#2B1A12" stroke-width="3.5" fill="none" stroke-linecap="round"></path><circle cx="38" cy="90" r="5" fill="#FF9B73"></circle><circle cx="82" cy="90" r="5" fill="#FF9B73"></circle></svg>
+<h2 style="margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; max-width: 520px">What do you need for your running today?</h2>
+<form id="askHome" style="display: flex; gap: 8px; align-items: center; background: #FFFFFF; border: 1px solid #D6D8DC; border-radius: 999px; padding: 6px 6px 6px 22px; width: 100%; max-width: 560px; box-sizing: border-box">
+<label class="sr" for="askH">Ask Mo</label>
+<input id="askH" type="text" autocomplete="off" placeholder="Ask Mo anything about your running" style="flex-grow: 1; min-width: 0; border: 0; outline: none; font-size: 16px; height: 48px; background: transparent; color: #2B1A12; font-family: inherit">
+<button type="submit" aria-label="Ask Mo" style="width: 48px; height: 48px; border-radius: 50%; border: 0; background: #2B1A12; color: #FFFFFF; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"></path><path d="M5 12l7-7 7 7"></path></svg></button>
+</form>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center">
+<button type="button" data-act="chat" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid #D6D8DC; background: #FFFFFF; color: #2B1A12; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">Shoes</button>
+<a href="#week" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid #D6D8DC; background: #FFFFFF; color: #2B1A12; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">Apparel</a>
+<a href="#week" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid #D6D8DC; background: #FFFFFF; color: #2B1A12; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">Fuel</a>
+<a href="#near" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid #D6D8DC; background: #FFFFFF; color: #2B1A12; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">Events</a>
+<a href="#near" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid #D6D8DC; background: #FFFFFF; color: #2B1A12; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">Run clubs</a>
+<a href="#news" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid #D6D8DC; background: #FFFFFF; color: #2B1A12; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">News</a>
+</div>
+<span style="font-size: 13px; color: #5B6068">Showing a sample runner: 34 miles a week, half marathon in 9 weeks, home in Miami, visiting Chicago.</span>
+</div>
+<section id="rotation" style="display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 16px">
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+<h2 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">Your rotation</h2>
+
+<span style="font-size: 14px; color: #5B6068">From Strava, updated after every run</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+<div style="background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">EASY DAYS</span>
+<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">Nike Pegasus 41</h3>
+<div style="height: 8px; border-radius: 999px; background: #EEF0F2; overflow: hidden"><div style="height: 8px; width: 82%; background: #E08A00; border-radius: 999px"></div></div>
+<span style="align-self: flex-start; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #FFF4E0; color: #8A4B00">Replace soon</span>
+<span style="font-size: 14px; line-height: 1.45; color: #33373D">412 of about 500 miles</span>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">RACE DAY</span>
+<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">Nike Vaporfly 3</h3>
+<div style="height: 8px; border-radius: 999px; background: #EEF0F2; overflow: hidden"><div style="height: 8px; width: 17%; background: #2E9B57; border-radius: 999px"></div></div>
+<span style="align-self: flex-start; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #E8F5EC; color: #1E6B3A">Fresh</span>
+<span style="font-size: 14px; line-height: 1.45; color: #33373D">85 miles, plenty left</span>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">SPEED</span>
+<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">Nothing yet</h3>
+<span style="align-self: flex-start; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #FEECEB; color: #B42318">Missing</span>
+<span style="font-size: 14px; line-height: 1.45; color: #33373D">You have no shoe for tempo runs or intervals.</span>
+<button type="button" data-act="chat" style="margin-top: auto; height: 44px; border-radius: 10px; border: 0; background: #2B1A12; color: #FFFFFF; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit">Find a speed shoe</button>
+</div>
+</div>
+</section>
+<section id="week" style="display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 16px">
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+<h2 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">For your week</h2>
+<span style="font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #EEF0F2; color: #4A4F57">Preview</span>
+<span style="font-size: 14px; color: #5B6068">Based on your training</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+<div style="background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">FUEL</span>
+<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">Sunday: 14 mile long run</h3>
+<span style="font-size: 14px; line-height: 1.45; color: #33373D">Bring 3 gels and a bottle with electrolytes. Many runners take a gel every 30 to 45 minutes on runs this long.</span>
+<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: your longest run so far is 12 miles.</span>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">APPAREL</span>
+<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">Cooler mornings ahead</h3>
+<span style="font-size: 14px; line-height: 1.45; color: #33373D">Lows near 48°F next week. A long sleeve top and light gloves will cover it.</span>
+<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: you run before 7 am most days.</span>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">RACE PREP</span>
+<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">9 weeks to your half</h3>
+<span style="font-size: 14px; line-height: 1.45; color: #33373D">Start testing your race day outfit and fuel on long runs now, so nothing is new on race day.</span>
+<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: your race is on your calendar.</span>
+</div>
+</div>
+</section>
+<section id="near" style="display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 16px">
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+<h2 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">While you’re in Chicago</h2>
+<span style="font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #EEF0F2; color: #4A4F57">Preview</span>
+<span style="font-size: 14px; color: #5B6068">You’re here until Friday</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+<div style="background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">RUN CLUB</span>
+<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">Thursday night social run</h3>
+<span style="font-size: 14px; line-height: 1.45; color: #33373D">6:30 pm. 5 miles, all paces. 1.2 miles from where you’re staying.</span>
+<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: Thursday is an easy day on your plan.</span>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">ROUTE</span>
+<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">Lakefront path, 6 miles</h3>
+<span style="font-size: 14px; line-height: 1.45; color: #33373D">A flat out and back that starts close to you and is popular with local runners.</span>
+<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: it matches tomorrow’s easy run.</span>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">BACK HOME</span>
+<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">A 10K in Miami in 3 weeks</h3>
+<span style="font-size: 14px; line-height: 1.45; color: #33373D">A good tune up race before your half. Registration is still open.</span>
+<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: it lands on a planned workout weekend.</span>
+</div>
+</div>
+</section>
+<section id="news" style="display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 16px">
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+<h2 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">Running news</h2>
+<span style="font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #EEF0F2; color: #4A4F57">Preview</span>
+<span style="font-size: 14px; color: #5B6068">Picked for what you run</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+<div style="background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">RACE GUIDE</span>
+<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">What to expect on your half marathon course</h3>
+<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: it’s your race.</span>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">GEAR</span>
+<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">This month’s new daily trainers</h3>
+<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: your Pegasus is close to done.</span>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">TRAINING</span>
+<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">How to taper in the final two weeks</h3>
+<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: your race is 9 weeks out.</span>
+</div>
+</div>
+</section>
+<span style="font-size: 13px; color: #5B6068">Rows marked Preview show where Mo is headed. The shoe rotation flow is the part you can try today. Events, routes and stories here are examples, not real listings.</span>
+</div>
+</div>
+<main class="wrap" id="chat" aria-live="polite" hidden></main>
+<footer id="foot" hidden><div class="wrap">
 <div id="plan"></div>
 <div class="chips" id="chips"></div>
 <form class="box" id="form">
@@ -110,7 +243,7 @@ svg.r{flex-shrink:0}
 </div>
 <script>
 (function(){
-var S, n=0, timers=[];
+var S, n=0, timers=[], view='home';
 var $=function(id){return document.getElementById(id)};
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function rabbit(w,kind,cls){
@@ -311,13 +444,14 @@ function render(){
  var ch=chosenList(),key=ch.map(function(p){return p.name}).join()+S.found;
  if(key!==render.planKey){render.planKey=key;
   $('plan').innerHTML=ch.length?'<div class="plan"><div class="l">'+rabbit(40,'cheer','hop')+'<div><b>Your plan: '+ch.length+(ch.length===1?' shoe':' shoes')+', $'+ch.reduce(function(a,p){return a+p.price},0)+'</b><small>'+ch.map(function(p){return esc(p.name)}).join(' + ')+'</small></div></div>'+(S.found?'<span class="done">Summary sent</span>':'<button type="button" id="find">Find best prices</button>')+'</div>':''}
- var ck=String(S.confirm);
- if(ck!==render.hdrKey){render.hdrKey=ck;$('hdr').innerHTML=S.confirm?'<span class="cq">Start over and clear your plan?</span><button class="ghost" id="yes" type="button">Yes, start over</button><button class="ghost" id="no" type="button">Cancel</button>':'<button class="ghost" id="restart" type="button">Start over</button>'}
+ $('home').hidden=view!=='home';$('chat').hidden=view!=='chat';$('foot').hidden=view!=='chat';
+ var ck=String(S.confirm)+view;
+ if(ck!==render.hdrKey){render.hdrKey=ck;$('hdr').innerHTML=S.confirm?'<span class="cq">Start over and clear your plan?</span><button class="ghost" id="yes" type="button">Yes, start over</button><button class="ghost" id="no" type="button">Cancel</button>':(view==='home'?'<button class="ghost" data-act="chat" type="button">Chat with Mo</button>':'<button class="ghost" id="goHome" type="button">Home</button><button class="ghost" id="restart" type="button">Start over</button>')}
  $('ask').placeholder={start:'Connect Strava, or tell me yourself…',race:'Training for a half in March…',miles:'About 35 miles…',shoes:'Pegasus 41 with about 300 miles…',shoeMiles:'About 250 miles…',budget:'Around $350…',replace:'Replace it or keep it…',done:'Ask for cheaper, softer, another brand…'}[S.stage]||'Message Mo';
 }
 function send(){
  var t=$('ask').value.trim();if(!t||S.typing||S.stage==='working')return;var q=t.toLowerCase(),v;
- if(S.stage==='start')return flow(/strava|connect|yes|sure|ok/.test(q)?'connect':'manual',t);
+ if(S.stage==='start'){if(/strava|connect|\byes\b|\bsure\b|\bok\b/.test(q))return flow('connect',t);if(/myself|manual|\bno\b|enter|type/.test(q))return flow('manual',t);you(t);return say('I can help with that. To get it right, I need to know a bit about your training first. Want to connect Strava, or tell me yourself?')}
  if(S.stage==='consent')return flow(/no|don|not/.test(q)?'manual':'allow',t);
  if(S.stage==='confirmData')return flow(/no|off|wrong|not/.test(q)?'off':'right',t);
  if(S.stage==='fix')return flow(/shoe/.test(q)?'fixShoes':'fixMiles',t);
@@ -335,6 +469,8 @@ function summary(){var ch=chosenList(),t=ch.reduce(function(a,p){return a+p.pric
 function start(){timers.forEach(clearTimeout);timers=[];S=fresh();render.planKey=null;render.hdrKey=null;render();window.scrollTo(0,0)}
 document.addEventListener('click',function(e){
  var b=e.target.closest('button');if(!b)return;
+ if(b.dataset.act==='chat'){view='chat';render();return scroll()}
+ if(b.id==='goHome'){view='home';render();return window.scrollTo(0,0)}
  if(b.id==='restart'){if(chosenList().length)return set({confirm:true});return start()}
  if(b.id==='yes')return start();
  if(b.id==='no')return set({confirm:false});
@@ -344,6 +480,7 @@ document.addEventListener('click',function(e){
  if(b.dataset.i!==undefined){var c=current[+b.dataset.i];if(!c)return;if(c[1]==='r')refine(c[2]);else if(c[1]==='c')flow(c[2],c[0]);else answer(c[1],c[2],c[3]||c[0])}
 });
 $('form').addEventListener('submit',function(e){e.preventDefault();send()});
+$('askHome').addEventListener('submit',function(e){e.preventDefault();var t=$('askH').value.trim();$('askH').value='';view='chat';render();if(t){$('ask').value=t;send()}else scroll()});
 $('logo').innerHTML=rabbit(40,'idle');
 start();
 })();
