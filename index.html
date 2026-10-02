@@ -85,6 +85,13 @@ footer .wrap{padding-top:12px;padding-bottom:16px;display:flex;flex-direction:co
 .box button{width:44px;height:44px;border-radius:10px;border:0;background:#2B1A12;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 svg.r{flex-shrink:0}
+@keyframes mo-blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(0.1)}}
+@keyframes mo-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.mo-eye{transform-box:fill-box;transform-origin:center;animation:mo-blink 4.5s infinite}
+.mo-float{animation:mo-bob 3.2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.mo-eye,.mo-float,.mo-pulse,.mo-hop,.mo-ear{animation:none}}
+.mo-pulse{animation:pulse 1s ease-in-out infinite}
+.mo-hop{animation:hop .8s ease-in-out 3}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
 @keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-8px)}}
 @keyframes ear{0%,100%{transform:rotate(0)}50%{transform:rotate(-14deg)}}
@@ -114,13 +121,12 @@ svg.r{flex-shrink:0}
 </defs></svg>
 <div class="app">
 <header><div class="wrap">
-<div class="brand"><span id="logo"></span><div><h1>Mo</h1><span>Your running partner · prototype</span></div></div>
+<div class="brand"><span id="logo"></span><div><h1>Mo</h1><span id="status" aria-live="polite">Your running partner · prototype</span></div></div>
 <div id="hdr" class="hdr"></div>
 </div></header>
 <div class="wrap" id="home" style="max-width: 960px">
 <div style="display: flex; flex-direction: column; gap: 36px; padding-bottom: 56px">
-<div style="display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 36px 0 4px; text-align: center">
-<svg width="104" height="123" viewBox="0 0 120 142" aria-hidden="true" style="flex-shrink: 0"><ellipse cx="60" cy="134" rx="42" ry="8" fill="url(#mo-s)"></ellipse><g filter="url(#mo-z)"><rect x="36" y="4" width="18" height="52" rx="9" fill="url(#mo-e)"></rect><rect x="66" y="4" width="18" height="52" rx="9" fill="url(#mo-e)" transform="rotate(12 75 54)"></rect><circle cx="60" cy="82" r="44" fill="url(#mo-b)"></circle><path d="M52 42 Q56 30 60 40 Q63 29 68 42 Z" fill="#FF9A6B"></path></g><g clip-path="url(#mo-clip)"><rect x="10" y="0" width="100" height="130" filter="url(#mo-g)" opacity="0.5"></rect><rect x="10" y="0" width="100" height="130" filter="url(#mo-gd)" opacity="0.35"></rect></g><rect x="40" y="13" width="10" height="33" rx="5" fill="url(#mo-i)"></rect><rect x="70" y="13" width="10" height="33" rx="5" fill="url(#mo-i)" transform="rotate(12 75 54)"></rect><ellipse cx="44" cy="60" rx="20" ry="13" fill="url(#mo-h)" transform="rotate(-28 44 60)"></ellipse><ellipse cx="60" cy="96" rx="20" ry="15" fill="url(#mo-m)" filter="url(#mo-z)"></ellipse><circle cx="34" cy="93" r="9" fill="url(#mo-c)"></circle><circle cx="86" cy="93" r="9" fill="url(#mo-c)"></circle><rect x="44" y="68" width="9" height="13" rx="4.5" fill="#2B1A12"></rect><rect x="68" y="68" width="9" height="13" rx="4.5" fill="#2B1A12"></rect><circle cx="50" cy="71.5" r="2" fill="#FFFFFF"></circle><circle cx="74" cy="71.5" r="2" fill="#FFFFFF"></circle><path d="M56.5 89 Q60 87 63.5 89 Q62 93 60 93.5 Q58 93 56.5 89 Z" fill="#E0655A"></path><path d="M60 93.5 L60 96 M60 96 Q55 101 51 97 M60 96 Q65 101 69 97" stroke="#2B1A12" stroke-width="2.6" fill="none" stroke-linecap="round"></path></svg>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 56px 0 4px; text-align: center">
 <h2 style="margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; max-width: 520px">What do you need for your running today?</h2>
 <form id="askHome" style="display: flex; gap: 8px; align-items: center; background: #FFFFFF; border: 1px solid #D6D8DC; border-radius: 999px; padding: 6px 6px 6px 22px; width: 100%; max-width: 560px; box-sizing: border-box">
 <label class="sr" for="askH">Ask Mo</label>
@@ -268,12 +274,13 @@ var TOPIC=/\b(eat|food|fuel|gels?|nutrition|drink|hydrat\w*|apparel|jacket|short
 var OFF='I can’t help with that yet. Right now I can check your shoe rotation and recommend shoes. Fuel, apparel, events and news are coming.';
 var $=function(id){return document.getElementById(id)};
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function rabbit(w,kind,cls,big){
+function rabbit(w,kind,cls,big,live){
+  var ey=live?' class="mo-eye"':'';
   var L=kind==='cheer'?['34','rotate(-14 43 54)']:['36',''],R=kind==='cheer'?['68','rotate(14 77 54)']:['66','rotate(12 75 54)'];
   function ear(e,inner){var x=+e[0];return inner?'<rect x="'+(x+4)+'" y="13" width="10" height="33" rx="5" fill="url(#mo-i)"'+(e[1]?' transform="'+e[1]+'"':'')+'></rect>':'<rect x="'+x+'" y="4" width="18" height="52" rx="9" fill="url(#mo-e)"'+(e[1]?' transform="'+e[1]+'"':'')+'></rect>'}
   var wrapL=function(s){return kind==='think'?'<g class="ear">'+s+'</g>':s};
   var nose='<path d="M56.5 89 Q60 87 63.5 89 Q62 93 60 93.5 Q58 93 56.5 89 Z" fill="#E0655A"></path>';
-  var face={idle:'<rect x="44" y="68" width="9" height="13" rx="4.5" fill="#2B1A12"></rect><rect x="68" y="68" width="9" height="13" rx="4.5" fill="#2B1A12"></rect><circle cx="50" cy="71.5" r="2" fill="#FFFFFF"></circle><circle cx="74" cy="71.5" r="2" fill="#FFFFFF"></circle>'+nose+'<path d="M60 93.5 L60 96 M60 96 Q55 101 51 97 M60 96 Q65 101 69 97" stroke="#2B1A12" stroke-width="2.6" fill="none" stroke-linecap="round"></path>',
+  var face={idle:'<g'+ey+'><rect x="44" y="68" width="9" height="13" rx="4.5" fill="#2B1A12"></rect><rect x="68" y="68" width="9" height="13" rx="4.5" fill="#2B1A12"></rect><circle cx="50" cy="71.5" r="2" fill="#FFFFFF"></circle><circle cx="74" cy="71.5" r="2" fill="#FFFFFF"></circle></g>'+nose+'<path d="M60 93.5 L60 96 M60 96 Q55 101 51 97 M60 96 Q65 101 69 97" stroke="#2B1A12" stroke-width="2.6" fill="none" stroke-linecap="round"></path>',
    think:'<rect x="44" y="73" width="9" height="5" rx="2.5" fill="#2B1A12"></rect><rect x="68" y="73" width="9" height="5" rx="2.5" fill="#2B1A12"></rect>'+nose+'<path d="M60 93.5 L60 96 M55 97.5 Q60 99.5 65 97.5" stroke="#2B1A12" stroke-width="2.6" fill="none" stroke-linecap="round"></path>',
    cheer:'<path d="M43 77 Q48.5 67 54 77" stroke="#2B1A12" stroke-width="3.5" fill="none" stroke-linecap="round"></path><path d="M67 77 Q72.5 67 78 77" stroke="#2B1A12" stroke-width="3.5" fill="none" stroke-linecap="round"></path>'+nose+'<path d="M52 96 Q60 108 68 96 Z" fill="#2B1A12"></path>'}[kind];
   var fur=wrapL(ear(L))+ear(R)+'<circle cx="60" cy="82" r="44" fill="url(#mo-b)"></circle><path d="M52 42 Q56 30 60 40 Q63 29 68 42 Z" fill="#FF9A6B"></path>';
@@ -449,7 +456,7 @@ function replies(){
  if(S.stage==='done')return[['Cheaper options','r','cheaper'],['More cushion','r','cushion'],['Different brand','r','brand'],['Why these?','r','why']];
  return[];
 }
-var current=[], latest=[];
+var current=[], latest=[], cheerUntil=0;
 var ART='<svg viewBox="0 0 300 250" role="img" aria-label="A watercolor drawing of Mo cheering with both arms up, wearing new blue running shoes" style="display: block; width: 100%; height: auto"><rect width="300" height="250" fill="#F3ECDD"></rect><g filter="url(#wc-wash)"><path d="M-20 70 Q120 -20 320 90 L320 260 L-20 260 Z" fill="#9DBB96" opacity="0.7"></path><path d="M190 -20 Q250 50 330 26 L330 -20 Z" fill="#F0C27A" opacity="0.8"></path><path d="M-20 206 Q150 190 320 210 L320 260 L-20 260 Z" fill="#D2C1A2" opacity="0.9"></path><ellipse cx="152" cy="222" rx="60" ry="8" fill="#1F2536" opacity="0.8"></ellipse><rect x="122" y="14" width="20" height="60" rx="10" fill="#EE7A3F" transform="rotate(-12 132 74)"></rect><rect x="160" y="14" width="20" height="60" rx="10" fill="#EE7A3F" transform="rotate(14 170 74)"></rect><circle cx="152" cy="98" r="40" fill="#F08344"></circle><ellipse cx="152" cy="166" rx="34" ry="40" fill="#EE7A3F"></ellipse><ellipse cx="152" cy="172" rx="19" ry="24" fill="#FBE3CF"></ellipse><ellipse cx="152" cy="112" rx="18" ry="12" fill="#FBE3CF"></ellipse><path d="M120 150 Q96 130 92 100 L104 98 Q110 124 130 140 Z" fill="#EE7A3F"></path><path d="M184 150 Q208 130 212 100 L200 98 Q194 124 174 140 Z" fill="#EE7A3F"></path><path d="M130 202 l-22 10 l34 6 z" fill="#2F6FB8"></path><path d="M174 202 l22 10 l-34 6 z" fill="#2F6FB8"></path><circle cx="126" cy="108" r="7" fill="#F2A089" opacity="0.8"></circle><circle cx="178" cy="108" r="7" fill="#F2A089" opacity="0.8"></circle><circle cx="60" cy="60" r="5" fill="#D8463A" opacity="0.8"></circle><circle cx="244" cy="96" r="5" fill="#2F6FB8" opacity="0.8"></circle><circle cx="232" cy="150" r="4" fill="#E3B341"></circle><circle cx="70" cy="140" r="4" fill="#E3B341"></circle><circle cx="46" cy="104" r="4" fill="#2F6FB8" opacity="0.7"></circle><circle cx="258" cy="52" r="4" fill="#D8463A" opacity="0.7"></circle></g><g filter="url(#wc-ink)" fill="none" stroke="#1E2738" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M-10 72 Q118 -12 312 92"></path><path d="M126 70 Q112 24 122 16 Q136 14 142 62"></path><path d="M162 62 Q170 18 182 18 Q194 24 180 72"></path><path d="M112 88 Q118 58 152 58 Q188 60 192 96 Q194 126 168 136 Q150 142 134 136 Q108 126 112 88 Z"></path><path d="M134 138 Q116 150 118 176 Q120 198 136 206 M170 138 Q188 150 186 176 Q184 198 168 206"></path><path d="M122 150 Q98 130 93 100 M104 98 Q110 122 128 138 M92 100 q4 -8 12 -2"></path><path d="M182 150 Q206 130 211 100 M200 98 Q194 122 176 138 M212 100 q-4 -8 -12 -2"></path><path d="M136 206 Q124 204 108 212 Q122 220 142 218 Z M168 206 Q180 204 196 212 Q182 220 162 218 Z"></path><path d="M118 213 l10 2 M176 215 l10 -2"></path><path d="M146 110 Q152 106 158 110 Q155 116 152 117 Q149 116 146 110 Z" fill="#1E2738"></path><path d="M142 121 Q152 134 162 121 Z" fill="#1E2738"></path><path d="M128 98 Q134 88 140 98 M164 98 Q170 88 176 98" stroke-width="3.2"></path><path d="M84 84 l-6 -8 M78 96 l-10 -2 M220 84 l6 -8 M226 96 l10 -2"></path><path d="M126 170 l4 4 M124 178 l5 1 M176 186 l5 -2"></path></g><g filter="url(#wc-ink)" fill="none" stroke="#1E2738" stroke-width="1.6" stroke-linecap="round"><path d="M20 224 l4 -16 M28 226 l2 -20 M36 224 l6 -14 M48 228 l1 -17 M60 226 l5 -13 M236 224 l-3 -16 M246 226 l2 -19 M256 224 l5 -14 M268 228 l-1 -15 M278 226 l5 -12"></path></g><rect width="300" height="250" filter="url(#wc-paper)" opacity="0.5"></rect></svg>';
 var PEN='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16v4"/><path d="M13.5 6.5l4 4"/></svg>';
 function chosenList(){return ORDER.filter(function(k){return S.chosen[k]}).map(function(k){return S.chosen[k]})}
@@ -478,6 +485,9 @@ function render(){
  var ch=chosenList(),key=ch.map(function(p){return p.name}).join()+S.found;
  if(key!==render.planKey){render.planKey=key;
   $('plan').innerHTML=ch.length?'<div class="plan"><div class="l">'+rabbit(40,'cheer','hop')+'<div><b>Your plan: '+ch.length+(ch.length===1?' shoe':' shoes')+', $'+ch.reduce(function(a,p){return a+p.price},0)+'</b><small>'+ch.map(function(p){return esc(p.name)}).join(' + ')+'</small></div></div>'+(S.found?'<span class="done">Plan ready</span>':'<button type="button" id="find">Find best prices</button>')+'</div>':''}
+ var mood=view==='chat'&&(S.typing||S.stage==='working')?'think':(Date.now()<cheerUntil?'cheer':'idle');
+ if(mood!==render.mood){render.mood=mood;$('logo').innerHTML=mood==='think'?rabbit(48,'think','mo-pulse'):mood==='cheer'?rabbit(48,'cheer','mo-hop'):rabbit(48,'idle','mo-float',false,true)}
+ $('status').textContent=mood==='think'?(S.stage==='working'?'Working on it…':'Thinking…'):mood==='cheer'?'Nice pick':(view==='chat'&&S.stage==='done'?'Ready when you are':'Your running partner · prototype');
  $('modeBtn').textContent=mode==='known'?'See what a new runner sees':'Back to the sample runner';
  $('home').hidden=view!=='home';$('chat').hidden=view!=='chat';$('foot').hidden=view!=='chat';
  var ck=String(S.confirm)+view;
@@ -502,7 +512,7 @@ function send(){
 }
 function summary(){var ch=chosenList(),t=ch.reduce(function(a,p){return a+p.price},0),d=S.budget-t;
  return'Here’s your plan:\n'+ch.map(function(p){return p.name+', $'+p.price}).join('\n')+'\nTotal: $'+t+(d>=0?', $'+d+' under your $'+S.budget+' budget.':', $'+(-d)+' over your $'+S.budget+' budget.')+'\nThis is where the prototype ends. In the full version, I’d check retailers for price, stock and your size, then send you to the best deal.'}
-function start(){timers.forEach(clearTimeout);timers=[];S=fresh();render.planKey=null;render.hdrKey=null;render();window.scrollTo(0,0)}
+function start(){timers.forEach(clearTimeout);timers=[];S=fresh();render.planKey=null;render.hdrKey=null;render.mood=null;render();window.scrollTo(0,0)}
 document.addEventListener('click',function(e){
  var b=e.target.closest('button');if(!b)return;
  if(b.dataset.act==='chat'){view='chat';render();return scroll()}
@@ -513,12 +523,12 @@ document.addEventListener('click',function(e){
  if(b.id==='no')return set({confirm:false});
  if(b.id==='find'){if(S.typing)return;you('Find the best prices for my plan.');S.found=true;return mo(function(){return[msg('mo','text',{text:summary()}),msg('mo','art')]})}
  if(b.dataset.edit)return edit(b.dataset.edit);
- if(b.dataset.add){var k=b.dataset.add,pk=latest.filter(function(p){return p.key===k})[0];if(!pk)return;if(S.chosen[k]&&S.chosen[k].name===pk.name)delete S.chosen[k];else S.chosen[k]={name:pk.name,price:pk.price};S.found=false;return render()}
+ if(b.dataset.add){var k=b.dataset.add,pk=latest.filter(function(p){return p.key===k})[0];if(!pk)return;if(S.chosen[k]&&S.chosen[k].name===pk.name)delete S.chosen[k];else{S.chosen[k]={name:pk.name,price:pk.price};cheerUntil=Date.now()+2600;setTimeout(render,2700)}S.found=false;return render()}
  if(b.dataset.i!==undefined){var c=current[+b.dataset.i];if(!c)return;if(c[1]==='r')refine(c[2]);else if(c[1]==='c')flow(c[2],c[0]);else answer(c[1],c[2],c[3]||c[0])}
 });
 $('form').addEventListener('submit',function(e){e.preventDefault();send()});
 $('askHome').addEventListener('submit',function(e){e.preventDefault();var t=$('askH').value.trim();$('askH').value='';view='chat';render();if(t){$('ask').value=t;send()}else scroll()});
-$('logo').innerHTML=rabbit(44,'idle');
+
 start();
 })();
 </script>
