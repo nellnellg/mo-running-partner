@@ -43,6 +43,7 @@ main{flex-grow:1;padding-top:28px;padding-bottom:24px;display:flex;flex-directio
 .pick.top{border:2px solid #F26B3A}
 .pick .hd{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:24px}
 .pick .tp{white-space:nowrap;flex-shrink:0;font-size:12px;font-weight:600;padding:3px 8px;border-radius:999px;background:#FDEBDF;color:#9A3412}
+.pick .tp.lt{background:#EEF0F2;color:#4A4F57}
 .pick .nm{font-size:18px;font-weight:700;line-height:1.2}
 .pick .pr{font-size:20px;font-weight:700}
 .pick .wy{font-size:14px;line-height:1.45}
@@ -108,80 +109,131 @@ function rabbit(w,kind,cls){
   cheer:'<path d="M43 78 Q48 70 53 78" stroke="#2B1A12" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M67 78 Q72 70 77 78" stroke="#2B1A12" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M50 90 Q60 104 70 90 Z" fill="#2B1A12"/><circle cx="38" cy="90" r="5" fill="#FF9B73"/><circle cx="82" cy="90" r="5" fill="#FF9B73"/>'}[kind];
   return '<svg class="r '+(cls||'')+'" width="'+w+'" height="'+Math.round(w*130/120)+'" viewBox="0 0 120 130" aria-hidden="true">'+ears+'<circle cx="60" cy="82" r="44" fill="#F26B3A"/>'+face+'</svg>';
 }
+var L=(function(){
 var AVOID='Saucony';
 var CAT={
- speed:{base:{brand:'Saucony',name:'Saucony Endorphin Speed 5',price:175,why:'A light, plated trainer that feels snappy on tempo runs and intervals.',feel:'Bouncy and fast'},
-  cheaper:{brand:'Adidas',name:'Adidas Adizero SL2',price:130,why:'A light, simple trainer that handles faster days for less.',feel:'Light and responsive'},
-  cushion:{brand:'ASICS',name:'ASICS Superblast 2',price:200,why:'A tall stack of bouncy foam, so fast days and long runs are easier on your legs.',feel:'Soft and bouncy'},
-  alt:{brand:'Adidas',name:'Adidas Adizero Evo SL',price:150,why:'A similar light, bouncy ride from Adidas, without a plate.',feel:'Bouncy and fast'}},
- easy:{base:{brand:'Brooks',name:'Brooks Ghost 17',price:150,why:'A reliable, cushioned trainer for easy and long runs.',feel:'Balanced'},
-  cheaper:{brand:'ASICS',name:'ASICS Dynablast 5',price:120,why:'A lighter, simpler trainer that covers easy miles for less.',feel:'Light and bouncy'},
-  cushion:{brand:'Brooks',name:'Brooks Glycerin 22',price:165,why:'One of the softest daily trainers Brooks makes, for long, slow miles.',feel:'Very soft'}},
- race:{base:{brand:'Nike',name:'Nike Vaporfly 4',price:260,why:'A very light carbon plated racer for race day and a few key workouts.',feel:'Propulsive'},
-  cheaper:{brand:'On',name:'On Cloudboom Strike 2',price:230,why:'A carbon plated racer that costs less than most.',feel:'Propulsive'},
-  cushion:{brand:'Nike',name:'Nike Alphafly 3',price:285,why:'A plated racer with more foam underfoot for the late miles.',feel:'Soft and propulsive'}}
+ speed:[{brand:'Saucony',name:'Saucony Endorphin Speed 5',price:175,soft:false,why:'A light, plated trainer that feels snappy on tempo runs and intervals.',feel:'Bouncy and fast'},
+  {brand:'Adidas',name:'Adidas Adizero Evo SL',price:150,soft:false,why:'A light, bouncy shoe for faster days, without a plate.',feel:'Bouncy and fast'},
+  {brand:'Adidas',name:'Adidas Adizero SL2',price:130,soft:false,why:'A light, simple trainer that handles faster days for less.',feel:'Light and responsive'},
+  {brand:'ASICS',name:'ASICS Superblast 2',price:200,soft:true,why:'A tall stack of bouncy foam, so fast days and long runs are easier on your legs.',feel:'Soft and bouncy'},
+  {brand:'New Balance',name:'New Balance Rebel v5',price:140,soft:true,why:'Soft, bouncy foam in a light shoe that still feels quick.',feel:'Soft and light'}],
+ easy:[{brand:'Brooks',name:'Brooks Ghost 17',price:150,soft:false,why:'A reliable, cushioned trainer for easy and long runs.',feel:'Balanced'},
+  {brand:'ASICS',name:'ASICS Dynablast 5',price:120,soft:false,why:'A lighter, simpler trainer that covers easy miles for less.',feel:'Light and bouncy'},
+  {brand:'Brooks',name:'Brooks Glycerin 22',price:165,soft:true,why:'One of the softest daily trainers Brooks makes, for long, slow miles.',feel:'Very soft'},
+  {brand:'ASICS',name:'ASICS Novablast 5',price:150,soft:true,why:'A soft, bouncy trainer that keeps easy miles comfortable.',feel:'Soft and bouncy'}],
+ race:[{brand:'Nike',name:'Nike Vaporfly 4',price:260,soft:false,why:'A very light carbon plated racer for race day and a few key workouts.',feel:'Propulsive'},
+  {brand:'On',name:'On Cloudboom Strike 2',price:230,soft:false,why:'A carbon plated racer that costs less than most.',feel:'Propulsive'},
+  {brand:'Nike',name:'Nike Alphafly 3',price:285,soft:true,why:'A plated racer with more foam underfoot for the late miles.',feel:'Soft and propulsive'},
+  {brand:'Adidas',name:'Adidas Adizero Adios Pro 4',price:250,soft:true,why:'A plated racer with a softer ride that costs less than the Alphafly.',feel:'Soft and propulsive'}]
 };
+var NAMES={speed:'speed shoe',easy:'easy day shoe',race:'race shoe'};
+var ART={speed:'a speed shoe',easy:'an easy day shoe',race:'a race shoe'};
+function nums(t){var m=String(t).replace(/,/g,'').match(/\d+(\.\d+)?/g);return m?m.map(Number):[]}
+function parseMiles(t){var n=nums(t);if(!n.length)return null;var v=n.length>1?Math.round((n[0]+n[1])/2):Math.round(n[0]);return v>0&&v<=150?v:null}
+function parseBudget(t){var n=nums(t);if(!n.length)return null;var v=Math.round(n[0]);return v>=50&&v<=5000?v:null}
+function parseShoeMiles(t){var n=nums(t);if(!n.length)return null;var v=Math.round(n[0]);return v>=0&&v<=2000?v:null}
+function parseRace(t){var q=t.toLowerCase();if(/half|13/.test(q))return'half';if(/marathon|full|26/.test(q))return'full';if(/5 ?k|10 ?k/.test(q))return'short';return null}
+function parseReplace(t){var q=t.toLowerCase();if(/\b(don.?t|do not|not)\s+keep\b/.test(q))return true;if(/\bkeep\b/.test(q))return false;if(/\b(no|nope|nah|not yet|don.?t|later)\b/.test(q))return false;return true}
+function parseShoes(t){var q=t.toLowerCase().replace(/,/g,'');if(/\b(nothing|none|no shoes)\b/.test(q))return{kind:'none'};
+ var m=q.match(/(\d+)\s*(mi\b|mile)/),n=nums(q),miles=m?+m[1]:(n.length===1&&n[0]>=20?n[0]:null);
+ var name=t.split(/\bwith\b|,|\(|\babout\b|\baround\b|\band\b/i)[0].replace(/^(i have|i run in|i use|i wear)\s+/i,'').replace(/^(my|a|an|one|just|the)\s+/i,'').trim();
+ if(name.length<3||name.length>28||/^\d/.test(name))name='daily trainer';
+ return{kind:/\bflat\b|race shoe|\btwo\b|\b2 (pairs|shoes)\b/.test(q)?'two':'one',miles:miles,name:name}}
+function cap(t){return t.charAt(0).toUpperCase()+t.slice(1)}
+function list(a){return a.length<2?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1]}
+function raceName(r){return{short:'5K or 10K',half:'half marathon',full:'marathon'}[r]||'race'}
+function worn(s){return s.daily&&s.shoeMiles>=350}
+function slots(s){
+ var easy=!s.daily?['Missing','bad','Nothing for most of your miles.']:worn(s)?['Replace soon','warn',cap(s.shoeName)+' at '+s.shoeMiles+' mi. Most last 300 to 500.']:['Good for now','ok',cap(s.shoeName)+' at '+s.shoeMiles+' mi. Plenty of life left.'];
+ var race=s.flat?['Covered','ok','Your race flat still has life in it.']:s.race==='short'?['Optional','ok','Nice to have for a 5K or 10K.']:['Missing','bad',s.race==='full'?'Worth having for a marathon.':'Helps a lot on race day.'];
+ return[['Easy days',easy],['Speed',['Missing','bad','Nothing for tempo runs or intervals.']],['Race day',race]]}
+function roles(s){var r=!s.daily?['easy','speed']:(worn(s)&&s.replace?['speed','easy']:['speed']);if(!s.flat&&s.race!=='short')r.push('race');return r}
+function choose(role,cheaper,cushion,avoid){var c=CAT[role].filter(function(x){return!(avoid&&x.brand===AVOID)});
+ if(cushion){var so=c.filter(function(x){return x.soft});if(so.length)c=so}
+ return cheaper?c.slice().sort(function(a,b){return a.price-b.price})[0]:c[0]}
+function plan(s){
+ var rs=roles(s),B=s.budget,auto=false;
+ function build(ch){return rs.map(function(r){return choose(r,ch,s.cushion,s.avoid)})}
+ function sum(a){return a.reduce(function(t,p){return t+p.price},0)}
+ function fit(a){var t=0,c=0;for(var i=0;i<a.length;i++){if(t+a[i].price<=B){t+=a[i].price;c++}else break}return c}
+ var ps=build(s.cheaper);
+ if(sum(ps)>B&&!s.cheaper){var alt=build(true);if(fit(alt)>fit(ps)||(fit(ps)===0&&alt[0].price<ps[0].price)){ps=alt;auto=true}}
+ var lab={speed:'FILLS: SPEED',easy:s.daily?'REPLACES: EASY DAYS':'FILLS: EASY DAYS',race:'FILLS: RACE DAY'};
+ var run=0,stop=false,picks=ps.map(function(p,i){var later=false;if(i===0||(!stop&&run+p.price<=B))run+=p.price;else{later=true;stop=true}
+  return{key:rs[i],role:lab[rs[i]],brand:p.brand,name:p.name,price:p.price,why:p.why,feel:p.feel,top:i===0,later:later}});
+ var now=picks.filter(function(p){return!p.later}),lat=picks.filter(function(p){return p.later}),pre=auto?'I went with lower priced models to fit your budget. ':'',ok=true,text;
+ if(picks[0].price>B){ok=false;text='The '+picks[0].name+' is $'+picks[0].price+', $'+(picks[0].price-B)+' over your $'+B+' budget. It’s the lowest price I’d recommend for '+(s.cushion?'a soft '+NAMES[picks[0].key]:ART[picks[0].key])+'.'+(lat.length?' Add the '+list(lat.map(function(p){return NAMES[p.key]}))+' when you can.':'')}
+ else if(!lat.length)text=pre+(picks.length===1?'This comes':'Together these come')+' to $'+run+', within your $'+B+' budget.';
+ else{ok=false;text=pre+'To stay within $'+B+', start with the '+list(now.map(function(p){return p.name}))+' ($'+run+'). Add the '+list(lat.map(function(p){return NAMES[p.key]}))+' later.'}
+ return{picks:picks,ok:ok,text:text,auto:auto}}
+function intro(s){var ps=plan(s).picks,n=ps.length,first=NAMES[ps[0].key];
+ var skip=s.flat?' Your race flat still has life, so I left race day out.':s.race==='short'?' A race shoe is optional for a 5K or 10K, so I left it out.':'';
+ var kept=s.daily&&!worn(s)?' Your '+s.shoeName+' has plenty of life left, so it stays in your rotation.':'';
+ return(n===1?'Here is one pick for your '+raceName(s.race)+' training: '+ART[ps[0].key]+', the one gap in your rotation.':'Here are '+['','','two','three'][n]+' picks for your '+raceName(s.race)+' training. I put the '+first+' first because it will make the biggest difference right now.')+kept+skip}
+function why(s){return['Here’s how I picked them:',
+ 'Speed: you run '+s.miles+' miles a week with nothing for faster workouts.'+(s.daily?' That’s your biggest gap.':''),
+ !s.daily?'Easy days: most of your miles are easy, so a dedicated trainer comes first.':worn(s)?(s.replace?'Easy days: your '+s.shoeName+' is at '+s.shoeMiles+' miles, and most shoes lose cushion between 300 and 500.':'Easy days: you’re keeping your '+s.shoeName+' for now, so I left this out.'):'Easy days: your '+s.shoeName+' has plenty of life at '+s.shoeMiles+' miles, so you don’t need a new one yet.',
+ s.flat?'Race day: your race flat still has life, so I left this out.':s.race==='short'?'Race day: a race shoe is optional for a 5K or 10K, so I left it out.':'Race day: a plated shoe helps most on race day, and it’s the first one to wait on if money is tight.',
+ 'Budget: I keep what you buy now within $'+s.budget+', and I tell you when something has to wait.'].join('\n')}
+function refineText(kind,s,had){
+ if(kind==='cheaper')return s.cushion?'Here are the lowest priced picks that are still soft.':'Here are lower priced picks. They’re simpler shoes, but they cover the same jobs.';
+ if(kind==='cushion')return s.cheaper?'Got it. I found softer shoes and kept the prices as low as I could.':'Got it. I swapped in softer versions for each role.';
+ return had?'No problem. I took out the Saucony shoe and found a similar one from another brand. Everything else stays the same.':'No problem. None of these picks are Saucony, and I’ll keep it out from here on.'}
+function snapOf(s){return{race:s.race,miles:s.miles,daily:s.daily,flat:s.flat,shoeMiles:s.shoeMiles,shoeName:s.shoeName,replace:s.replace,budget:s.budget,cheaper:s.cheaper,cushion:s.cushion,avoid:s.avoid}}
+return{parseMiles:parseMiles,parseBudget:parseBudget,parseShoeMiles:parseShoeMiles,parseRace:parseRace,parseReplace:parseReplace,parseShoes:parseShoes,raceName:raceName,worn:worn,slots:slots,plan:plan,intro:intro,why:why,refineText:refineText,snapOf:snapOf,AVOID:AVOID};
+
+})();
 function fresh(){return{msgs:[{id:0,who:'mo',kind:'text',text:'Hi, I’m Mo, your running partner. I’ll keep up with your training and help with the gear you need along the way.\nLet’s start with your shoe rotation. What are you training for?'}],
- stage:'race',race:null,miles:null,daily:false,flat:false,budget:null,replace:true,mode:'base',avoid:false,chosen:{},typing:false,work:0}}
+ stage:'race',race:null,miles:null,daily:false,flat:false,shoeMiles:410,shoeName:'daily trainer',budget:null,replace:true,cheaper:false,cushion:false,avoid:false,chosen:{},typing:false,work:0}}
 function set(p){for(var k in p)S[k]=p[k];render()}
 function later(ms,fn){timers.push(setTimeout(fn,ms))}
 function msg(who,kind,x){n++;var m={id:n,who:who,kind:kind};for(var k in (x||{}))m[k]=x[k];return m}
 function you(t){S.msgs.push(msg('you','text',{text:t}));$('ask').value='';render(true)}
 function mo(build,patch,ms){S.typing=true;render(true);later(ms||800,function(){S.msgs=S.msgs.concat(build());S.typing=false;set(patch||{});scroll()})}
+function say(t,patch){mo(function(){return[msg('mo','text',{text:t})]},patch)}
 function scroll(){window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})}
-function raceName(r){return{short:'5K or 10K',half:'half marathon',full:'marathon'}[r]||'race'}
-function roles(s){var r=['speed'];if(!s.daily||s.replace)r.push('easy');r.push('race');return r}
-function slots(){
- var easy=!S.daily?['Missing','bad','Nothing for most of your miles.']:['Replace soon','warn','Daily trainer at 410 mi. Most last 300 to 500.'];
- var speed=['Missing','bad','Nothing for tempo runs or intervals.'];
- var race=S.flat?['Covered','ok','Your race flat has life left at 120 mi.']:S.race==='short'?['Optional','ok','Nice to have for a 5K or 10K.']:['Missing','bad',S.race==='full'?'Worth having for a marathon.':'Optional, but helps on race day.'];
- return[['Easy days',easy],['Speed',speed],['Race day',race]];
-}
-function picksFor(sn){
- var opt=sn.flat||sn.race==='short',top=sn.daily?'speed':'easy';
- var lab={speed:'FILLS: SPEED',easy:sn.daily?'REPLACES: EASY DAYS':'FILLS: EASY DAYS',race:opt?'RACE DAY (OPTIONAL)':'FILLS: RACE DAY'};
- return roles(sn).map(function(r){var c=CAT[r];var p=c[sn.mode]||c.base;if(sn.avoid&&p.brand===AVOID&&c.alt)p=c.alt;
-  return{key:r,brand:p.brand,role:lab[r],name:p.name,price:p.price,why:p.why,feel:p.feel,top:r===top}});
-}
-function snap(){return{mode:S.mode,avoid:S.avoid,replace:S.replace,daily:S.daily,flat:S.flat,race:S.race,budget:S.budget}}
-function picksMsg(intro){return[msg('mo','text',{text:intro}),msg('mo','picks',{snap:snap()})]}
-function firstIntro(){var c=roles(S).length;return(c===3?'Here are three picks':'Here are two picks for the gaps')+' for your '+raceName(S.race)+' training. I put the '+(S.daily?'speed shoe':'easy day shoe')+' first because it will make the biggest difference right now.'}
+function picksMsg(intro){return[msg('mo','text',{text:intro}),msg('mo','picks',{snap:L.snapOf(S)})]}
+function askBudget(){say('Thanks. Last one: what’s your budget for new shoes?',{stage:'budget'})}
 function answer(stage,v,label){
  if(S.typing)return;you(label);
- if(stage==='race')mo(function(){return[msg('mo','text',{text:(v==='short'?'Nice, a fast one.':'Nice, a '+raceName(v)+'.')+' How many miles a week are you running right now?'})]},{race:v,stage:'miles'});
- else if(stage==='miles')mo(function(){return[msg('mo','text',{text:v+' miles a week, got it. What are you running in now? Rough mileage is fine.'})]},{miles:v,stage:'shoes'});
- else if(stage==='shoes')mo(function(){return[msg('mo','text',{text:'Thanks. Last one: what’s your budget for new shoes?'})]},{stage:'budget',daily:v!=='none',flat:v==='two'});
+ if(stage==='race')say((v==='short'?'Nice, a fast one.':'Nice, a '+L.raceName(v)+'.')+' How many miles a week are you running right now?',{race:v,stage:'miles'});
+ else if(stage==='miles')say('About '+v+' miles a week, got it. What are you running in now? Rough mileage is fine.',{miles:v,stage:'shoes'});
+ else if(stage==='shoes'){
+  if(v.kind==='none'){S.daily=false;S.flat=false;return askBudget()}
+  S.daily=true;S.flat=v.kind==='two';S.shoeName=v.name||'daily trainer';
+  if(v.miles==null)return say('Good to know. About how many miles are on your '+S.shoeName+'?',{stage:'shoeMiles'});
+  S.shoeMiles=v.miles;askBudget();
+ }
+ else if(stage==='shoeMiles'){S.shoeMiles=v;askBudget()}
  else if(stage==='budget'){
   mo(function(){return[msg('mo','text',{text:'Perfect. Give me a moment while I look at your rotation.'}),msg('mo','status')]},{budget:v,stage:'working',work:0},600);
   later(1500,function(){set({work:1})});later(2300,function(){set({work:2})});later(3100,function(){set({work:3})});
-  later(3300,function(){mo(function(){var o=[msg('mo','text',{text:'Here’s what I see before I recommend anything.'}),msg('mo','rotation')];
-   if(S.daily)o.push(msg('mo','text',{text:'One question first. Your daily trainer has about 410 miles on it. Do you want me to replace it, or keep it for easy runs a bit longer and focus on the gaps?'}));
-   else o=o.concat(picksMsg(firstIntro()));return o},{stage:S.daily?'replace':'done'},700)});
+  later(3300,function(){var w=L.worn(S);mo(function(){var o=[msg('mo','text',{text:'Here’s what I see before I recommend anything.'}),msg('mo','rotation')];
+   if(w)o.push(msg('mo','text',{text:'One question first. Your '+S.shoeName+' has about '+S.shoeMiles+' miles on it. Do you want me to replace it, or keep it for easy runs a bit longer and focus on the gaps?'}));
+   else o=o.concat(picksMsg(L.intro(S)));return o},{stage:w?'replace':'done'},700)});
  } else if(stage==='replace'){S.replace=v;
-  mo(function(){return picksMsg(v?'Makes sense, it’s close to the end of its life. '+firstIntro():'Got it, we’ll keep it going for now and I’ll remind you when it hits 500 miles. Here are picks for the two gaps: speed and race day.')},{stage:'done'});}
+  mo(function(){return picksMsg(v?'Makes sense, it’s close to the end of its life. '+L.intro(S):'Got it, we’ll keep it going for now and I’ll remind you when it hits 500 miles. '+L.intro(S))},{stage:'done'});}
 }
 function refine(kind,text){
  if(S.typing)return;
- if(kind==='cheaper'){you(text||'Can you find cheaper options?');S.mode='cheaper';S.chosen={};mo(function(){return picksMsg('Here are lower priced picks. They’re simpler shoes, but they cover the same jobs.')})}
- else if(kind==='cushion'){you(text||'I want more cushion.');S.mode='cushion';S.chosen={};mo(function(){return picksMsg('Got it. I swapped in softer versions for each role.')})}
- else if(kind==='brand'){you(text||'I don’t like Saucony. What else?');var had=picksFor(snap()).some(function(p){return p.brand===AVOID});S.avoid=true;S.chosen={};mo(function(){return picksMsg(had?'No problem. I replaced the Saucony shoe with a similar one from Adidas. Everything else stays the same.':'No problem. None of these picks are Saucony, and I’ll keep it out from here on.')})}
- else if(kind==='why'){you(text||'Why these?');
-  var l=['Here’s how I picked them:','Speed: you run '+S.miles+' miles a week with nothing for faster workouts. That’s your biggest gap.',
-   !S.daily?'Easy days: most of your miles are easy, so you need a dedicated trainer.':(S.replace?'Easy days: your trainer is at 410 miles, and most shoes lose cushion between 300 and 500.':'Easy days: you’re keeping your trainer for now, so I left this out.'),
-   S.flat?'Race day: your flat still has life, so this one is optional.':'Race day: a plated shoe helps most on race day, but it’s the one to skip if money is tight.',
-   'Budget: I tried to stay near $'+S.budget+' and I’ll tell you when the full set goes over.'];
-  mo(function(){return[msg('mo','text',{text:l.join('\n')})]})}
+ if(kind==='why'){you(text||'Why these?');return say(L.why(S))}
+ var had=L.plan(S).picks.some(function(p){return p.brand===L.AVOID});
+ you(text||{cheaper:'Can you find cheaper options?',cushion:'I want more cushion.',brand:'I don’t like Saucony. What else?'}[kind]);
+ if(kind==='cheaper')S.cheaper=true;else if(kind==='cushion')S.cushion=true;else{S.avoid=true;ORDER.forEach(function(k){if(S.chosen[k]&&S.chosen[k].name.indexOf(L.AVOID)===0)delete S.chosen[k]})}
+ mo(function(){return picksMsg(L.refineText(kind,S,had))});
 }
 function replies(){
  if(S.typing)return[];
  if(S.stage==='race')return[['5K or 10K','race','short'],['Half marathon','race','half'],['Marathon','race','full']];
  if(S.stage==='miles')return[15,25,35,45].map(function(x){return[x+' miles','miles',x]});
- if(S.stage==='shoes')return[['One daily trainer, about 410 mi','shoes','one'],['A daily trainer and an old race flat','shoes','two'],['Nothing yet','shoes','none']];
+ if(S.stage==='shoes')return[['One daily trainer, about 410 mi','shoes',{kind:'one',miles:410}],['A daily trainer and an old race flat','shoes',{kind:'two',miles:410}],['Nothing yet','shoes',{kind:'none'}]];
+ if(S.stage==='shoeMiles')return[['Under 200','shoeMiles',150],['200 to 350','shoeMiles',275],['Over 350','shoeMiles',410]];
  if(S.stage==='budget')return[200,350,500].map(function(x){return['$'+x,'budget',x,'Around $'+x]});
  if(S.stage==='replace')return[['Replace it','replace',true],['Keep it for now','replace',false]];
  if(S.stage==='done')return[['Cheaper options','r','cheaper'],['More cushion','r','cushion'],['Different brand','r','brand'],['Why these?','r','why']];
  return[];
 }
+var ORDER=['speed','easy','race'];
 var current=[], latest=[];
 function render(doScroll){
  var last=null;S.msgs.forEach(function(m){if(m.kind==='picks')last=m.id});
@@ -191,45 +243,41 @@ function render(doScroll){
   if(m.kind==='text')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'</div></div>';
   else if(m.kind==='status'){h+='<div class="ind card steps">';['Reading your training','Checking the shoes you own','Searching options under $'+(S.budget||0)].forEach(function(l,i){
     var d=S.work>i,a=S.work===i;h+='<div class="step"><span>'+l+'</span><b style="color:'+(d?'#1E6B3A':a?'#B5461C':'#6B7078')+'">'+(d?'Done':a?'Working…':'Waiting')+'</b></div>'});h+='</div>'}
-  else if(m.kind==='rotation'){h+='<div class="ind card"><span class="lab">ROTATION CHECK</span><div class="slots">';slots().forEach(function(x){h+='<div class="slot"><b>'+x[0]+'</b><span class="badge '+x[1][1]+'">'+x[1][0]+'</span><small>'+x[1][2]+'</small></div>'});h+='</div></div>'}
-  else if(m.kind==='picks'){var ps=picksFor(m.snap);
-   if(m.id===last){latest=ps;h+='<div class="ind"><div class="picks">';ps.forEach(function(p){var on=!!S.chosen[p.key];
-     h+='<div class="pick'+(p.top?' top':'')+'"><div class="hd"><span class="lab">'+p.role+'</span>'+(p.top?'<span class="tp">Top pick</span>':'')+'</div><span class="nm">'+esc(p.name)+'</span><span class="pr">$'+p.price+'</span><span class="wy">'+esc(p.why)+'</span><span class="fl">Feel: '+p.feel+'</span><button type="button" data-add="'+p.key+'" class="'+(on?'on':'')+'" aria-pressed="'+on+'">'+(on?'Added to plan':'Add to plan')+'</button></div>'});
-    var tot=ps.reduce(function(a,p){return a+p.price},0),rc=ps.filter(function(p){return p.key==='race'})[0],b=m.snap.budget,ok=true,t;
-    if(tot<=b)t='Together these come to $'+tot+', within your $'+b+' budget.';
-    else if(rc&&tot-rc.price<=b){ok=false;t='Together these come to $'+tot+', $'+(tot-b)+' over your budget. Skip the race shoe for now and you’re at $'+(tot-rc.price)+'.'}
-    else{ok=false;t='Together these come to $'+tot+', $'+(tot-b)+' over your budget. Start with the top pick and add the others later.'}
-    h+='</div><div class="note '+(ok?'ok':'warn')+'">'+t+'</div><div class="cap">List prices from September 2026. Check retailers for current deals.</div></div>'}
+  else if(m.kind==='rotation'){h+='<div class="ind card"><span class="lab">ROTATION CHECK</span><div class="slots">';L.slots(S).forEach(function(x){h+='<div class="slot"><b>'+x[0]+'</b><span class="badge '+x[1][1]+'">'+x[1][0]+'</span><small>'+x[1][2]+'</small></div>'});h+='</div></div>'}
+  else if(m.kind==='picks'){var pl=L.plan(m.snap),ps=pl.picks;
+   if(m.id===last){latest=ps;h+='<div class="ind"><div class="picks">';ps.forEach(function(p){var on=!!(S.chosen[p.key]&&S.chosen[p.key].name===p.name);
+     h+='<div class="pick'+(p.top?' top':'')+'"><div class="hd"><span class="lab">'+p.role+'</span>'+(p.top?'<span class="tp">Top pick</span>':p.later?'<span class="tp lt">Later</span>':'')+'</div><span class="nm">'+esc(p.name)+'</span><span class="pr">$'+p.price+'</span><span class="wy">'+esc(p.why)+'</span><span class="fl">Feel: '+p.feel+'</span><button type="button" data-add="'+p.key+'" class="'+(on?'on':'')+'" aria-pressed="'+on+'">'+(on?'Added to plan':'Add to plan')+'</button></div>'});
+    h+='</div><div class="note '+(pl.ok?'ok':'warn')+'">'+esc(pl.text)+'</div><div class="cap">List prices from September 2026. Check retailers for current deals.</div></div>'}
    else h+='<div class="ind old"><span class="lab">EARLIER PICKS</span><span>'+ps.map(function(p){return esc(p.name)+' $'+p.price}).join(' · ')+'</span></div>'}
  });
  if(S.typing)h+='<div class="typing">'+rabbit(36,'think','pulse')+'<span>Mo is thinking…</span></div>';
  $('chat').innerHTML=h;
  current=replies();
  $('chips').innerHTML=current.map(function(c,i){return'<button type="button" data-i="'+i+'">'+esc(c[0])+'</button>'}).join('');
- var ch=latest.filter(function(p){return S.chosen[p.key]});
- var key=ch.map(function(p){return p.key}).join();
+ var ch=ORDER.filter(function(k){return S.chosen[k]}).map(function(k){return S.chosen[k]});
+ var key=ch.map(function(p){return p.name}).join();
  if(key!==render.planKey){render.planKey=key;
   $('plan').innerHTML=ch.length?'<div class="plan"><div class="l">'+rabbit(40,'cheer','hop')+'<div><b>Your plan: '+ch.length+(ch.length===1?' shoe':' shoes')+', $'+ch.reduce(function(a,p){return a+p.price},0)+'</b><small>'+ch.map(function(p){return esc(p.name)}).join(' + ')+'</small></div></div><button type="button" id="find">Find best prices</button></div>':''}
- $('ask').placeholder={race:'Training for a half in March…',miles:'About 35 miles…',shoes:'Describe your current shoes…',budget:'Around $350…',replace:'Replace it or keep it…',done:'Ask for cheaper, softer, another brand…'}[S.stage]||'Message Mo';
+ $('ask').placeholder={race:'Training for a half in March…',miles:'About 35 miles…',shoes:'Pegasus 41 with about 300 miles…',shoeMiles:'About 250 miles…',budget:'Around $350…',replace:'Replace it or keep it…',done:'Ask for cheaper, softer, another brand…'}[S.stage]||'Message Mo';
  if(doScroll)scroll();
 }
 function send(){
- var t=$('ask').value.trim();if(!t||S.typing)return;var q=t.toLowerCase(),num=parseInt(q.replace(/[^0-9]/g,''),10);
- if(S.stage==='race'){if(/marathon/.test(q)&&!/half/.test(q))return answer('race','full',t);if(/half|13/.test(q))return answer('race','half',t);if(/5 ?k|10 ?k/.test(q))return answer('race','short',t)}
- else if(S.stage==='miles'&&num)return answer('miles',num,t);
- else if(S.stage==='shoes'){if(/nothing|none|no shoes/.test(q))return answer('shoes','none',t);if(/flat|race|two|2/.test(q))return answer('shoes','two',t);return answer('shoes','one',t)}
- else if(S.stage==='budget'&&num)return answer('budget',num,t);
- else if(S.stage==='replace')return answer('replace',!/keep|no|not/.test(q),t);
- else if(S.stage==='done'){if(/cheap|budget|price|less|afford/.test(q))return refine('cheaper',t);if(/cushion|soft|comfort|plush/.test(q))return refine('cushion',t);if(/brand|saucony|don.t like|hate/.test(q))return refine('brand',t);if(/why|how/.test(q))return refine('why',t);
-  you(t);return mo(function(){return[msg('mo','text',{text:'In this prototype I can adjust for price, cushion or brand, or explain my picks. Try one of those.'})]})}
- you(t);mo(function(){return[msg('mo','text',{text:'Sorry, I didn’t catch that. You can tap one of the options below.'})]});
+ var t=$('ask').value.trim();if(!t||S.typing||S.stage==='working')return;var q=t.toLowerCase(),v;
+ if(S.stage==='race'){v=L.parseRace(t);if(v)return answer('race',v,t);you(t);return say('Is that a 5K or 10K, a half marathon or a marathon?')}
+ if(S.stage==='miles'){v=L.parseMiles(t);if(v)return answer('miles',v,t);you(t);return say('Roughly how many miles do you run in a normal week? A number like 25 works.')}
+ if(S.stage==='shoes')return answer('shoes',L.parseShoes(t),t);
+ if(S.stage==='shoeMiles'){v=L.parseShoeMiles(t);if(v!=null)return answer('shoeMiles',v,t);you(t);return say('A rough number is fine, like 250.')}
+ if(S.stage==='budget'){v=L.parseBudget(t);if(v)return answer('budget',v,t);you(t);return say('What’s a dollar amount you’re comfortable with? Something like $300 works.')}
+ if(S.stage==='replace')return answer('replace',L.parseReplace(t),t);
+ if(/cheap|budget|price|less|afford/.test(q))return refine('cheaper',t);if(/cushion|soft|comfort|plush/.test(q))return refine('cushion',t);if(/brand|saucony|don.t like|hate/.test(q))return refine('brand',t);if(/why|how/.test(q))return refine('why',t);
+ you(t);say('In this prototype I can adjust for price, cushion or brand, or explain my picks. Try one of those.');
 }
 function start(){timers.forEach(clearTimeout);timers=[];S=fresh();render.planKey=null;render();window.scrollTo(0,0)}
 document.addEventListener('click',function(e){
  var b=e.target.closest('button');if(!b)return;
  if(b.id==='restart')return start();
  if(b.id==='find'){if(S.typing)return;you('Find the best prices for my plan.');return mo(function(){return[msg('mo','text',{text:'On it. Next I’d check retailers for price, stock and your size, then send you to the best deal. That flow comes in the next version of this prototype.'})]})}
- if(b.dataset.add){S.chosen[b.dataset.add]=!S.chosen[b.dataset.add];return render()}
+ if(b.dataset.add){var k=b.dataset.add,pk=latest.filter(function(p){return p.key===k})[0];if(!pk)return;if(S.chosen[k]&&S.chosen[k].name===pk.name)delete S.chosen[k];else S.chosen[k]={name:pk.name,price:pk.price};return render()}
  if(b.dataset.i!==undefined){var c=current[+b.dataset.i];if(!c)return;if(c[1]==='r')refine(c[2]);else answer(c[1],c[2],c[3]||c[0])}
 });
 $('form').addEventListener('submit',function(e){e.preventDefault();send()});
