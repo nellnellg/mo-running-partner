@@ -68,7 +68,15 @@ button.yb:hover{background:#45302A}
 .rows span{color:#4A4F57}
 .old{border:1px dashed #C4C8CE;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:4px;font-size:14px;color:#5B6068}
 .typing{display:flex;gap:12px;align-items:center;font-size:14px;color:#5B6068}
-footer{position:sticky;bottom:0;background:#FBF6F2;border-top:1px solid #E3E5E8}
+footer{background:transparent}
+.sheetWrap{position:fixed;inset:0;z-index:20}
+.backdrop{position:absolute;inset:0;background:rgba(43,26,18,.45)}
+.sheet{position:absolute;inset:12px;background:#FBF6F2;border-radius:28px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 64px rgba(43,26,18,.35)}
+.stop{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px 6px}
+.stop .brand b{display:block;font-size:16px;font-weight:700}
+.round{width:48px;height:48px;border-radius:50%;border:1px solid #E3E5E8;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.scroller{flex:1;overflow-y:auto;min-height:0}
+@media (max-width:600px){.sheet{inset:6px;border-radius:22px}#status2{display:none}}
 footer .wrap{padding-top:12px;padding-bottom:16px;display:flex;flex-direction:column;gap:10px}
 .plan{background:#2B1A12;color:#fff;border-radius:14px;padding:12px 12px 12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .plan .l{display:flex;align-items:center;gap:12px}
@@ -78,9 +86,9 @@ footer .wrap{padding-top:12px;padding-bottom:16px;display:flex;flex-direction:co
 .plan button{height:44px;padding:0 16px;border-radius:10px;border:0;background:#fff;color:#2B1A12;font-size:14px;font-weight:600}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips button{min-height:44px;padding:8px 16px;border-radius:999px;border:1px solid #D6D8DC;background:#fff;font-size:14px;font-weight:500}
-.box{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #D6D8DC;border-radius:14px;padding:6px 6px 6px 16px}
+.box{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #D6D8DC;border-radius:999px;padding:6px 6px 6px 22px;box-shadow:0 6px 24px rgba(43,26,18,.10)}
 .box input{flex-grow:1;min-width:0;border:0;outline:none;font-size:15px;height:44px;background:transparent}
-.box button{width:44px;height:44px;border-radius:10px;border:0;background:#2B1A12;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.box button{width:44px;height:44px;border-radius:50%;border:0;background:#2B1A12;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 svg.r{flex-shrink:0}
 @keyframes mo-blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(0.1)}}
@@ -116,8 +124,8 @@ svg.r{flex-shrink:0}
 </defs></svg>
 <div class="app">
 <header><div class="wrap">
-<div class="brand"><span id="logo"></span><div><h1>Mo</h1><span id="status" aria-live="polite">Your running partner · prototype</span></div></div>
-<div id="hdr" class="hdr"></div>
+<div class="brand"><span id="logo"></span><div><h1>Mo</h1><span>Your running partner · prototype</span></div></div>
+<div class="hdr"><button class="ghost" data-act="chat" type="button">Chat with Mo</button></div>
 </div></header>
 <div class="wrap" id="home" style="max-width: 960px">
 <div style="display: flex; flex-direction: column; gap: 36px; padding-bottom: 56px">
@@ -271,8 +279,18 @@ svg.r{flex-shrink:0}
 <span style="font-size: 13px; color: #5B6068">The shoe rotation flow is the part you can try today. The other rows show where Mo is headed. Events, routes and stories here are examples, not real listings.</span>
 </div>
 </div>
-<main class="wrap" id="chat" aria-live="polite" hidden></main>
-<footer id="foot" hidden><div class="wrap">
+<div id="sheetWrap" class="sheetWrap" hidden>
+<div class="backdrop" id="backdrop"></div>
+<section class="sheet" role="dialog" aria-modal="true" aria-label="Chat with Mo">
+<div class="stop">
+<button type="button" class="round" id="goHome" aria-label="Close chat"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<div class="brand"><span id="logo2"></span><div><b>Mo</b><span id="status2" aria-live="polite"></span></div></div>
+<div id="shdr" class="hdr"></div>
+</div>
+<div class="scroller" id="scroller">
+<main class="wrap" id="chat" aria-live="polite"></main>
+</div>
+<footer id="foot"><div class="wrap">
 <div id="plan"></div>
 <div class="chips" id="chips"></div>
 <form class="box" id="form">
@@ -281,6 +299,8 @@ svg.r{flex-shrink:0}
 <button type="submit" aria-label="Send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg></button>
 </form>
 </div></footer>
+</section>
+</div>
 </div>
 <script>
 (function(){
@@ -395,7 +415,7 @@ function msg(who,kind,x){n++;var m={id:n,who:who,kind:kind};for(var k in (x||{})
 function you(t,field){S.msgs.push(msg('you','text',{text:t,field:field||null}));$('ask').value='';render();scroll()}
 function mo(build,patch,ms){S.typing=true;render();scroll();later(ms||800,function(){S.msgs=S.msgs.concat(build());S.typing=false;set(patch||{});scroll()})}
 function say(t,patch){mo(function(){return[msg('mo','text',{text:t})]},patch)}
-function scroll(){requestAnimationFrame(function(){requestAnimationFrame(function(){window.scrollTo({top:document.documentElement.scrollHeight,behavior:'smooth'})})})}
+function scroll(){requestAnimationFrame(function(){requestAnimationFrame(function(){var el=$('scroller');el.scrollTo({top:el.scrollHeight,behavior:'smooth'})})})}
 function picksMsg(intro){return[msg('mo','text',{text:intro}),msg('mo','picks',{snap:L.snapOf(S)})]}
 function rotationMsgs(lead){var w=L.worn(S),o=[msg('mo','text',{text:lead}),msg('mo','rotation',{snap:L.snapOf(S)})];
  if(w&&S.askReplace)o.push(msg('mo','text',{text:'One question first. Your '+S.shoeName+' has about '+S.shoeMiles+' miles on it. Do you want me to replace it, or keep it for easy runs a bit longer and focus on the gaps?'}));
@@ -499,12 +519,12 @@ function render(){
  if(key!==render.planKey){render.planKey=key;
   $('plan').innerHTML=ch.length?'<div class="plan"><div class="l">'+rabbit(40,'cheer','hop')+'<div><b>Your plan: '+ch.length+(ch.length===1?' shoe':' shoes')+', $'+ch.reduce(function(a,p){return a+p.price},0)+'</b><small>'+ch.map(function(p){return esc(p.name)}).join(' + ')+'</small></div></div>'+(S.found?'<span class="done">Plan ready</span>':'<button type="button" id="find">Find best prices</button>')+'</div>':''}
  var mood=view==='chat'&&(S.typing||S.stage==='working')?'think':(Date.now()<cheerUntil?'cheer':'idle');
- if(mood!==render.mood){render.mood=mood;$('logo').innerHTML=mood==='think'?rabbit(48,'think','mo-pulse'):mood==='cheer'?rabbit(48,'cheer','mo-hop'):rabbit(48,'idle','mo-float',false,true)}
- $('status').textContent=mood==='think'?(S.stage==='working'?'Working on it…':'Thinking…'):mood==='cheer'?'Nice pick':(view==='chat'&&S.stage==='done'?'Ready when you are':'Your running partner · prototype');
+ if(mood!==render.mood){render.mood=mood;$('logo2').innerHTML=mood==='think'?rabbit(48,'think','mo-pulse'):mood==='cheer'?rabbit(48,'cheer','mo-hop'):rabbit(48,'idle','mo-float',false,true)}
+ $('status2').textContent=mood==='think'?(S.stage==='working'?'Working on it…':'Thinking…'):mood==='cheer'?'Nice pick':(S.stage==='done'?'Ready when you are':'Your running partner');
  $('modeBtn').textContent=mode==='known'?'See what a new runner sees':'Back to the sample runner';
- $('home').hidden=view!=='home';$('chat').hidden=view!=='chat';$('foot').hidden=view!=='chat';
+ $('sheetWrap').hidden=view!=='chat';document.body.style.overflow=view==='chat'?'hidden':'';
  var ck=String(S.confirm)+view;
- if(ck!==render.hdrKey){render.hdrKey=ck;$('hdr').innerHTML=S.confirm?'<span class="cq">Start over and clear your plan?</span><button class="ghost" id="yes" type="button">Yes, start over</button><button class="ghost" id="no" type="button">Cancel</button>':(view==='home'?'<button class="ghost" data-act="chat" type="button">Chat with Mo</button>':'<button class="ghost" id="goHome" type="button">Home</button><button class="ghost" id="restart" type="button">Start over</button>')}
+ if(ck!==render.hdrKey){render.hdrKey=ck;$('shdr').innerHTML=S.confirm?'<span class="cq">Start over and clear your plan?</span><button class="ghost" id="yes" type="button">Yes, start over</button><button class="ghost" id="no" type="button">Cancel</button>':'<button class="ghost" id="restart" type="button">Start over</button>'}
  $('ask').placeholder={start:'Connect Strava, or tell me yourself…',race:'Training for a half in March…',miles:'About 35 miles…',shoes:'Pegasus 41 with about 300 miles…',shoeMiles:'About 250 miles…',budget:'Around $350…',replace:'Replace it or keep it…',done:'Ask for cheaper, softer, another brand…'}[S.stage]||'Message Mo';
 }
 function send(){
@@ -525,12 +545,12 @@ function send(){
 }
 function summary(){var ch=chosenList(),t=ch.reduce(function(a,p){return a+p.price},0),d=S.budget-t;
  return'Here’s your plan:\n'+ch.map(function(p){return p.name+', $'+p.price}).join('\n')+'\nTotal: $'+t+(d>=0?', $'+d+' under your $'+S.budget+' budget.':', $'+(-d)+' over your $'+S.budget+' budget.')+'\nThis is where the prototype ends. In the full version, I’d check retailers for price, stock and your size, then send you to the best deal.'}
-function start(){timers.forEach(clearTimeout);timers=[];S=fresh();render.planKey=null;render.hdrKey=null;render.mood=null;render();window.scrollTo(0,0)}
+function start(){timers.forEach(clearTimeout);timers=[];S=fresh();render.planKey=null;render.hdrKey=null;render.mood=null;render();$('scroller').scrollTop=0}
 document.addEventListener('click',function(e){
  var b=e.target.closest('button');if(!b)return;
- if(b.dataset.act==='chat'){view='chat';render();return scroll()}
+ if(b.dataset.act==='chat'){view='chat';render();scroll();return setTimeout(function(){$('ask').focus()},50)}
  if(b.dataset.act==='mode'){mode=mode==='known'?'new':'known';start();if(mode==='new'){view='chat';render()}return}
- if(b.id==='goHome'){view='home';render();return window.scrollTo(0,0)}
+ if(b.id==='goHome'){S.confirm=false;view='home';return render()}
  if(b.id==='restart'){if(chosenList().length)return set({confirm:true});return start()}
  if(b.id==='yes')return start();
  if(b.id==='no')return set({confirm:false});
@@ -539,6 +559,9 @@ document.addEventListener('click',function(e){
  if(b.dataset.add){var k=b.dataset.add,pk=latest.filter(function(p){return p.key===k})[0];if(!pk)return;if(S.chosen[k]&&S.chosen[k].name===pk.name)delete S.chosen[k];else{S.chosen[k]={name:pk.name,price:pk.price};cheerUntil=Date.now()+2600;setTimeout(render,2700)}S.found=false;return render()}
  if(b.dataset.i!==undefined){var c=current[+b.dataset.i];if(!c)return;if(c[1]==='r')refine(c[2]);else if(c[1]==='c')flow(c[2],c[0]);else answer(c[1],c[2],c[3]||c[0])}
 });
+$('logo').innerHTML=rabbit(48,'idle','mo-float',false,true);
+$('backdrop').addEventListener('click',function(){S.confirm=false;view='home';render()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&view==='chat'){S.confirm=false;view='home';render()}});
 $('form').addEventListener('submit',function(e){e.preventDefault();send()});
 $('askHome').addEventListener('submit',function(e){e.preventDefault();var t=$('askH').value.trim();$('askH').value='';view='chat';render();if(t){$('ask').value=t;send()}else scroll()});
 
