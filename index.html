@@ -58,6 +58,12 @@ button.yb:hover{background:#45302A}
 .pick button.on{background:#E8F5EC;color:#1E6B3A;border-color:#A7D7B5}
 .note{font-size:14px;line-height:1.5;padding:10px 14px;border-radius:12px;margin-top:10px}
 .cap{font-size:12px;color:#5B6068;margin-top:8px}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:12px;font-size:14px}
+.two ul{margin:6px 0 0;padding-left:18px;line-height:1.6;color:#33373D}
+.rows{margin-top:8px}
+.rows div{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #EEF0F2;font-size:14px}
+.rows div:first-child{border-top:0}
+.rows span{color:#4A4F57}
 .old{border:1px dashed #C4C8CE;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:4px;font-size:14px;color:#5B6068}
 .typing{display:flex;gap:12px;align-items:center;font-size:14px;color:#5B6068}
 footer{position:sticky;bottom:0;background:#FBF6F2;border-top:1px solid #E3E5E8}
@@ -154,7 +160,7 @@ function fitText(k,s){if(k==='speed')return'You run '+s.miles+' miles a week wit
 function worn(s){return s.daily&&s.shoeMiles>=350}
 function slots(s){
  var easy=!s.daily?['Missing','bad','Nothing for most of your miles.']:worn(s)?['Replace soon','warn',cap(s.shoeName)+' at '+s.shoeMiles+' mi. Most last 300 to 500.']:['Good for now','ok',cap(s.shoeName)+' at '+s.shoeMiles+' mi. Plenty of life left.'];
- var race=s.flat?['Covered','ok','Your race flat still has life in it.']:s.race==='none'?['Optional','ok','No race planned, so you can skip this.']:s.race==='short'?['Optional','ok','Nice to have for a 5K or 10K.']:['Missing','bad',s.race==='full'?'Worth having for a marathon.':'Helps a lot on race day.'];
+ var race=s.flat?['Covered','ok','Your '+(s.flatName||'race flat')+' still has life in it.']:s.race==='none'?['Optional','ok','No race planned, so you can skip this.']:s.race==='short'?['Optional','ok','Nice to have for a 5K or 10K.']:['Missing','bad',s.race==='full'?'Worth having for a marathon.':'Helps a lot on race day.'];
  return[['Easy days',easy],['Speed',['Missing','bad','Nothing for tempo runs or intervals.']],['Race day',race]]}
 function roles(s){var r=!s.daily?['easy','speed']:(worn(s)&&s.replace?['speed','easy']:['speed']);if(!s.flat&&s.race!=='short'&&s.race!=='none')r.push('race');return r}
 function choose(role,cheaper,cushion,avoid){var c=CAT[role].filter(function(x){return!(avoid&&x.brand===AVOID)});
@@ -176,26 +182,26 @@ function plan(s){
  else{ok=false;text=pre+'To stay within $'+B+', start with the '+list(now.map(function(p){return p.name}))+' ($'+run+'). Add the '+list(lat.map(function(p){return NAMES[p.key]}))+' later.'}
  return{picks:picks,ok:ok,text:text,auto:auto}}
 function intro(s){var ps=plan(s).picks,n=ps.length,first=NAMES[ps[0].key];
- var skip=s.flat?' Your race flat still has life, so I left race day out.':s.race==='none'?' You’re not training for a race, so I left race day out.':s.race==='short'?' A race shoe is optional for a 5K or 10K, so I left it out.':'';
+ var skip=s.flat?' Your '+(s.flatName||'race flat')+' still has life, so I left race day out.':s.race==='none'?' You’re not training for a race, so I left race day out.':s.race==='short'?' A race shoe is optional for a 5K or 10K, so I left it out.':'';
  var kept=s.daily&&!worn(s)?' Your '+s.shoeName+' has plenty of life left, so it stays in your rotation.':'';
  return(n===1?'Here is one pick for '+train(s)+': '+ART[ps[0].key]+', the one gap in your rotation.':'Here are '+['','','two','three'][n]+' picks for '+train(s)+'. I put the '+first+' first because it will make the biggest difference right now.')+kept+skip}
 function why(s){return['Here’s how I picked them:',
  'Speed: you run '+s.miles+' miles a week with nothing for faster workouts.'+(s.daily?' That’s your biggest gap.':''),
  !s.daily?'Easy days: most of your miles are easy, so a dedicated trainer comes first.':worn(s)?(s.replace?'Easy days: your '+s.shoeName+' is at '+s.shoeMiles+' miles, and most shoes lose cushion between 300 and 500.':'Easy days: you’re keeping your '+s.shoeName+' for now, so I left this out.'):'Easy days: your '+s.shoeName+' has plenty of life at '+s.shoeMiles+' miles, so you don’t need a new one yet.',
- s.flat?'Race day: your race flat still has life, so I left this out.':s.race==='none'?'Race day: you’re not training for a race, so I left this out.':s.race==='short'?'Race day: a race shoe is optional for a 5K or 10K, so I left it out.':'Race day: a plated shoe helps most on race day, and it’s the first one to wait on if money is tight.',
+ s.flat?'Race day: your '+(s.flatName||'race flat')+' still has life, so I left this out.':s.race==='none'?'Race day: you’re not training for a race, so I left this out.':s.race==='short'?'Race day: a race shoe is optional for a 5K or 10K, so I left it out.':'Race day: a plated shoe helps most on race day, and it’s the first one to wait on if money is tight.',
  'Budget: I keep what you buy now within $'+s.budget+', and I tell you when something has to wait.'].join('\n')}
 function refineText(kind,s,had){
  if(kind==='cheaper')return s.cushion?'Here are the lowest priced picks that are still soft.':'Here are lower priced picks. They’re simpler shoes, but they cover the same jobs.';
  if(kind==='cushion')return s.cheaper?'Got it. I found softer shoes and kept the prices as low as I could.':'Got it. I swapped in softer versions for each role.';
  return had?'No problem. I took out the Saucony shoe and found a similar one from another brand. Everything else stays the same.':'No problem. None of these picks are Saucony, and I’ll keep it out from here on.'}
-function snapOf(s){return{race:s.race,miles:s.miles,daily:s.daily,flat:s.flat,shoeMiles:s.shoeMiles,shoeName:s.shoeName,replace:s.replace,budget:s.budget,cheaper:s.cheaper,cushion:s.cushion,avoid:s.avoid}}
+function snapOf(s){return{race:s.race,miles:s.miles,daily:s.daily,flat:s.flat,flatName:s.flatName,shoeMiles:s.shoeMiles,shoeName:s.shoeName,replace:s.replace,budget:s.budget,cheaper:s.cheaper,cushion:s.cushion,avoid:s.avoid}}
 return{parseMiles:parseMiles,parseBudget:parseBudget,parseShoeMiles:parseShoeMiles,parseRace:parseRace,parseReplace:parseReplace,parseShoes:parseShoes,raceName:raceName,worn:worn,slots:slots,plan:plan,intro:intro,why:why,refineText:refineText,snapOf:snapOf,AVOID:AVOID};
 
 })();
 var ORDER=['speed','easy','race'];
 function Q(k){return{race:'What are you training for?',miles:'How many miles a week are you running right now?',shoes:'What are you running in now? Rough mileage is fine.',shoeMiles:'About how many miles are on your '+S.shoeName+'?',budget:'What’s your budget for new shoes?',replace:'Do you want me to replace your '+S.shoeName+', or keep it a bit longer?'}[k]}
-function fresh(){return{msgs:[{id:0,who:'mo',kind:'text',text:'Hi, I’m Mo, your running partner. I’ll keep up with your training and help with the gear you need along the way.\nLet’s start with your shoe rotation. What are you training for?'}],
- stage:'race',resume:null,race:null,miles:null,daily:false,flat:false,shoeMiles:410,shoeName:'daily trainer',budget:null,replace:true,cheaper:false,cushion:false,avoid:false,chosen:{},typing:false,work:0,confirm:false,found:false}}
+function fresh(){return{msgs:[{id:0,who:'mo',kind:'text',text:'Hi, I’m Mo, your running partner. I’ll keep up with your training and help with the gear you need along the way.\nThe fastest way to start is to connect Strava, so I can see your training and your shoes. Or you can tell me yourself.'}],
+ stage:'start',connected:false,flatName:null,resume:null,race:null,miles:null,daily:false,flat:false,shoeMiles:410,shoeName:'daily trainer',budget:null,replace:true,cheaper:false,cushion:false,avoid:false,chosen:{},typing:false,work:0,confirm:false,found:false}}
 function set(p){for(var k in p)S[k]=p[k];render()}
 function later(ms,fn){timers.push(setTimeout(fn,ms))}
 function msg(who,kind,x){n++;var m={id:n,who:who,kind:kind};for(var k in (x||{}))m[k]=x[k];return m}
@@ -209,7 +215,7 @@ function rotationMsgs(lead){var w=L.worn(S),o=[msg('mo','text',{text:lead}),msg(
  else o=o.concat(picksMsg(L.intro(S)));return o}
 function next(stage){say('Thanks. '+(stage==='budget'?'Last one: what’s your budget for new shoes?':Q(stage)),{stage:stage})}
 function runCheck(){
- mo(function(){return[msg('mo','text',{text:'Perfect. Give me a moment while I look at your rotation.'}),msg('mo','status')]},{stage:'working',work:0},600);
+ mo(function(){return[msg('mo','text',{text:'Perfect. Give me a moment while I look at your rotation.'}),msg('mo','status',{labels:['Reading your training','Checking the shoes you own','Searching options under $'+S.budget]})]},{stage:'working',work:0},600);
  later(1500,function(){set({work:1})});later(2300,function(){set({work:2})});later(3100,function(){set({work:3})});
  later(3300,function(){S.askReplace=true;var w=L.worn(S);mo(function(){return rotationMsgs('Here’s what I see before I recommend anything.')},{stage:w?'replace':'done'},700)});
 }
@@ -227,12 +233,27 @@ function answer(stage,v,label){
    return mo(function(){return rotationMsgs('Got it, I updated that. Here’s your rotation now.')},{stage:w?'replace':'done'})}
   return say('Got it, I updated that. '+Q(back),{stage:back});
  }
- if(stage==='race')say((v==='none'?'Nice, running for the love of it.':v==='short'?'Nice, a fast one.':'Nice, a '+L.raceName(v)+'.')+' How many miles a week are you running right now?',{stage:'miles'});
+ if(stage==='race'){var nice=v==='none'?'Nice, running for the love of it.':v==='short'?'Nice, a fast one.':'Nice, a '+L.raceName(v)+'.';if(S.connected)say(nice+' And what’s your budget for new shoes?',{stage:'budget'});else say(nice+' How many miles a week are you running right now?',{stage:'miles'})}
  else if(stage==='miles')say('About '+v+' miles a week, got it. '+Q('shoes'),{stage:'shoes'});
  else if(stage==='shoes'){if(needMiles)say('Good to know. '+Q('shoeMiles'),{stage:'shoeMiles'});else next('budget')}
  else if(stage==='shoeMiles')next('budget');
  else if(stage==='budget')runCheck();
  else if(stage==='replace')mo(function(){return picksMsg((v?'Makes sense, it’s close to the end of its life. ':'Got it, we’ll keep it going for now and I’ll remind you when it hits 500 miles. ')+L.intro(S))},{stage:'done'});
+}
+function flow(act,label){
+ if(S.typing)return;you(label);
+ if(act==='connect')mo(function(){return[msg('mo','text',{text:'Before I connect, here’s exactly what I’ll look at.'}),msg('mo','consent')]},{stage:'consent'});
+ else if(act==='manual')say('No problem, I’ll ask instead. '+Q('race'),{stage:'race'});
+ else if(act==='allow'){
+  mo(function(){return[msg('mo','text',{text:'Thanks. Connecting now.'}),msg('mo','status',{labels:['Connecting to Strava','Reading your last 12 weeks','Finding your shoes']})]},{stage:'working',work:0},600);
+  later(1500,function(){set({work:1})});later(2300,function(){set({work:2})});later(3100,function(){set({work:3})});
+  later(3300,function(){mo(function(){return[msg('mo','text',{text:'Here’s what I found from your last 12 weeks.'}),msg('mo','found'),msg('mo','text',{text:'8 runs had no shoe tagged, so I counted them toward the Pegasus. Does this look right?'})]},
+   {stage:'confirmData',connected:true,miles:34,daily:true,flat:true,flatName:'Vaporfly 3',shoeName:'Pegasus 41',shoeMiles:412},700)});
+ }
+ else if(act==='right')say('Great. There are two things Strava can’t tell me. First, what are you training for?',{stage:'race'});
+ else if(act==='off')say('No problem. What should I fix?',{stage:'fix'});
+ else if(act==='fixMiles'){S.resume='race';say(Q('miles'),{stage:'miles'})}
+ else if(act==='fixShoes'){S.resume='race';S.flat=false;S.flatName=null;say(Q('shoes'),{stage:'shoes'})}
 }
 function edit(field){
  if(S.typing||S.stage==='working')return;
@@ -250,6 +271,10 @@ function refine(kind,text){
 }
 function replies(){
  if(S.typing)return[];
+ if(S.stage==='start')return[['Connect Strava','c','connect'],['I’ll enter it myself','c','manual']];
+ if(S.stage==='consent')return[['Allow access','c','allow'],['No thanks','c','manual']];
+ if(S.stage==='confirmData')return[['Looks right','c','right'],['Something’s off','c','off']];
+ if(S.stage==='fix')return[['Weekly miles','c','fixMiles'],['My shoes','c','fixShoes']];
  if(S.stage==='race')return[['5K or 10K','race','short'],['Half marathon','race','half'],['Marathon','race','full'],['No race, just running','race','none']];
  if(S.stage==='miles')return[15,25,35,45].map(function(x){return[x+' miles','miles',x]});
  if(S.stage==='shoes')return[['One daily trainer, about 410 mi','shoes',{kind:'one',miles:410}],['A daily trainer and an old race flat','shoes',{kind:'two',miles:410}],['Nothing yet','shoes',{kind:'none'}]];
@@ -263,13 +288,15 @@ var current=[], latest=[];
 var PEN='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16v4"/><path d="M13.5 6.5l4 4"/></svg>';
 function chosenList(){return ORDER.filter(function(k){return S.chosen[k]}).map(function(k){return S.chosen[k]})}
 function render(){
- var last=null,lastField={};S.msgs.forEach(function(m){if(m.kind==='picks')last=m.id;if(m.field)lastField[m.field]=m.id});
+ var last=null,lastStatus=null,lastField={};S.msgs.forEach(function(m){if(m.kind==='picks')last=m.id;if(m.kind==='status')lastStatus=m.id;if(m.field)lastField[m.field]=m.id});
  var h='';latest=[];
  S.msgs.forEach(function(m){
   if(m.who==='you'){h+='<div class="you">'+(m.field&&lastField[m.field]===m.id?'<button type="button" class="yb" data-edit="'+m.field+'" aria-label="Edit your answer: '+esc(m.text)+'"><span>'+esc(m.text)+'</span>'+PEN+'</button>':'<div class="yb">'+esc(m.text)+'</div>')+'</div>';return}
   if(m.kind==='text')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'</div></div>';
-  else if(m.kind==='status'){h+='<div class="ind card steps">';['Reading your training','Checking the shoes you own','Searching options under $'+(S.budget||0)].forEach(function(l,i){
-    var d=S.work>i,a=S.work===i;h+='<div class="step"><span>'+l+'</span><b style="color:'+(d?'#1E6B3A':a?'#B5461C':'#6B7078')+'">'+(d?'Done':a?'Working…':'Waiting')+'</b></div>'});h+='</div>'}
+  else if(m.kind==='status'){h+='<div class="ind card steps">';m.labels.forEach(function(l,i){
+    var cur=m.id===lastStatus,d=!cur||S.work>i,a=cur&&S.work===i;h+='<div class="step"><span>'+l+'</span><b style="color:'+(d?'#1E6B3A':a?'#B5461C':'#6B7078')+'">'+(d?'Done':a?'Working…':'Waiting')+'</b></div>'});h+='</div>'}
+  else if(m.kind==='consent')h+='<div class="ind card"><h2 class="lab">WHAT MO WILL SEE</h2><div class="two"><div><b>Mo reads</b><ul><li>Your runs from the last 12 weeks</li><li>Distance, pace and run type</li><li>Your shoes and their mileage</li></ul></div><div><b>Mo never</b><ul><li>Posts or changes anything</li><li>Sees your routes or location</li><li>Shares your data</li></ul></div></div><p class="cap">This is a demo. No real account is connected, and the data is a sample runner.</p></div>';
+  else if(m.kind==='found')h+='<div class="ind card"><h2 class="lab">FROM STRAVA</h2><div class="rows"><div><span>Weekly miles</span><b>34 average</b></div><div><span>Runs per week</span><b>5, with 1 workout</b></div><div><span>Longest run</span><b>12 miles</b></div><div><span>Nike Pegasus 41</span><b>412 miles</b></div><div><span>Nike Vaporfly 3</span><b>85 miles, races only</b></div></div></div>';
   else if(m.kind==='rotation'){h+='<div class="ind card"><h2 class="lab">ROTATION CHECK</h2><div class="slots">';L.slots(m.snap||S).forEach(function(x){h+='<div class="slot"><b>'+x[0]+'</b><span class="badge '+x[1][1]+'">'+x[1][0]+'</span><small>'+esc(x[1][2])+'</small></div>'});h+='</div></div>'}
   else if(m.kind==='picks'){var pl=L.plan(m.snap),ps=pl.picks;
    if(m.id===last){latest=ps;h+='<div class="ind"><h2 class="sr">Mo’s picks</h2><div class="picks">';ps.forEach(function(p){var on=!!(S.chosen[p.key]&&S.chosen[p.key].name===p.name);
@@ -286,10 +313,14 @@ function render(){
   $('plan').innerHTML=ch.length?'<div class="plan"><div class="l">'+rabbit(40,'cheer','hop')+'<div><b>Your plan: '+ch.length+(ch.length===1?' shoe':' shoes')+', $'+ch.reduce(function(a,p){return a+p.price},0)+'</b><small>'+ch.map(function(p){return esc(p.name)}).join(' + ')+'</small></div></div>'+(S.found?'<span class="done">Summary sent</span>':'<button type="button" id="find">Find best prices</button>')+'</div>':''}
  var ck=String(S.confirm);
  if(ck!==render.hdrKey){render.hdrKey=ck;$('hdr').innerHTML=S.confirm?'<span class="cq">Start over and clear your plan?</span><button class="ghost" id="yes" type="button">Yes, start over</button><button class="ghost" id="no" type="button">Cancel</button>':'<button class="ghost" id="restart" type="button">Start over</button>'}
- $('ask').placeholder={race:'Training for a half in March…',miles:'About 35 miles…',shoes:'Pegasus 41 with about 300 miles…',shoeMiles:'About 250 miles…',budget:'Around $350…',replace:'Replace it or keep it…',done:'Ask for cheaper, softer, another brand…'}[S.stage]||'Message Mo';
+ $('ask').placeholder={start:'Connect Strava, or tell me yourself…',race:'Training for a half in March…',miles:'About 35 miles…',shoes:'Pegasus 41 with about 300 miles…',shoeMiles:'About 250 miles…',budget:'Around $350…',replace:'Replace it or keep it…',done:'Ask for cheaper, softer, another brand…'}[S.stage]||'Message Mo';
 }
 function send(){
  var t=$('ask').value.trim();if(!t||S.typing||S.stage==='working')return;var q=t.toLowerCase(),v;
+ if(S.stage==='start')return flow(/strava|connect|yes|sure|ok/.test(q)?'connect':'manual',t);
+ if(S.stage==='consent')return flow(/no|don|not/.test(q)?'manual':'allow',t);
+ if(S.stage==='confirmData')return flow(/no|off|wrong|not/.test(q)?'off':'right',t);
+ if(S.stage==='fix')return flow(/shoe/.test(q)?'fixShoes':'fixMiles',t);
  if(S.stage==='race'){v=L.parseRace(t);if(v)return answer('race',v,t);you(t);return say('Is that a 5K or 10K, a half marathon or a marathon? You can also say you’re not training for a race.')}
  if(S.stage==='miles'){v=L.parseMiles(t);if(v)return answer('miles',v,t);you(t);return say('Roughly how many miles do you run in a normal week? A number like 25 works.')}
  if(S.stage==='shoes')return answer('shoes',L.parseShoes(t),t);
@@ -310,7 +341,7 @@ document.addEventListener('click',function(e){
  if(b.id==='find'){if(S.typing)return;you('Find the best prices for my plan.');S.found=true;return say(summary())}
  if(b.dataset.edit)return edit(b.dataset.edit);
  if(b.dataset.add){var k=b.dataset.add,pk=latest.filter(function(p){return p.key===k})[0];if(!pk)return;if(S.chosen[k]&&S.chosen[k].name===pk.name)delete S.chosen[k];else S.chosen[k]={name:pk.name,price:pk.price};S.found=false;return render()}
- if(b.dataset.i!==undefined){var c=current[+b.dataset.i];if(!c)return;if(c[1]==='r')refine(c[2]);else answer(c[1],c[2],c[3]||c[0])}
+ if(b.dataset.i!==undefined){var c=current[+b.dataset.i];if(!c)return;if(c[1]==='r')refine(c[2]);else if(c[1]==='c')flow(c[2],c[0]);else answer(c[1],c[2],c[3]||c[0])}
 });
 $('form').addEventListener('submit',function(e){e.preventDefault();send()});
 $('logo').innerHTML=rabbit(40,'idle');
