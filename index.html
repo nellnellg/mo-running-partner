@@ -468,11 +468,12 @@ function askPicks(need,list,done){
 // Turns the model's answer into cards. Only shoes from the list are allowed, and the scripted picks fill in if there are none.
 function optsMsgs(key,role,list,d,fallText,fallFit,note,ok){
  var by={},items=[],ai=false;list.forEach(function(c){by[c.name]=c});
- function make(c,fit){return{key:key,role:role,name:c.name,price:c.price,fit:fit,why:c.why,feel:c.feel}}
+ function tidy(t){return String(t).replace(/'/g,'’')}
+ function make(c,fit){return{key:key,role:role,name:c.name,price:c.price,fit:tidy(fit),spec:c.w+'g · '+c.d+'mm drop',feel:c.feel}}
  if(d&&d.picks)d.picks.forEach(function(p){var c=p&&by[p.name];if(c&&p.reason&&items.length<3&&!items.some(function(i){return i.name===c.name}))items.push(make(c,String(p.reason)))});
  if(items.length)ai=true;else items=list.slice().sort(function(a,b){return(b.brand==='On')-(a.brand==='On')}).slice(0,3).map(function(c){return make(c,fallFit(c))});
  items[0].top=true;
- return[msg('mo','text',{text:ai&&d.message?String(d.message):fallText}),msg('mo','opts',{items:items,note:note,ok:ok})]}
+ return[msg('mo','text',{text:ai&&d.message?tidy(d.message):fallText}),msg('mo','opts',{items:items,note:note,ok:ok})]}
 function showEasy(){
  var list=L.CAT.easy.filter(function(c){return c.price<=SR.budget});
  askPicks({type:'easy day',why:'On Cloudsurfer Max is at 410 miles. Most daily trainers last 300 to 500.',replaces:'On Cloudsurfer Max'},list,function(d){
@@ -620,7 +621,7 @@ function render(){
   else if(m.kind==='rotation'){h+='<div class="ind card"><h2 class="lab">ROTATION CHECK</h2><div class="slots">';L.slots(m.snap||S).forEach(function(x){h+='<div class="slot"><b>'+x[0]+'</b><span class="badge '+x[1][1]+'">'+x[1][0]+'</span><small>'+esc(x[1][2])+'</small></div>'});h+='</div></div>'}
   else if(m.kind==='opts'){
    if(m.id===last){latest=m.items;h+='<div class="ind"><h2 class="sr">Mo’s picks</h2><div class="picks">';m.items.forEach(function(p){var on=!!(S.chosen[p.key]&&S.chosen[p.key].name===p.name);
-     h+='<div class="pick'+(p.top?' top':'')+'"><div class="hd"><span class="lab">'+p.role+'</span>'+(p.top?'<span class="tp">Top pick</span>':'')+'</div><h3 class="nm">'+esc(p.name)+'</h3><span class="pr">$'+p.price+'</span><span class="fit">'+esc(p.fit)+'</span><span class="wy">'+esc(p.why)+'</span><span class="fl">Feel: '+p.feel+'</span><button type="button" data-pick="'+esc(p.name)+'" class="'+(on?'on':'')+'" aria-pressed="'+on+'" aria-label="'+(on?'Remove '+esc(p.name)+' from plan':'Add '+esc(p.name)+' to plan')+'">'+(on?'Added to plan':'Add to plan')+'</button></div>'});
+     h+='<div class="pick'+(p.top?' top':'')+'"><div class="hd"><span class="lab">'+p.role+'</span>'+(p.top?'<span class="tp">Top pick</span>':'')+'</div><h3 class="nm">'+esc(p.name)+'</h3><span class="pr">$'+p.price+'</span><span class="fit">'+esc(p.fit)+'</span><span class="wy">'+esc(p.spec)+'</span><span class="fl">Feel: '+p.feel+'</span><button type="button" data-pick="'+esc(p.name)+'" class="'+(on?'on':'')+'" aria-pressed="'+on+'" aria-label="'+(on?'Remove '+esc(p.name)+' from plan':'Add '+esc(p.name)+' to plan')+'">'+(on?'Added to plan':'Add to plan')+'</button></div>'});
     h+='</div><div class="note '+(m.ok?'ok':'warn')+'">'+esc(m.note)+'</div><div class="cap">List prices from fall 2026. Check retailers for current deals.</div></div>'}
    else h+='<div class="ind old"><span class="lab">EARLIER PICKS</span><span>'+m.items.map(function(p){return esc(p.name)+' $'+p.price}).join(' · ')+'</span></div>'}
   else if(m.kind==='picks'){var pl=L.plan(m.snap),ps=pl.picks;
