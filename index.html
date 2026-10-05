@@ -447,12 +447,20 @@ function say(t,patch){mo(function(){return[msg('mo','text',{text:t})]},patch)}
 function scroll(){requestAnimationFrame(function(){requestAnimationFrame(function(){var el=$('scroller');el.scrollTo({top:el.scrollHeight,behavior:'smooth'})})})}
 // ----- The sample runner. Based on Nelson's own rotation, with the Cloudsurfer Max set to 410 miles and no race shoe. -----
 var SR={weeklyMiles:28,goal:'Miami Marathon on January 31, 2027',budget:200,shoes:[
- {name:'On Cloudsurfer Max',brand:'On',use:'easy and daily',miles:410,weight:'290g',drop:'6mm',price:180},
+ {name:'On Cloudsurfer Max',brand:'On',use:'easy and daily',miles:410,weight:'290g',drop:'6mm',w:290,d:6,price:180},
  {name:'On Cloudeclipse',brand:'On',use:'easy and daily',miles:115},
  {name:'On Cloudmonster 3 Hyper',brand:'On',use:'long and tempo',miles:107},
  {name:'Adidas Adizero Finesse',brand:'Adidas',use:'track',miles:0}]};
 var GAPQ='One more thing. You’re training for the Miami Marathon and you don’t have a race shoe. Want me to look at some?';
-function cand(c){return{name:c.name,price:c.price,weight:c.w+'g',drop:c.d+'mm',feel:c.feel,about:c.why}}
+// Comparisons are worked out here, so Mo never has to do the math or guess.
+function cand(c,ref){
+ var cmp=[],same=SR.shoes.filter(function(x){return x.brand===c.brand});
+ if(same.length===1)cmp.push('same brand as your '+same[0].name);else if(same.length)cmp.push('same brand as '+same.length+' of your '+SR.shoes.length+' shoes');
+ SR.shoes.forEach(function(x){if(x.name!==c.name&&x.name.indexOf(c.name)===0)cmp.push('same family as your '+x.name+', which you use for '+x.use+' runs')});
+ if(ref&&ref.w){var dw=c.w-ref.w,dd=c.d-ref.d;
+  cmp.push(dw===0?'same weight as your '+ref.name:Math.abs(dw)+'g '+(dw<0?'lighter':'heavier')+' than your '+ref.name);
+  cmp.push(dd===0?'same '+c.d+'mm drop as your '+ref.name:Math.abs(dd)+'mm '+(dd<0?'lower':'higher')+' drop than your '+ref.name)}
+ return{name:c.name,price:c.price,weight:c.w+'g',drop:c.d+'mm',feel:c.feel,about:c.why,compared:cmp}}
 // Asks the model to choose and explain. Calls done(null) if it fails or is slow, so the scripted picks can step in.
 function askPicks(need,list,done){
  var mine=S,t0=Date.now(),fin=false;S.typing=true;render();scroll();
@@ -460,7 +468,7 @@ function askPicks(need,list,done){
  if(!window.fetch||!MO_URL)return end(null);
  var ctl=window.AbortController?new AbortController():null,t=setTimeout(function(){if(ctl)ctl.abort()},9000);
  fetch(MO_URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':MO_KEY},signal:ctl?ctl.signal:undefined,
-  body:JSON.stringify({runner:{weeklyMiles:SR.weeklyMiles,goal:SR.goal,budget:SR.budget,shoes:SR.shoes.map(function(x){return{name:x.name,use:x.use,miles:x.miles,weight:x.weight,drop:x.drop}})},need:need,candidates:list.map(cand)})})
+  body:JSON.stringify({runner:{weeklyMiles:SR.weeklyMiles,goal:SR.goal,budget:SR.budget,shoes:SR.shoes.map(function(x){return{name:x.name,use:x.use,miles:x.miles,weight:x.weight,drop:x.drop}})},need:need,candidates:list.map(function(c){return cand(c,SR.shoes.filter(function(x){return x.name===need.replaces})[0])})})})
   .then(function(r){if(!r.ok)throw new Error('status '+r.status);return r.json()})
   .then(function(d){end(d)},function(e){console.warn('Mo is using its scripted picks:',e&&e.message);end(null)})
   .then(function(){clearTimeout(t)});
