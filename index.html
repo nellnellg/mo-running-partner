@@ -317,6 +317,9 @@ svg.r{flex-shrink:0}
 var S, n=0, timers=[], view='home', mode='known';
 var TOPIC=/\b(eat|food|fuel|gels?|nutrition|drink|hydrat\w*|apparel|jacket|shorts|cloth\w*|wear|weather|clubs?|events?|news|injur\w*|pain|workouts?|stretch\w*|sleep|weight)\b/;
 var OFF='I can’t help with that yet. Right now I can check your shoe rotation and recommend shoes. Fuel, apparel, events and news are coming.';
+// Mo's model lives behind a Supabase function. The key below is the publishable one, which is safe in a page.
+var MO_URL='https://yyafrhtslqepaehjmccs.supabase.co/functions/v1/rapid-function';
+var MO_KEY='sb_publishable_9EKjd-osF2Cu635rVZJr-A_OIAB3ek5';
 var $=function(id){return document.getElementById(id)};
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function rabbit(w,kind,cls,big,live){
@@ -423,10 +426,26 @@ function set(p){for(var k in p)S[k]=p[k];render()}
 function later(ms,fn){timers.push(setTimeout(fn,ms))}
 function msg(who,kind,x){n++;var m={id:n,who:who,kind:kind};for(var k in (x||{}))m[k]=x[k];return m}
 function you(t,field){S.msgs.push(msg('you','text',{text:t,field:field||null}));$('ask').value='';render();scroll()}
-function mo(build,patch,ms){S.typing=true;render();scroll();later(ms||800,function(){S.msgs=S.msgs.concat(build());S.typing=false;set(patch||{});scroll()})}
+function mo(build,patch,ms){S.typing=true;render();scroll();later(ms||800,function(){var add=build();add.forEach(function(x){if(x.kind==='picks')askMo(x)});S.msgs=S.msgs.concat(add);S.typing=false;set(patch||{});scroll()})}
 function say(t,patch){mo(function(){return[msg('mo','text',{text:t})]},patch)}
 function scroll(){requestAnimationFrame(function(){requestAnimationFrame(function(){var el=$('scroller');el.scrollTo({top:el.scrollHeight,behavior:'smooth'})})})}
 function picksMsg(intro){return[msg('mo','text',{text:intro}),msg('mo','picks',{snap:L.snapOf(S)})]}
+// Asks the real model to write the reason on each card. If it fails or is slow, the scripted reasons stay.
+function askMo(m){
+ if(!window.fetch||!MO_URL)return;
+ var s=m.snap,ps=L.plan(s).picks,shoes=[];
+ if(s.daily)shoes.push({name:s.shoeName,use:'easy and daily',miles:s.shoeMiles});
+ if(s.flat)shoes.push({name:s.flatName||'race flat',use:'race day'});
+ var body={runner:{weeklyMiles:s.miles,goal:s.race==='none'?'no race, running for fitness':L.raceName(s.race),budget:s.budget,shoes:shoes},
+  need:{type:'rotation gaps',why:ps.map(function(p){return p.role.toLowerCase()}).join(', ')},
+  candidates:ps.map(function(p){return{name:p.name,price:p.price,job:p.role.toLowerCase(),feel:p.feel,about:p.why}})};
+ var ctl=window.AbortController?new AbortController():null,t=setTimeout(function(){if(ctl)ctl.abort()},8000);
+ fetch(MO_URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':MO_KEY},body:JSON.stringify(body),signal:ctl?ctl.signal:undefined})
+  .then(function(r){if(!r.ok)throw new Error('status '+r.status);return r.json()})
+  .then(function(d){var ai={};(d.picks||[]).forEach(function(p){if(p&&p.name&&p.reason)ai[p.name]=String(p.reason)});m.ai=ai;if(S.msgs.indexOf(m)>-1)render()})
+  .catch(function(e){console.warn('Mo is using its scripted reasons:',e&&e.message)})
+  .then(function(){clearTimeout(t)});
+}
 function rotationMsgs(lead){var w=L.worn(S),o=[msg('mo','text',{text:lead}),msg('mo','rotation',{snap:L.snapOf(S)})];
  if(w&&S.askReplace)o.push(msg('mo','text',{text:'One question first. Your '+S.shoeName+' has about '+S.shoeMiles+' miles on it. Do you want me to replace it, or keep it for easy runs a bit longer and focus on the gaps?'}));
  else o=o.concat(picksMsg(L.intro(S)));return o}
@@ -517,7 +536,7 @@ function render(){
   else if(m.kind==='rotation'){h+='<div class="ind card"><h2 class="lab">ROTATION CHECK</h2><div class="slots">';L.slots(m.snap||S).forEach(function(x){h+='<div class="slot"><b>'+x[0]+'</b><span class="badge '+x[1][1]+'">'+x[1][0]+'</span><small>'+esc(x[1][2])+'</small></div>'});h+='</div></div>'}
   else if(m.kind==='picks'){var pl=L.plan(m.snap),ps=pl.picks;
    if(m.id===last){latest=ps;h+='<div class="ind"><h2 class="sr">Mo’s picks</h2><div class="picks">';ps.forEach(function(p){var on=!!(S.chosen[p.key]&&S.chosen[p.key].name===p.name);
-     h+='<div class="pick'+(p.top?' top':'')+'"><div class="hd"><span class="lab">'+p.role+'</span>'+(p.top?'<span class="tp">Top pick</span>':p.later?'<span class="tp lt">Later</span>':'')+'</div><h3 class="nm">'+esc(p.name)+'</h3><span class="pr">$'+p.price+'</span><span class="fit">'+esc(p.fit)+'</span><span class="wy">'+esc(p.why)+'</span><span class="fl">Feel: '+p.feel+'</span><button type="button" data-add="'+p.key+'" class="'+(on?'on':'')+'" aria-pressed="'+on+'" aria-label="'+(on?'Remove '+esc(p.name)+' from plan':'Add '+esc(p.name)+' to plan')+'">'+(on?'Added to plan':'Add to plan')+'</button></div>'});
+     h+='<div class="pick'+(p.top?' top':'')+'"><div class="hd"><span class="lab">'+p.role+'</span>'+(p.top?'<span class="tp">Top pick</span>':p.later?'<span class="tp lt">Later</span>':'')+'</div><h3 class="nm">'+esc(p.name)+'</h3><span class="pr">$'+p.price+'</span><span class="fit">'+esc((m.ai&&m.ai[p.name])||p.fit)+'</span><span class="wy">'+esc(p.why)+'</span><span class="fl">Feel: '+p.feel+'</span><button type="button" data-add="'+p.key+'" class="'+(on?'on':'')+'" aria-pressed="'+on+'" aria-label="'+(on?'Remove '+esc(p.name)+' from plan':'Add '+esc(p.name)+' to plan')+'">'+(on?'Added to plan':'Add to plan')+'</button></div>'});
     h+='</div><div class="note '+(pl.ok?'ok':'warn')+'">'+esc(pl.text)+'</div><div class="cap">List prices from September 2026. Check retailers for current deals.</div></div>'}
    else h+='<div class="ind old"><span class="lab">EARLIER PICKS</span><span>'+ps.map(function(p){return esc(p.name)+' $'+p.price}).join(' · ')+'</span></div>'}
  });
