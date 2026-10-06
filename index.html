@@ -56,6 +56,8 @@ button.yb:hover{background:#45302A}
 .pick .fit{font-size:14px;line-height:1.45;font-weight:600}
 .pick .wy{font-size:13px;line-height:1.45;color:#4A4F57}
 .pick .fl{font-size:13px;color:#5B6068}
+.lk{display:flex;flex-wrap:wrap;gap:0 16px;font-size:14px;font-weight:600}
+.lk a{display:inline-flex;align-items:center;min-height:32px;color:#9A3412;text-decoration:underline}
 .pick button{margin-top:auto;height:44px;border-radius:10px;font-size:14px;font-weight:600;background:#fff;border:1px solid #D6D8DC}
 .pick button.on{background:#E8F5EC;color:#1E6B3A;border-color:#A7D7B5}
 .note{font-size:14px;line-height:1.5;padding:10px 14px;border-radius:12px;margin-top:10px}
@@ -362,17 +364,18 @@ var CAT={
   {brand:'Adidas',name:'Adidas Adizero SL2',price:130,soft:false,why:'A light, simple trainer that handles faster days for less.',feel:'Light and responsive'},
   {brand:'ASICS',name:'ASICS Superblast 2',price:200,soft:true,why:'A tall stack of bouncy foam, so fast days and long runs are easier on your legs.',feel:'Soft and bouncy'},
   {brand:'New Balance',name:'New Balance Rebel v5',price:140,soft:true,why:'Soft, bouncy foam in a light shoe that still feels quick.',feel:'Soft and light'}],
- easy:[{brand:'ASICS',name:'ASICS Novablast 6',price:155,soft:true,w:253,d:8,why:'Light and bouncy, the most versatile of the five.',feel:'Light and bouncy'},
-  {brand:'Hoka',name:'Hoka Clifton Pro',price:165,soft:true,w:270,d:8,why:'Soft and mellow, a comfortable ride for easy miles.',feel:'Soft and mellow'},
-  {brand:'New Balance',name:'New Balance 1080v15',price:170,soft:false,w:262,d:6,why:'A light, responsive trainer for daily miles.',feel:'Light and responsive'},
-  {brand:'Nike',name:'Nike Vomero Plus',price:180,soft:true,w:300,d:10,why:'A high stack of foam with a lot of bounce.',feel:'Soft and bouncy'},
-  {brand:'On',name:'On Cloudmonster 3',price:190,soft:false,w:275,d:5,why:'Same family as the Cloudmonster 3 Hyper, built for daily miles.',feel:'Cushioned and stable'}],
- race:[{brand:'On',name:'On Cloudboom Strike 2',price:230,soft:false,w:204,d:5,why:'A carbon plated racer that is supportive enough for training too.',feel:'Supportive and propulsive'},
-  {brand:'Hoka',name:'Hoka Rocket X3',price:250,soft:false,w:208,d:7,why:'A plated racer with a controlled ride.',feel:'Controlled and propulsive'},
-  {brand:'Puma',name:'Puma Fast-R Nitro Elite 3',price:250,soft:false,w:167,d:8,why:'A very light, efficient plated racer built for the marathon.',feel:'Light and propulsive'},
-  {brand:'ASICS',name:'ASICS Metaspeed Sky Tokyo',price:270,soft:true,w:169,d:5,why:'A light plated racer with a responsive bounce.',feel:'Bouncy and propulsive'},
-  {brand:'Adidas',name:'Adidas Adizero Adios Pro 5',price:275,soft:true,w:177,d:4,why:'An approachable plated racer, the newer version of the Adios Pro 4.',feel:'Soft and propulsive'}]
+ easy:[{brand:'ASICS',name:'ASICS Novablast 6',url:'https://www.asics.com/us/en-us/novablast-6/p/ANA_1011C243-002.html',price:155,soft:true,w:253,d:8,why:'Light and bouncy, the most versatile of the five.',feel:'Light and bouncy'},
+  {brand:'Hoka',name:'Hoka Clifton Pro',url:'https://www.hoka.com/en/us/mens-road/clifton-pro/1176510.html',price:165,soft:true,w:270,d:8,why:'Soft and mellow, a comfortable ride for easy miles.',feel:'Soft and mellow'},
+  {brand:'New Balance',name:'New Balance 1080v15',url:'https://www.newbalance.com/pd/1080v15/M1080V15_RU-FTW-802829-PMG-NA.html',price:170,soft:false,w:262,d:6,why:'A light, responsive trainer for daily miles.',feel:'Light and responsive'},
+  {brand:'Nike',name:'Nike Vomero Plus',url:'https://www.nike.com/t/vomero-plus-mens-road-running-shoes-5npsVBwT',price:180,soft:true,w:300,d:10,why:'A high stack of foam with a lot of bounce.',feel:'Soft and bouncy'},
+  {brand:'On',name:'On Cloudmonster 3',url:'https://www.on.com/en-us/products/cloudmonster-3-m-3mg1005/mens',price:190,soft:false,w:275,d:5,why:'Same family as the Cloudmonster 3 Hyper, built for daily miles.',feel:'Cushioned and stable'}],
+ race:[{brand:'On',name:'On Cloudboom Strike 2',url:'https://www.on.com/en-us/products/cloudboom-strike-2-u-3ug3005/unisex/aconite-verdite-shoes-3UG30056138',price:230,soft:false,w:204,d:5,why:'A carbon plated racer that is supportive enough for training too.',feel:'Supportive and propulsive'},
+  {brand:'Hoka',name:'Hoka Rocket X3',url:'https://www.hoka.com/en/us/race-shoes/rocket-x-3/1168724.html',price:250,soft:false,w:208,d:7,why:'A plated racer with a controlled ride.',feel:'Controlled and propulsive'},
+  {brand:'Puma',name:'Puma Fast-R Nitro Elite 3',url:'https://us.puma.com/us/en/pd/fast-r-nitro-elite-3-mens-road-running-shoes/312060',price:250,soft:false,w:167,d:8,why:'A very light, efficient plated racer built for the marathon.',feel:'Light and propulsive'},
+  {brand:'ASICS',name:'ASICS Metaspeed Sky Tokyo',url:'https://www.asics.com/us/en-us/metaspeed-sky-tokyo/p/ANA_1013A162-600.html',price:270,soft:true,w:169,d:5,why:'A light plated racer with a responsive bounce.',feel:'Bouncy and propulsive'},
+  {brand:'Adidas',name:'Adidas Adizero Adios Pro 5',url:'https://www.adidas.com/us/adizero-adios-pro-5-running-shoes/KI8294.html',price:275,soft:true,w:177,d:4,why:'An approachable plated racer, the newer version of the Adios Pro 4.',feel:'Soft and propulsive'}]
 };
+var STORES={On:'https://www.on.com/en-us/explore/stores',ASICS:'https://www.asics.com/us/en-us/stores/',Hoka:'https://stores.hoka.com','New Balance':'https://stores.newbalance.com/store-locator',Nike:'https://www.nike.com/retail',Puma:'https://stores.puma.com/us/en/browse/',Adidas:'https://www.adidas.com/us/stores'};
 var NAMES={speed:'speed shoe',easy:'easy day shoe',race:'race shoe'};
 var ART={speed:'a speed shoe',easy:'an easy day shoe',race:'a race shoe'};
 function nums(t){var m=String(t).replace(/,/g,'').match(/\d+(\.\d+)?/g);return m?m.map(Number):[]}
@@ -429,7 +432,7 @@ function refineText(kind,s,had){
  if(kind==='cushion')return s.cheaper?'Got it. I found softer shoes and kept the prices as low as I could.':'Got it. I swapped in softer versions for each role.';
  return had?'No problem. I took out the Saucony shoe and found a similar one from another brand. Everything else stays the same.':'No problem. None of these picks are Saucony, and I’ll keep it out from here on.'}
 function snapOf(s){return{race:s.race,miles:s.miles,daily:s.daily,flat:s.flat,flatName:s.flatName,shoeMiles:s.shoeMiles,shoeName:s.shoeName,replace:s.replace,budget:s.budget,cheaper:s.cheaper,cushion:s.cushion,avoid:s.avoid}}
-return{CAT:CAT,parseMiles:parseMiles,parseBudget:parseBudget,parseShoeMiles:parseShoeMiles,parseRace:parseRace,parseReplace:parseReplace,parseShoes:parseShoes,raceName:raceName,worn:worn,slots:slots,plan:plan,intro:intro,why:why,refineText:refineText,snapOf:snapOf,AVOID:AVOID};
+return{CAT:CAT,STORES:STORES,parseMiles:parseMiles,parseBudget:parseBudget,parseShoeMiles:parseShoeMiles,parseRace:parseRace,parseReplace:parseReplace,parseShoes:parseShoes,raceName:raceName,worn:worn,slots:slots,plan:plan,intro:intro,why:why,refineText:refineText,snapOf:snapOf,AVOID:AVOID};
 
 })();
 var ORDER=['speed','easy','race'];
@@ -447,7 +450,7 @@ function say(t,patch){mo(function(){return[msg('mo','text',{text:t})]},patch)}
 function scroll(){requestAnimationFrame(function(){requestAnimationFrame(function(){var el=$('scroller');el.scrollTo({top:el.scrollHeight,behavior:'smooth'})})})}
 // ----- The sample runner. Based on Nelson's own rotation, with the Cloudsurfer Max set to 410 miles and no race shoe. -----
 var SR={weeklyMiles:28,goal:'Miami Marathon on January 31, 2027',budget:200,shoes:[
- {name:'On Cloudsurfer Max',brand:'On',use:'easy and daily',miles:410,weight:'290g',drop:'6mm',w:290,d:6,price:180},
+ {name:'On Cloudsurfer Max',url:'https://www.on.com/en-us/products/cloudsurfer-max-m-3mf3043',brand:'On',use:'easy and daily',miles:410,weight:'290g',drop:'6mm',w:290,d:6,price:180},
  {name:'On Cloudeclipse',brand:'On',use:'easy and daily',miles:115},
  {name:'On Cloudmonster 3 Hyper',brand:'On',use:'long and tempo',miles:107},
  {name:'Adidas Adizero Finesse',brand:'Adidas',use:'track',miles:0}]};
@@ -477,7 +480,7 @@ function askPicks(need,list,done){
 function optsMsgs(key,role,list,d,fallText,fallFit,note,ok){
  var by={},items=[],ai=false;list.forEach(function(c){by[c.name]=c});
  function tidy(t){return String(t).replace(/'/g,'’')}
- function make(c,fit){return{key:key,role:role,name:c.name,price:c.price,fit:tidy(fit),spec:c.w+'g · '+c.d+'mm drop',feel:c.feel}}
+ function make(c,fit){return{key:key,role:role,name:c.name,price:c.price,fit:tidy(fit),spec:c.w+'g · '+c.d+'mm drop',feel:c.feel,brand:c.brand,url:c.url,store:L.STORES[c.brand]}}
  if(d&&d.picks)d.picks.forEach(function(p){var c=p&&by[p.name];if(c&&p.reason&&items.length<3&&!items.some(function(i){return i.name===c.name}))items.push(make(c,String(p.reason)))});
  if(items.length)ai=true;else items=list.slice().sort(function(a,b){return(b.brand==='On')-(a.brand==='On')}).slice(0,3).map(function(c){return make(c,fallFit(c))});
  items[0].top=true;
@@ -502,7 +505,7 @@ function sflow(act,label){
  if(S.typing)return;you(label);
  var old=SR.shoes[0];
  if(act==='options')showEasy();
- else if(act==='reorder'){S.chosen.easy={name:old.name,price:old.price};S.found=false;say('Easy. The '+old.name+' is $'+old.price+', which fits your $'+SR.budget+' budget, so I added it to your plan.',{stage:'wait'});later(2600,function(){say(GAPQ,{stage:'gap'})})}
+ else if(act==='reorder'){S.chosen.easy={name:old.name,price:old.price};S.found=false;mo(function(){return[msg('mo','text',{text:'Easy. The '+old.name+' is $'+old.price+', which fits your $'+SR.budget+' budget, so I added it to your plan.'}),msg('mo','links',{name:old.name,brand:old.brand,url:old.url,store:L.STORES[old.brand]})]},{stage:'wait'});later(2600,function(){say(GAPQ,{stage:'gap'})})}
  else if(act==='later'){say('No problem. You also have your On Cloudeclipse at 115 miles for easy days, so there’s no rush. I’ll check in again at 450 miles.',{stage:'wait'});later(2600,function(){say(GAPQ,{stage:'gap'})})}
  else if(act==='raceYes')say('Race shoes start around $230, which is over your $'+SR.budget+' budget. Want to see them anyway?',{stage:'over'});
  else if(act==='raceNo')say('Got it. I won’t bring it up again.',{stage:'sdone'});
@@ -518,6 +521,8 @@ function ssend(t,q){
  if(st==='sdone'&&/why|how/.test(q))return sflow('why',t);
  you(t);say(st==='wait'?'One second, I’m not done yet.':'That’s the whole sample flow for now. You can add a shoe to your plan, or start over.');
 }
+function links(name,brand,url,store){
+ return'<span class="lk">'+(url?'<a href="'+esc(url)+'" target="_blank" rel="noopener" aria-label="View the '+esc(name)+', opens in a new tab">View shoe</a>':'')+(store?'<a href="'+esc(store)+'" target="_blank" rel="noopener" aria-label="Find a store for '+esc(brand)+', opens in a new tab">Find a store</a>':'')+'</span>'}
 function picksMsg(intro){return[msg('mo','text',{text:intro}),msg('mo','picks',{snap:L.snapOf(S)})]}
 // Asks the real model to write the reason on each card. If it fails or is slow, the scripted reasons stay.
 function askMo(m){
@@ -627,9 +632,10 @@ function render(){
   else if(m.kind==='consent')h+='<div class="ind card"><h2 class="lab">WHAT MO WILL SEE</h2><div class="two"><div><b>Mo reads</b><ul><li>Your runs from the last 12 weeks</li><li>Distance, pace and run type</li><li>Heart rate from your watch</li><li>Your shoes and their mileage</li><li>Where your runs start, to find clubs and routes nearby</li></ul></div><div><b>Mo never</b><ul><li>Posts or changes anything</li><li>Tracks you between runs</li><li>Shares your data</li></ul></div></div><p class="cap">This is a demo. No real account is connected, and the data is a sample runner.</p></div>';
   else if(m.kind==='found')h+='<div class="ind card"><h2 class="lab">FROM STRAVA</h2><div class="rows"><div><span>Weekly miles</span><b>34 average</b></div><div><span>Runs per week</span><b>5, with 1 workout</b></div><div><span>Longest run</span><b>12 miles</b></div><div><span>Last run</span><b>Easy 5.2 miles, mostly zone 2</b></div><div><span>Nike Pegasus 41</span><b>412 miles</b></div><div><span>Nike Vaporfly 3</span><b>85 miles, races only</b></div></div></div>';
   else if(m.kind==='rotation'){h+='<div class="ind card"><h2 class="lab">ROTATION CHECK</h2><div class="slots">';L.slots(m.snap||S).forEach(function(x){h+='<div class="slot"><b>'+x[0]+'</b><span class="badge '+x[1][1]+'">'+x[1][0]+'</span><small>'+esc(x[1][2])+'</small></div>'});h+='</div></div>'}
+  else if(m.kind==='links')h+='<div class="ind">'+links(m.name,m.brand,m.url,m.store)+'</div>';
   else if(m.kind==='opts'){
    if(m.id===last){latest=m.items;h+='<div class="ind"><h2 class="sr">Mo’s picks</h2><div class="picks">';m.items.forEach(function(p){var on=!!(S.chosen[p.key]&&S.chosen[p.key].name===p.name);
-     h+='<div class="pick'+(p.top?' top':'')+'"><div class="hd"><span class="lab">'+p.role+'</span>'+(p.top?'<span class="tp">Top pick</span>':'')+'</div><h3 class="nm">'+esc(p.name)+'</h3><span class="pr">$'+p.price+'</span><span class="fit">'+esc(p.fit)+'</span><span class="wy">'+esc(p.spec)+'</span><span class="fl">Feel: '+p.feel+'</span><button type="button" data-pick="'+esc(p.name)+'" class="'+(on?'on':'')+'" aria-pressed="'+on+'" aria-label="'+(on?'Remove '+esc(p.name)+' from plan':'Add '+esc(p.name)+' to plan')+'">'+(on?'Added to plan':'Add to plan')+'</button></div>'});
+     h+='<div class="pick'+(p.top?' top':'')+'"><div class="hd"><span class="lab">'+p.role+'</span>'+(p.top?'<span class="tp">Top pick</span>':'')+'</div><h3 class="nm">'+esc(p.name)+'</h3><span class="pr">$'+p.price+'</span><span class="fit">'+esc(p.fit)+'</span><span class="wy">'+esc(p.spec)+'</span><span class="fl">Feel: '+p.feel+'</span>'+links(p.name,p.brand,p.url,p.store)+'<button type="button" data-pick="'+esc(p.name)+'" class="'+(on?'on':'')+'" aria-pressed="'+on+'" aria-label="'+(on?'Remove '+esc(p.name)+' from plan':'Add '+esc(p.name)+' to plan')+'">'+(on?'Added to plan':'Add to plan')+'</button></div>'});
     h+='</div><div class="note '+(m.ok?'ok':'warn')+'">'+esc(m.note)+'</div><div class="cap">List prices from fall 2026. Check retailers for current deals.</div></div>'}
    else h+='<div class="ind old"><span class="lab">EARLIER PICKS</span><span>'+m.items.map(function(p){return esc(p.name)+' $'+p.price}).join(' · ')+'</span></div>'}
   else if(m.kind==='picks'){var pl=L.plan(m.snap),ps=pl.picks;
