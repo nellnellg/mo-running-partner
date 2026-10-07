@@ -72,6 +72,10 @@ button.yb:hover{background:#45302A}
 .add .picked button{min-height:44px;border:0;background:transparent;color:#9A3412;font-size:14px;font-weight:600;text-decoration:underline}
 .add .go{height:48px;border-radius:12px;border:0;background:#2B1A12;color:#fff;font-size:15px;font-weight:600}
 .add .go:disabled{background:#E3E5E8;color:#5B6068;cursor:not-allowed}
+.rot{display:flex;flex-direction:column;gap:8px}
+.rot .rl{font-size:14px;font-weight:600;color:#5B6068}
+.saved{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:8px;font-size:13px;color:#5B6068}
+.saved button{min-height:32px;border:0;background:transparent;padding:0;color:#9A3412;font-size:13px;font-weight:600;text-decoration:underline}
 .mine{background:#FFF1E8;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;min-height:132px}
 .mine.empty{background:#F7F8F9;color:#5B6068;justify-content:center}
 .mine .use{font-size:13px;font-weight:600;color:#9A3412}
@@ -472,7 +476,7 @@ function fresh(){var s={msgs:[{id:0,who:'mo',kind:'text',text:'Hi, I’m Mo, you
  stage:'start',connected:false,flatName:null,resume:null,race:null,miles:null,daily:false,flat:false,shoeMiles:410,shoeName:'daily trainer',budget:null,replace:true,cheaper:false,cushion:false,avoid:false,chosen:{},typing:false,work:0,confirm:false,found:false};
  if(mode==='known'){s.sample=true;s.msgs[0].text='Hi, I’m Mo. Your On Cloudsurfer Max is over 400 miles, might want to change it soon. Most daily trainers last 300 to 500.\nWant to see some new options, or reorder the same shoe?';s.stage='alert';s.connected=true;s.race='full';s.miles=SR.weeklyMiles;s.budget=SR.budget}
  else{s.mine=true;s.form=newForm();ME=loadMe();
-  if(!ME.shoes.length){s.msgs[0].text='Hi, I’m Mo. Tell me about the shoe you’re thinking of replacing. It takes three taps.';s.msgs.push({id:-1,who:'mo',kind:'addshoe'});s.stage='add'}
+  if(!ME.shoes.length){s.msgs[0].text='Hi, I’m Mo. Tell me about the shoe you’re thinking of replacing. It takes three taps, and I’ll save it to your rotation so I remember it next time.';s.msgs.push({id:-1,who:'mo',kind:'addshoe'});s.stage='add'}
   else{var due=ME.shoes.filter(function(x){return x.miles>=400})[0];
    if(due){s.cur=due;s.msgs[0].text='Welcome back. Your '+due.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?';s.stage='mask'}
    else{s.msgs[0].text='Welcome back. Nothing in your rotation looks due yet. Want to add another shoe?';s.stage='mdone'}}}
@@ -587,14 +591,14 @@ function mineCard(name,b,u,last){
  return'<div class="mine'+(last==='name'?' pop':'')+'">'+(u!=null?'<span class="use'+(last==='u'?' pop':'')+'">'+USES[u][0]+'</span>':'')+'<h3>'+esc(name)+'</h3>'
   +(w?'<div class="bar"><i class="'+(last==='b'?'grow':'')+'" style="width:'+w.pct+'%;background:'+w.color+'"></i></div><span class="badge" style="'+w.bs+'">'+w.badge+'</span><span class="ln">'+w.line+'</span>':'')+'</div>'}
 function addForm(m,active){
- if(m.done){var d=m.done,bi=BUCKETS.map(function(x){return x[1]}).indexOf(d.miles),ui=USES.map(function(x){return x[1]}).indexOf(d.use);return'<div class="ind">'+mineCard(d.name,bi,ui,null)+'</div>'}
+ if(m.done){var d=m.done,bi=BUCKETS.map(function(x){return x[1]}).indexOf(d.miles),ui=USES.map(function(x){return x[1]}).indexOf(d.use);return'<div class="ind">'+mineCard(d.name,bi,ui,null)+'<div class="saved"><span>In your rotation, saved on this device</span><button type="button" data-act="rotation">See my rotation</button></div></div>'}
  if(!active)return'';
  var f=S.form,h='<div class="ind card add" role="group" aria-label="Add a shoe">';
  h+='<fieldset><legend>Which shoe are we replacing?</legend>'+(f.name?'<div class="picked"><span>'+esc(f.name)+'</span><button type="button" data-f="clear">Change</button></div>'
    :'<input id="shoeQ" class="q" type="text" autocomplete="off" placeholder="Search, like Cloudsurfer Max" aria-label="Search for your shoe" value="'+esc(f.q)+'"><div class="res" id="shoeRes">'+resHTML(f.q)+'</div>')+'</fieldset>';
  h+='<fieldset><legend>About how many miles are on it?</legend><div class="opts">'+BUCKETS.map(function(x,i){return'<button type="button" data-f="b" data-v="'+i+'" aria-pressed="'+(f.b===i)+'">'+x[0]+'</button>'}).join('')+'</div></fieldset>';
  h+='<fieldset><legend>What do you use it for?</legend><div class="opts">'+USES.map(function(x,i){return'<button type="button" data-f="u" data-v="'+i+'" aria-pressed="'+(f.u===i)+'">'+x[0]+'</button>'}).join('')+'</div></fieldset>';
- h+=mineCard(f.name,f.b,f.u,f.last)+'<button type="button" class="go" data-f="add"'+(f.name&&f.b!=null&&f.u!=null?'':' disabled')+'>Add shoe</button></div>';
+ h+='<div class="rot"><span class="rl">Your rotation</span>'+mineCard(f.name,f.b,f.u,f.last)+'</div><button type="button" class="go" data-f="add"'+(f.name&&f.b!=null&&f.u!=null?'':' disabled')+'>Add to my rotation</button></div>';
  f.last=null;return h}
 function pickName(nm){S.form.name=nm;S.form.last='name';render()}
 function formAct(b){
@@ -606,10 +610,10 @@ function formAct(b){
   ME.shoes=ME.shoes.filter(function(x){return x.name!==sh.name}).concat([sh]);saveMe();
   S.msgs.forEach(function(m){if(m.kind==='addshoe'&&!m.done)m.done=sh});S.cur=sh;S.form=newForm();S.stage='wait';afterAdd(sh)}}
 function afterAdd(sh){
- if(!sh.role)return say('Added. I don’t have track shoes in my catalog yet, so I’ll keep this one in your rotation for now.',{stage:'mdone'});
- if(sh.miles==null)return say('Added. Without a mileage I’ll go by feel, so tell me when your '+sh.name+' starts to feel flat. Want to see what else is out there?',{stage:'mask'});
- if(sh.miles>=400)return say('Added. Your '+sh.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?',{stage:'mask'});
- say('Added. Your '+sh.name+' probably has '+(sh.miles>=200?'some':'plenty of')+' life left, so there’s no rush. Want to look at something new anyway?',{stage:'mask'})}
+ if(!sh.role)return say('Added to your rotation. I don’t have track shoes in my catalog yet, so I’ll keep this one in your rotation for now.',{stage:'mdone'});
+ if(sh.miles==null)return say('Added to your rotation. Without a mileage I’ll go by feel, so tell me when your '+sh.name+' starts to feel flat. Want to see what else is out there?',{stage:'mask'});
+ if(sh.miles>=400)return say('Added to your rotation. Your '+sh.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?',{stage:'mask'});
+ say('Added to your rotation. Your '+sh.name+' probably has '+(sh.miles>=200?'some':'plenty of')+' life left, so there’s no rush. Want to look at something new anyway?',{stage:'mask'})}
 function myRunner(){return{budget:ME.budget&&ME.budget<9000?ME.budget:undefined,shoes:ME.shoes.map(function(x){var sp=SPEC[x.name]||{};return{name:x.name,brand:x.brand,use:x.use,miles:x.miles,w:sp.w,d:sp.d,weight:sp.w?sp.w+'g':undefined,drop:sp.d!=null?sp.d+'mm':undefined}})}}
 function showMine(force){
  var sh=S.cur,B=ME.budget||9999,all=L.CAT[sh.role].filter(function(c){return c.name!==sh.name}),inB=all.filter(function(c){return c.price<=B});
@@ -652,7 +656,7 @@ function home(){
  var C='cursor: default; background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px',BT='margin-top: auto; height: 44px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; ';
  g.innerHTML=ME.shoes.map(function(x){var w=wear(x.miles);
   return'<div style="'+C+'"><span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">'+esc(x.label.toUpperCase())+'</span><h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">'+esc(x.name)+'</h3><div style="height: 8px; border-radius: 999px; background: #EEF0F2; overflow: hidden"><div style="height: 8px; width: '+w.pct+'%; background: '+w.color+'; border-radius: 999px"></div></div><span style="align-self: flex-start; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; '+w.bs+'">'+w.badge+'</span><span style="font-size: 14px; line-height: 1.45; color: #33373D">'+w.line+'</span>'+(x.miles>=400?'<button type="button" data-act="chat" style="'+BT+'border: 0; background: #2B1A12; color: #FFFFFF">See what Mo suggests</button>':'')+'</div>'}).join('')
-  +'<div style="'+C+'; border-style: dashed; background: transparent"><h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">'+(ME.shoes.length?'Add another shoe':'No shoes yet')+'</h3><span style="font-size: 14px; line-height: 1.45; color: #33373D">'+(ME.shoes.length?'Mo learns your rotation one shoe at a time.':'Add the one you’re thinking of replacing. It takes three taps.')+'</span><button type="button" data-act="addshoe" style="'+BT+'border: 1px solid #2B1A12; background: #FFFFFF; color: #2B1A12">Add a shoe</button>'+(ME.shoes.length?'<button type="button" data-act="forget" style="min-height: 44px; border: 0; background: transparent; color: #9A3412; font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer; font-family: inherit">Clear my shoes</button>':'')+'</div>'}
+  +'<div style="'+C+'; border-style: dashed; background: transparent"><h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">'+(ME.shoes.length?'Add another shoe':'No shoes yet')+'</h3><span style="font-size: 14px; line-height: 1.45; color: #33373D">'+(ME.shoes.length?'Mo learns your rotation one shoe at a time.':'Add the one you’re thinking of replacing. It takes three taps, and Mo saves it here.')+'</span><button type="button" data-act="addshoe" style="'+BT+'border: 1px solid #2B1A12; background: #FFFFFF; color: #2B1A12">Add a shoe</button>'+(ME.shoes.length?'<button type="button" data-act="forget" style="min-height: 44px; border: 0; background: transparent; color: #9A3412; font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer; font-family: inherit">Clear my shoes</button>':'')+'</div>'}
 function picksMsg(intro){return[msg('mo','text',{text:intro}),msg('mo','picks',{snap:L.snapOf(S)})]}
 // Asks the real model to write the reason on each card. If it fails or is slow, the scripted reasons stay.
 function askMo(m){
@@ -824,6 +828,7 @@ document.addEventListener('click',function(e){
  if(b.dataset.f)return formAct(b);
  if(b.dataset.shoe)return pickName(b.dataset.shoe);
  if(b.dataset.act==='addshoe'){view='chat';if(S.stage!=='add'&&!S.typing){S.form=newForm();S.msgs.push(msg('mo','text',{text:'Sure. Tell me about the next one.'}),msg('mo','addshoe'));S.stage='add'}render();return scroll()}
+ if(b.dataset.act==='rotation'){S.confirm=false;view='home';render();return setTimeout(function(){$('rotation').scrollIntoView({behavior:window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})},60)}
  if(b.dataset.act==='forget'){ME={shoes:[]};saveMe();return start()}
  if(b.dataset.act==='chat'){view='chat';render();scroll();return setTimeout(function(){$('ask').focus()},50)}
  if(b.dataset.act==='mode'){mode=mode==='known'?'new':'known';start();if(mode==='new'){view='chat';render()}return}
