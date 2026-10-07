@@ -102,8 +102,7 @@ button.yb:hover{background:#45302A}
 .shelf .sfoot{display:flex;flex-direction:column;gap:10px;min-height:76px;font-size:14px;color:#6B5A50}
 .shelf.one .sfoot{min-height:21px}
 .shelf .sfoot .due{font-weight:600;color:#8A4B00}
-.shelf .slot{margin:8px 8px 0;border:1.5px dashed #C9A892;border-bottom:0;border-radius:14px 14px 0 0;background:#FBF6F2}
-.shelf .slot .name{color:#6B5A50}
+.shelf .vacant .name{color:#6B5A50}
 .shelf .txt{min-height:32px;border:0;background:transparent;padding:0;color:#9A3412;font-size:13px;font-weight:600;text-decoration:underline;text-align:left}
 .b1,.b2{height:44px;border-radius:10px;padding:0 16px;font-size:14px;font-weight:600}
 .b1{border:1.5px solid #2B1A12;background:#2B1A12;color:#fff}
@@ -143,7 +142,6 @@ button.yb:hover{background:#45302A}
 .shelf .shoe .mi{grid-column:2;grid-row:1 / span 2;font-size:52px;margin:0;align-self:center}
 .shelf .shoe .wearbar{grid-column:1 / -1;margin-top:8px}
 .shelf .shoe .sfoot{grid-column:1 / -1;min-height:0;margin-top:6px}
-.shelf .slot{margin:10px 10px 0}
 .pk .grid{grid-template-columns:1fr}
 .pk .top .name{font-size:40px}
 }
@@ -280,7 +278,7 @@ svg.r{flex-shrink:0}
 <article class="shoe"><span class="use">Easy days</span><h3 class="name"><span class="brand">On</span>Cloudeclipse</h3><p class="mi">115<small>mi</small></p><div class="wearbar"><i style="width:23%;background:#1E6B3A"></i></div><div class="sfoot">Plenty left</div></article>
 <article class="shoe"><span class="use">Long and tempo</span><h3 class="name"><span class="brand">On</span>Cloudmonster 3 Hyper</h3><p class="mi">107<small>mi</small></p><div class="wearbar"><i style="width:21%;background:#1E6B3A"></i></div><div class="sfoot">Plenty left</div></article>
 <article class="shoe"><span class="use">Track</span><h3 class="name"><span class="brand">Adidas</span>Adizero Finesse</h3><p class="mi">0<small>mi</small></p><div class="wearbar"><i style="width:2%;background:#1E6B3A"></i></div><div class="sfoot">Brand new</div></article>
-<article class="shoe slot"><span class="use">Race day</span><h3 class="name"><span class="brand">&nbsp;</span>Nothing yet</h3><p class="mi" style="visibility:hidden">0<small>mi</small></p><div class="wearbar" style="visibility:hidden"><i style="width:0%;background:#1E6B3A"></i></div><div class="sfoot"><span>No race shoe for Miami</span><button type="button" class="b2" data-act="chat">Find a race shoe</button></div></article>
+<article class="shoe vacant"><span class="use">Race day</span><h3 class="name"><span class="brand">&nbsp;</span>Nothing yet</h3><p class="mi" style="visibility:hidden">0<small>mi</small></p><div class="wearbar" style="visibility:hidden"><i style="width:0%;background:#1E6B3A"></i></div><div class="sfoot"><span>No race shoe for Miami</span><button type="button" class="b2" data-act="chat">Find a race shoe</button></div></article>
 </div>
 </section>
 <section id="week" style="display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 96px">
@@ -505,7 +503,7 @@ function fresh(){var s={msgs:[{id:0,who:'mo',kind:'text',text:'Hi, I’m Mo, you
  stage:'start',connected:false,flatName:null,resume:null,race:null,miles:null,daily:false,flat:false,shoeMiles:410,shoeName:'daily trainer',budget:null,replace:true,cheaper:false,cushion:false,avoid:false,chosen:{},typing:false,work:0,confirm:false,found:false};
  if(mode==='known'){s.sample=true;s.msgs[0].text='Hi, I’m Mo. Your On Cloudsurfer Max is over 400 miles, might want to change it soon. Most daily trainers last 300 to 500.\nWant to see some new options, or reorder the same shoe?';s.stage='alert';s.connected=true;s.race='full';s.miles=SR.weeklyMiles;s.budget=SR.budget}
  else{s.mine=true;s.form=newForm();ME=loadMe();
-  if(!ME.shoes.length){s.msgs[0].text='Hi, I’m Mo. Tell me about the shoe you’re thinking of replacing. It takes three taps, and I’ll save it to your rotation so I remember it next time.';s.msgs.push({id:-1,who:'mo',kind:'addshoe'});s.stage='add'}
+  if(!ME.shoes.length){s.msgs[0].text='Hi, I’m Mo. Tell me about a shoe you run in. It takes three taps, and I’ll save it to your rotation so I remember it next time.';s.msgs.push({id:-1,who:'mo',kind:'addshoe'});s.stage='add'}
   else{var due=ME.shoes.filter(function(x){return x.miles>=400})[0];
    if(due){s.cur=due;s.msgs[0].text='Welcome back. Your '+due.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?';s.stage='mask'}
    else{s.msgs[0].text='Welcome back. Nothing in your rotation looks due yet. Want to add another shoe?';s.stage='mdone'}}}
@@ -626,14 +624,14 @@ function wear(m){
  if(m>=200)return{pct:60,color:'#1E6B3A',badge:'Good for now',bs:'background:#E8F5EC;color:#1E6B3A',line:'200 to 400 miles, by your estimate'};
  return{pct:25,color:'#1E6B3A',badge:'Fresh',bs:'background:#E8F5EC;color:#1E6B3A',line:'Under 200 miles, by your estimate'}}
 function mineCard(name,b,u,last){
- if(!name)return'<div class="shelf one">'+shoeHTML({cls:' slot',name:'Your shoe',foot:'Shows up here as you answer'})+'</div>';
+ if(!name)return'<div class="shelf one">'+shoeHTML({cls:' vacant',name:'Your shoe',foot:'Shows up here as you answer'})+'</div>';
  var w=b==null?null:wear(BUCKETS[b][1]),br=brandOf(name);
  return'<div class="shelf one">'+shoeHTML({use:u!=null?USES[u][0]:'',brand:br,name:shortName(name,br),mi:w?miText(BUCKETS[b][1]):null,pct:w?w.pct:0,color:w?w.color:'',foot:w?(w.due?'<span class="due">Probably due</span>':w.line):'',pn:last==='name',pb:last==='b',pu:last==='u'})+'</div>'}
 function addForm(m,active){
  if(m.done){var d=m.done,bi=BUCKETS.map(function(x){return x[1]}).indexOf(d.miles),ui=USES.map(function(x){return x[1]}).indexOf(d.use);return'<div class="ind">'+mineCard(d.name,bi,ui,null)+'<div class="saved"><span>In your rotation, saved on this device</span><button type="button" data-act="rotation">See my rotation</button></div></div>'}
  if(!active)return'';
  var f=S.form,h='<div class="ind card add" role="group" aria-label="Add a shoe">';
- h+='<fieldset><legend>Which shoe are we replacing?</legend>'+(f.name?'<div class="picked"><span>'+esc(f.name)+'</span><button type="button" data-f="clear">Change</button></div>'
+ h+='<fieldset><legend>Which shoe do you run in?</legend>'+(f.name?'<div class="picked"><span>'+esc(f.name)+'</span><button type="button" data-f="clear">Change</button></div>'
    :'<input id="shoeQ" class="q" type="text" autocomplete="off" placeholder="Search, like Cloudsurfer Max" aria-label="Search for your shoe" value="'+esc(f.q)+'"><div class="res" id="shoeRes">'+resHTML(f.q)+'</div>')+'</fieldset>';
  h+='<fieldset><legend>About how many miles are on it?</legend><div class="opts">'+BUCKETS.map(function(x,i){return'<button type="button" data-f="b" data-v="'+i+'" aria-pressed="'+(f.b===i)+'">'+x[0]+'</button>'}).join('')+'</div></fieldset>';
  h+='<fieldset><legend>What do you use it for?</legend><div class="opts">'+USES.map(function(x,i){return'<button type="button" data-f="u" data-v="'+i+'" aria-pressed="'+(f.u===i)+'">'+x[0]+'</button>'}).join('')+'</div></fieldset>';
@@ -695,7 +693,7 @@ function home(){
  var k='m'+JSON.stringify(ME.shoes);if(g.dataset.k===k)return;g.dataset.k=k;
  g.innerHTML=ME.shoes.map(function(x){var w=wear(x.miles);
   return shoeHTML({use:x.label,brand:x.brand,name:shortName(x.name,x.brand),mi:miText(x.miles),pct:w.pct,color:w.color,foot:w.due?'<span class="due">Probably due</span><button type="button" class="b1" data-act="chat">See what Mo suggests</button>':w.line})}).join('')
-  +shoeHTML({cls:' slot',name:ME.shoes.length?'Add another':'No shoes yet',foot:'<span>'+(ME.shoes.length?'Mo learns your rotation one shoe at a time.':'It takes three taps, and Mo saves it here.')+'</span><button type="button" class="b2" data-act="addshoe">Add a shoe</button>'+(ME.shoes.length?'<button type="button" class="txt" data-act="forget">Clear my shoes</button>':'')})}
+  +shoeHTML({cls:' vacant',name:ME.shoes.length?'Add another':'No shoes yet',foot:'<span>'+(ME.shoes.length?'Mo learns your rotation one shoe at a time.':'Add a shoe you run in. It takes three taps, and Mo saves it here.')+'</span><button type="button" class="b2" data-act="addshoe">Add a shoe</button>'+(ME.shoes.length?'<button type="button" class="txt" data-act="forget">Clear my shoes</button>':'')})}
 function picksMsg(intro){return[msg('mo','text',{text:intro}),msg('mo','picks',{snap:L.snapOf(S)})]}
 // Asks the real model to write the reason on each card. If it fails or is slow, the scripted reasons stay.
 function askMo(m){
