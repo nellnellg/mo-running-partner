@@ -79,6 +79,11 @@ button.yb:hover{background:#45302A}
 .shelf .sfoot .due{font-weight:600;color:#8A4B00}
 .shelf .vacant .name{color:#6B5A50}
 .shelf .txt{min-height:32px;border:0;background:transparent;padding:0;color:#9A3412;font-size:13px;font-weight:600;text-decoration:underline;text-align:left}
+.raceline{display:flex;flex-wrap:wrap;align-items:center;gap:2px 12px;font-size:15px;min-height:32px}
+.raceline:empty{display:none}
+.raceline b{font-weight:600}
+.raceline button,.racedone button{min-height:32px;border:0;background:transparent;padding:0;color:#9A3412;font-size:14px;font-weight:600;text-decoration:underline}
+.racedone{font-size:15px;font-weight:600}
 .b1,.b2{height:44px;border-radius:10px;padding:0 16px;font-size:14px;font-weight:600}
 .b1{border:1.5px solid #2B1A12;background:#2B1A12;color:#fff}
 .b2{border:1.5px solid #2B1A12;background:transparent;color:#2B1A12}
@@ -210,6 +215,7 @@ svg.r{flex-shrink:0}
 </div>
 <div id="rotGrid" class="shelf"></div>
 </section>
+<div id="raceLine" class="raceline"></div>
 <span style="font-size: 13px; color: #5B6068">Mo estimates mileage from what you tell it, so it says “probably.”</span>
 </div>
 </div>
@@ -294,7 +300,7 @@ return{CAT:CAT,STORES:STORES,parseBudget:parseBudget};
 
 })();
 var ORDER=['speed','easy','race'];
-function fresh(){var s={msgs:[{id:0,who:'mo',kind:'text',text:''}],stage:'add',chosen:{},typing:false,confirm:false};
+function fresh(){var s={msgs:[{id:0,who:'mo',kind:'text',text:''}],stage:'add',chosen:{},typing:false,confirm:false,rf:{name:'',date:''}};
  {s.form=newForm();ME=loadMe();
   if(!ME.shoes.length){s.msgs[0].text='Hi, I’m Mo. Tell me about a shoe you run in. It takes three taps, and I’ll save it to your rotation so I remember it next time.';s.msgs.push({id:-1,who:'mo',kind:'addshoe'});s.stage='add'}
   else{var due=ME.shoes.filter(function(x){return x.miles>=400})[0];
@@ -390,6 +396,7 @@ function addForm(m,active){
 function pickName(nm){S.form.name=nm;S.form.last='name';render()}
 function formAct(b){
  var f=S.form,k=b.dataset.f;
+ if(k==='race')return saveRace();
  if(k==='clear'){f.name=null;f.q='';render();return setTimeout(function(){var q=$('shoeQ');if(q)q.focus()},30)}
  if(k==='b'||k==='u'){f[k]=+b.dataset.v;f.last=k;return render()}
  if(k==='add'&&f.name&&f.b!=null&&f.u!=null&&!S.typing){
@@ -397,26 +404,57 @@ function formAct(b){
   ME.shoes=ME.shoes.filter(function(x){return x.name!==sh.name}).concat([sh]);saveMe();
   S.msgs.forEach(function(m){if(m.kind==='addshoe'&&!m.done)m.done=sh;if(m.forForm)m.forForm=false});S.cur=sh;S.form=newForm();S.stage='wait';afterAdd(sh)}}
 function afterAdd(sh){
- if(!sh.role)return say('Added to your rotation. I don’t have track shoes in my catalog yet, so I’ll keep this one in your rotation for now.',{stage:'mdone'});
+ if(!sh.role){say('Added to your rotation. I don’t have track shoes in my catalog yet, so I’ll keep this one in your rotation for now.',{stage:'mdone'});return later(900,settle)}
  if(sh.miles==null)return say('Added to your rotation. Without a mileage I’ll go by feel, so tell me when your '+sh.name+' starts to feel flat. Want to see what else is out there?',{stage:'mask'});
  if(sh.miles>=400)return say('Added to your rotation. Your '+sh.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?',{stage:'mask'});
  say('Added to your rotation. Your '+sh.name+' probably has '+(sh.miles>=200?'some':'plenty of')+' life left, so there’s no rush. Want to look at something new anyway?',{stage:'mask'})}
-function myRunner(){return{budget:ME.budget&&ME.budget<9000?ME.budget:undefined,shoes:ME.shoes.map(function(x){var sp=SPEC[x.name]||{};return{name:x.name,brand:x.brand,use:x.use,miles:x.miles,w:sp.w,d:sp.d,weight:sp.w?sp.w+'g':undefined,drop:sp.d!=null?sp.d+'mm':undefined}})}}
+function myRunner(){return{goal:ME.race?ME.race.name+' on '+raceDate(ME.race.date):undefined,budget:ME.budget&&ME.budget<9000?ME.budget:undefined,shoes:ME.shoes.map(function(x){var sp=SPEC[x.name]||{};return{name:x.name,brand:x.brand,use:x.use,miles:x.miles,w:sp.w,d:sp.d,weight:sp.w?sp.w+'g':undefined,drop:sp.d!=null?sp.d+'mm':undefined}})}}
 function showMine(force){
  var sh=S.cur,B=ME.budget||9999,all=L.CAT[sh.role].filter(function(c){return c.name!==sh.name}),inB=all.filter(function(c){return c.price<=B});
- if(!inB.length&&!force){var min=Math.min.apply(null,all.map(function(c){return c.price}));return say('Nothing I have for '+sh.label.toLowerCase()+' is within $'+B+'. They start at $'+min+'. Want to see them anyway?',{stage:'mover'})}
- var list=inB.length?inB:all,rn=myRunner(),ref=rn.shoes.filter(function(x){return x.name===sh.name})[0],due=sh.miles>=400;PREF=sh.brand;
- askPicks({type:sh.use,why:due?sh.name+' is probably over 400 miles, by the runner’s own estimate.':'The runner wants to try something new for '+sh.use+' runs. Their '+sh.name+' still has life in it.',replaces:sh.name},list,function(d){
-  S.msgs=S.msgs.concat(optsMsgs(sh.role,due?'To replace your '+sh.name:'Something new for '+sh.label.toLowerCase(),list,d,
-   due?'Here are the ones I’d look at to replace your '+sh.name+'.':'Here are a few that would be a change from your '+sh.name+'.',
-   function(c){return c.brand&&c.brand===sh.brand?'Same brand as your '+sh.name+', if you want to stay with what you know.':c.w&&ref.w?(c.w<ref.w?'Lighter than your '+sh.name+' for the same kind of run.':'More shoe underfoot than your '+sh.name+' for the same kind of run.'):'A different take on the same kind of run as your '+sh.name+'.'},
+ if(!inB.length&&!force){var min=Math.min.apply(null,all.map(function(c){return c.price}));return say((sh.gap?'Race shoes start':'Shoes for '+sh.label.toLowerCase()+' start')+' around $'+min+', which is over your $'+B+'. Want to see them anyway?',{stage:'mover'})}
+ var list=inB.length?inB:all,rn=myRunner(),ref=rn.shoes.filter(function(x){return x.name===sh.name})[0]||{},due=sh.miles>=400;PREF=sh.brand;
+ var need=sh.gap?{type:sh.use,why:'The runner is training for the '+ME.race.name+' and has no race shoe in their rotation.'}
+  :{type:sh.use,why:due?sh.name+' is probably over 400 miles, by the runner’s own estimate.':'The runner wants to try something new for '+sh.use+' runs. Their '+sh.name+' still has life in it.',replaces:sh.name};
+ askPicks(need,list,function(d){
+  S.msgs=S.msgs.concat(optsMsgs(sh.role,sh.gap?'For the '+ME.race.name:due?'To replace your '+sh.name:'Something new for '+sh.label.toLowerCase(),list,d,
+   sh.gap?'Here are the ones I’d look at for the '+ME.race.name+'.':due?'Here are the ones I’d look at to replace your '+sh.name+'.':'Here are a few that would be a change from your '+sh.name+'.',
+   function(c){if(sh.gap)return c.brand&&c.brand===sh.brand?'Same brand as most of your rotation, built for race day.':'Built for race day, which is the one job your rotation doesn’t cover.';
+    return c.brand&&c.brand===sh.brand?'Same brand as your '+sh.name+', if you want to stay with what you know.':c.w&&ref.w?(c.w<ref.w?'Lighter than your '+sh.name+' for the same kind of run.':'More shoe underfoot than your '+sh.name+' for the same kind of run.'):'A different take on the same kind of run as your '+sh.name+'.'},
    !inB.length?'These are over your $'+B+' budget. You asked to see them anyway.':B>=9000?'You set no budget limit, so these come from the full list.':'All of these are within your $'+B+' budget.',!!inB.length));
-  S.typing=false;set({stage:'mdone'});scroll()},rn)}
+  S.typing=false;set({stage:'mdone'});scroll();settle()},rn)}
+// ----- The race: Mo asks once, saves it, and checks the rotation against it. -----
+function raceDate(d){return new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}
+function daysTo(d){return Math.ceil((new Date(d+'T12:00:00')-Date.now())/864e5)}
+function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+function hasRaceShoe(){return ME.shoes.some(function(x){return x.role==='race'})}
+function topBrand(){var n={},best='';ME.shoes.forEach(function(x){if(x.brand){n[x.brand]=(n[x.brand]||0)+1;if(!best||n[x.brand]>n[best])best=x.brand}});return best}
+// Once a conversation settles, Mo asks about a race if it never has.
+function settle(){if(ME.raceAsked||!ME.shoes.length)return;var mine=S;later(1800,function(){if(S!==mine||S.typing||S.stage!=='mdone')return;say('One more thing. Are you training for a race?',{stage:'rask'})})}
+function raceForm(m,active){
+ if(m.done)return'<div class="ind racedone">'+esc(m.done.name)+', '+raceDate(m.done.date)+'</div>';
+ if(!active)return'';
+ var f=S.rf,ok=f.name.trim().length>1&&f.date;
+ return'<div class="ind card add" role="group" aria-label="Your race"><fieldset><legend>Which race?</legend><input id="raceName" class="q" type="text" autocomplete="off" placeholder="Like Miami Marathon" aria-label="Race name" value="'+esc(f.name)+'"></fieldset>'
+  +'<fieldset><legend>When is it?</legend><input id="raceDate" class="q" type="date" aria-label="Race date" min="'+today()+'" value="'+esc(f.date)+'"></fieldset>'
+  +'<button type="button" class="go" id="raceSave" data-f="race"'+(ok?'':' disabled')+'>Save my race</button></div>'}
+function openRaceForm(lead){S.rf={name:ME.race?ME.race.name:'',date:ME.race?ME.race.date:''};S.msgs=S.msgs.filter(function(m){return!(m.kind==='raceform'&&!m.done)&&!m.forRace});
+ mo(function(){return[msg('mo','text',{text:lead,forRace:true}),msg('mo','raceform')]},{stage:'rform'})}
+function saveRace(){
+ var f=S.rf;if(!(f.name.trim().length>1&&f.date)||S.typing)return;
+ ME.race={name:f.name.trim(),date:f.date};ME.raceAsked=true;saveMe();
+ S.msgs.forEach(function(m){if(m.kind==='raceform'&&!m.done)m.done=ME.race;if(m.forRace)m.forRace=false});S.stage='wait';
+ var n=daysTo(ME.race.date),when=n<=0?'is today':n===1?'is tomorrow':'is '+n+' days away';
+ if(!hasRaceShoe()&&!ME.noRaceShoe)say('Saved. The '+ME.race.name+' '+when+', and you don’t have a race shoe in your rotation yet. Want me to look at some?',{stage:'rgap'});
+ else say('Saved. The '+ME.race.name+' '+when+'.',{stage:'mdone'})}
 function mflow(act,label){
  if(S.typing)return;you(label);
  if(act==='opts'){if(!S.cur||!S.cur.role)return say('I don’t have shoes for that kind of run in my catalog yet.',{stage:'mdone'});if(ME.budget==null)return say('What’s your budget for this one?',{stage:'mbudget'});showMine()}
  else if(act==='force')showMine(true);
- else if(act==='later')say('No problem. Your shoe is saved in this browser, so I’ll remember it next time.',{stage:'mdone'});
+ else if(act==='later'){say('No problem. Your shoe is saved in this browser, so I’ll remember it next time.',{stage:'mdone'});later(900,settle)}
+ else if(act==='raceYes')openRaceForm('Which race, and when is it?');
+ else if(act==='raceNo'){ME.raceAsked=true;saveMe();say('No problem. Tell me if that changes.',{stage:'mdone'})}
+ else if(act==='gapYes'){S.cur={gap:true,name:null,role:'race',label:'Race day',use:'race day',miles:null,brand:topBrand()};if(ME.budget==null)return say('What’s your budget for a race shoe?',{stage:'mbudget'});showMine()}
+ else if(act==='gapNo'){ME.noRaceShoe=true;saveMe();say('Got it. I won’t bring it up again.',{stage:'mdone'})}
  else if(act==='another'){S.form=newForm();mo(function(){return[msg('mo','text',{text:'Sure. Tell me about the next one.',forForm:true}),msg('mo','addshoe')]},{stage:'add'})}
 }
 function mbudget(v,label){if(S.typing)return;you(label);ME.budget=v||9999;saveMe();showMine()}
@@ -426,6 +464,10 @@ function msend(t,q){
  if(st==='mask')return mflow(/\bno\b|not|later|nah/.test(q)?'later':'opts',t);
  if(st==='mbudget'){v=L.parseBudget(t);if(v)return mbudget(v,t);you(t);return say('A dollar amount works, like $180.')}
  if(st==='mover')return mflow(/\bno\b|not|later|nah/.test(q)?'later':'force',t);
+ if(st==='rask')return mflow(/\bno\b|not|nah|nope/.test(q)?'raceNo':'raceYes',t);
+ if(st==='rgap')return mflow(/\bno\b|not|nah|else|other/.test(q)?'gapNo':'gapYes',t);
+ if(st==='rform'){if(!S.rf.name){S.rf.name=t;$('ask').value='';return render()}return}
+ if(/\brace\b|marathon|\b5k\b|\b10k\b/.test(q)&&st==='mdone'){you(t);return openRaceForm(ME.race?'Sure. Here’s your race.':'Which race, and when is it?')}
  if(st==='mdone'&&/add|another|new shoe/.test(q))return mflow('another',t);
  you(t);say(st==='wait'?'One second, I’m not done yet.':'I can add another shoe to your rotation whenever you like.');
 }
@@ -435,6 +477,9 @@ function replies(){
  if(S.stage==='mbudget')return[['$150','mb',150],['$200','mb',200],['$250','mb',250],['No limit','mb',0]];
  if(S.stage==='mover')return[['Show me anyway','m','force'],['Not now','m','later']];
  if(S.stage==='mdone')return[['Add another shoe','m','another']];
+ if(S.stage==='rask')return[['Yes','m','raceYes'],['Not right now','m','raceNo']];
+ if(S.stage==='rgap')return[['Yes, show me','m','gapYes'],['No, I race in something else','m','gapNo']];
+ if(S.stage==='rform')return[];
  if(S.stage==='add'||S.stage==='wait')return[];
  return[];
 }
@@ -447,6 +492,7 @@ function render(){
   if(m.who==='you'){h+='<div class="you"><div class="yb">'+esc(m.text)+'</div></div>';return}
   if(m.kind==='text')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'</div></div>';
   else if(m.kind==='addshoe')h+=addForm(m,S.stage==='add'&&m.id===lastAdd);
+  else if(m.kind==='raceform')h+=raceForm(m,S.stage==='rform');
   else if(m.kind==='opts'){
    if(m.id===last){latest=m.items;h+='<div class="ind pk"><h2 class="sr">Mo’s picks</h2><p class="forwhat">'+esc(m.items[0].role)+'</p><div class="grid'+(m.items.length===1?' solo':'')+'">'+m.items.map(pickHTML).join('')+'</div><p class="budget'+(m.ok?'':' warn')+'">'+esc(m.note)+'</p><div class="cap">List prices from fall 2026. Check retailers for current deals.</div></div>'}
    else h+='<div class="ind old"><span>Earlier picks</span><span>'+m.items.map(function(p){return esc(p.name)+' $'+p.price}).join(', ')+'</span></div>'}
@@ -464,10 +510,13 @@ function render(){
  $('sheetWrap').hidden=view!=='chat';document.body.style.overflow=view==='chat'?'hidden':'';
  var ck=String(S.confirm)+view;
  if(ck!==render.hdrKey){render.hdrKey=ck;$('shdr').innerHTML=S.confirm?'<span class="cq">Start over and clear your pick?</span><button class="ghost" id="yes" type="button">Yes, start over</button><button class="ghost" id="no" type="button">Cancel</button>':'<button class="ghost" id="restart" type="button">Start over</button>'}
- $('ask').placeholder={add:'Or type your shoe’s name…',mask:'Yes or not now…',mbudget:'Around $180…',mover:'Show me anyway, or not now…',mdone:'Message Mo'}[S.stage]||'Message Mo';
+ $('ask').placeholder={add:'Or type your shoe’s name…',mask:'Yes or not now…',mbudget:'Around $180…',rask:'Yes or not right now…',rgap:'Yes or no…',rform:'Type the race name…',mover:'Show me anyway, or not now…',mdone:'Message Mo'}[S.stage]||'Message Mo';
 }
 // The home screen shows the runner's shelf, saved in this browser.
 function home(){
+ var rl=$('raceLine'),rk=JSON.stringify(ME.race||0)+ME.shoes.length+today();
+ if(rl.dataset.k!==rk){rl.dataset.k=rk;var nd=ME.race?daysTo(ME.race.date):0;
+  rl.innerHTML=ME.race?'<span>Training for the <b>'+esc(ME.race.name)+'</b> on '+raceDate(ME.race.date)+(nd>1?', '+nd+' days away':nd===1?', tomorrow':nd===0?', today':'')+'</span><button type="button" data-act="race">Change</button>':ME.shoes.length?'<button type="button" data-act="race">Add a race</button>':''}
  var g=$('rotGrid'),k=JSON.stringify(ME.shoes);if(g.dataset.k===k)return;g.dataset.k=k;
  g.innerHTML=ME.shoes.map(function(x){var w=wear(x.miles);
   return shoeHTML({use:x.label,brand:x.brand,name:shortName(x.name,x.brand),mi:miText(x.miles),pct:w.pct,color:w.color,foot:w.due?'<span class="due">Probably due</span><button type="button" class="b1" data-act="suggest" data-name="'+esc(x.name)+'">See what Mo suggests</button>':w.line})}).join('')
@@ -489,6 +538,7 @@ document.addEventListener('click',function(e){
   S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();S.cur=sg;S.confirm=false;view='chat';
   you('What do you suggest for my '+sg.name+'?');if(ME.budget==null)say('What’s your budget for this one?',{stage:'mbudget'});else showMine();return scroll()}
  if(b.dataset.act==='sample'){ME={shoes:SAMPLE.map(function(x){var o={added:Date.now()};for(var k in x)o[k]=x[k];return o})};saveMe();return start()}
+ if(b.dataset.act==='race'){if(S.typing)return;S.confirm=false;view='chat';S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();openRaceForm(ME.race?'Sure. Here’s your race.':'Which race, and when is it?');return scroll()}
  if(b.dataset.act==='forget'){ME={shoes:[]};saveMe();return start()}
  if(b.dataset.act==='chat'){view='chat';render();scroll();return setTimeout(function(){$('ask').focus()},50)}
  if(b.id==='goHome'){S.confirm=false;view='home';return render()}
@@ -500,7 +550,7 @@ document.addEventListener('click',function(e){
 });
 $('logo').innerHTML=rabbit(48,'idle','',false,true);
 $('backdrop').addEventListener('click',function(){S.confirm=false;view='home';render()});
-$('chat').addEventListener('input',function(e){if(e.target.id==='shoeQ'){S.form.q=e.target.value;$('shoeRes').innerHTML=resHTML(S.form.q)}});
+$('chat').addEventListener('input',function(e){if(e.target.id==='raceName'||e.target.id==='raceDate'){S.rf[e.target.id==='raceName'?'name':'date']=e.target.value;var sv=$('raceSave');if(sv)sv.disabled=!(S.rf.name.trim().length>1&&S.rf.date);return}if(e.target.id==='shoeQ'){S.form.q=e.target.value;$('shoeRes').innerHTML=resHTML(S.form.q)}});
 $('chat').addEventListener('keydown',function(e){if(e.target.id==='shoeQ'&&e.key==='Enter'){e.preventDefault();var first=$('shoeRes').querySelector('button');if(first)pickName(first.dataset.shoe)}});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&view==='chat'){S.confirm=false;view='home';render()}});
 $('form').addEventListener('submit',function(e){e.preventDefault();send()});
