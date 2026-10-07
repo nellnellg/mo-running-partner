@@ -47,6 +47,11 @@ button.yb:hover{background:#45302A}
 .add .res{display:flex;flex-direction:column}
 .add .res button{min-height:44px;text-align:left;border:0;border-bottom:1px solid #EEF0F2;background:transparent;padding:8px 2px;font-size:15px}
 .add .res button:hover{background:#FBF6F2}
+.add .races button{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0 12px}
+.add .races b{font-weight:600}
+.add .races span{font-size:13px;color:#6B5A50}
+.add .chosen{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:16px}
+.add .chosen button{min-height:32px;border:0;background:transparent;padding:0;color:#9A3412;font-size:14px;font-weight:600;text-decoration:underline}
 .add .opts{display:flex;flex-wrap:wrap;gap:8px}
 .add .opts button{min-height:44px;padding:8px 16px;border-radius:999px;border:1px solid #D6D8DC;background:#fff;font-size:14px;font-weight:500}
 .add .opts button[aria-pressed="true"]{background:#2B1A12;border-color:#2B1A12;color:#fff}
@@ -397,6 +402,7 @@ function pickName(nm){S.form.name=nm;S.form.last='name';render()}
 function formAct(b){
  var f=S.form,k=b.dataset.f;
  if(k==='race')return saveRace();
+ if(k==='raceAgain'){S.rf={name:'',date:'',picked:false};render();var rn=$('raceName');if(rn)rn.focus();return}
  if(k==='clear'){f.name=null;f.q='';render();return setTimeout(function(){var q=$('shoeQ');if(q)q.focus()},30)}
  if(k==='b'||k==='u'){f[k]=+b.dataset.v;f.last=k;return render()}
  if(k==='add'&&f.name&&f.b!=null&&f.u!=null&&!S.typing){
@@ -430,14 +436,21 @@ function hasRaceShoe(){return ME.shoes.some(function(x){return x.role==='race'})
 function topBrand(){var n={},best='';ME.shoes.forEach(function(x){if(x.brand){n[x.brand]=(n[x.brand]||0)+1;if(!best||n[x.brand]>n[best])best=x.brand}});return best}
 // Once a conversation settles, Mo asks about a race if it never has.
 function settle(){if(ME.raceAsked||!ME.shoes.length)return;var mine=S;later(1800,function(){if(S!==mine||S.typing||S.stage!=='mdone')return;say('One more thing. Are you training for a race?',{stage:'rask'})})}
+// Races Mo knows. Dates come from each race's own site, checked October 7, 2026. No date means Mo asks the runner.
+var RACES=[['Chicago Marathon','Chicago','2026-10-11'],['New York City Marathon','New York','2026-11-01'],['Boston Marathon','Boston','2027-04-19'],['London Marathon','London',''],['Berlin Marathon','Berlin','2027-09-26'],['Tokyo Marathon','Tokyo','2027-03-07'],['Sydney Marathon','Sydney','2027-08-29'],['Miami Marathon','Miami','2027-01-31'],['Miami Half Marathon','Miami','2027-01-31'],['Marine Corps Marathon','Washington, DC','2026-10-25'],['Philadelphia Marathon','Philadelphia','2026-11-22'],['California International Marathon','Sacramento','2026-12-06'],['Houston Marathon','Houston','2027-01-17'],['Houston Half Marathon','Houston','2027-01-17'],['Los Angeles Marathon','Los Angeles','2027-03-07'],['Walt Disney World Marathon','Orlando',''],['Honolulu Marathon','Honolulu','2026-12-13'],['Twin Cities Marathon','Minneapolis',''],['Grandma’s Marathon','Duluth','2027-06-19'],['Big Sur Marathon','Big Sur','2027-04-25'],['Austin Marathon','Austin','2027-02-14'],['Dallas Marathon','Dallas','2026-12-13'],['Richmond Marathon','Richmond','2026-11-14'],['Indianapolis Monumental Marathon','Indianapolis','2026-11-07'],['Detroit Free Press Marathon','Detroit','2026-10-18'],['Jacksonville Marathon','Jacksonville',''],['A1A Marathon','Fort Lauderdale','2027-02-14'],['Fort Lauderdale 13.1','Fort Lauderdale','2026-11-08'],['Space Coast Marathon','Cocoa','2026-11-22'],['Palm Beaches Marathon','West Palm Beach','2026-12-13'],['Naples Half Marathon','Naples','2027-01-17'],['Key West Half Marathon','Key West','2027-01-17'],['Gasparilla Distance Classic','Tampa',''],['Miami Beach Halloween Half Marathon','Miami Beach','2026-10-24'],['Miami Turkey Trot','Miami','2026-11-26'],['Paris Marathon','Paris',''],['Valencia Marathon','Valencia','2026-12-06'],['Amsterdam Marathon','Amsterdam',''],['Toronto Waterfront Marathon','Toronto','2026-10-18'],['NYC Half','New York',''],['Brooklyn Half','Brooklyn',''],['Peachtree Road Race','Atlanta','2027-07-04'],['Cherry Blossom Ten Mile','Washington, DC','2027-04-04'],['Bolder Boulder','Boulder','2027-05-31'],['Bay to Breakers','San Francisco','2027-05-16'],['Broad Street Run','Philadelphia','']];
+function findRaces(q){q=q.trim().toLowerCase();if(q.length<2)return[];var w=q.split(/\s+/),t=today();return RACES.filter(function(r){var l=(r[0]+' '+r[1]).toLowerCase();return w.every(function(x){return l.indexOf(x)>-1})}).slice(0,5).map(function(r){return{name:r[0],city:r[1],date:r[2]>=t?r[2]:''}})}
+function raceRes(q){var t=q.trim(),r=findRaces(t),h=r.map(function(x){return'<button type="button" data-race="'+esc(x.name)+'" data-date="'+x.date+'"><b>'+esc(x.name)+'</b><span>'+(x.date?raceDate(x.date):'Add the date')+'</span></button>'}).join('');
+ if(t.length>=3&&!r.some(function(x){return x.name.toLowerCase()===t.toLowerCase()}))h+='<button type="button" data-race="'+esc(t)+'" data-date="">Use “'+esc(t)+'”</button>';return h}
+function pickRace(name,date){if(S.typing||S.stage!=='rform')return;S.rf={name:name,date:date,picked:true};if(date)return saveRace();render();var d=$('raceDate');if(d)d.focus()}
 function raceForm(m,active){
  if(m.done)return'<div class="ind racedone">'+esc(m.done.name)+', '+raceDate(m.done.date)+'</div>';
  if(!active)return'';
  var f=S.rf,ok=f.name.trim().length>1&&f.date;
- return'<div class="ind card add" role="group" aria-label="Your race"><fieldset><legend>Which race?</legend><input id="raceName" class="q" type="text" autocomplete="off" placeholder="Like Miami Marathon" aria-label="Race name" value="'+esc(f.name)+'"></fieldset>'
+ if(!f.picked)return'<div class="ind card add" role="group" aria-label="Your race"><fieldset><legend>Which race?</legend><input id="raceName" class="q" type="text" autocomplete="off" placeholder="Search, like Miami" aria-label="Search for your race" value="'+esc(f.name)+'"><div class="res races" id="raceRes">'+raceRes(f.name)+'</div></fieldset></div>';
+ return'<div class="ind card add" role="group" aria-label="Your race"><fieldset><legend>Which race?</legend><div class="chosen"><b>'+esc(f.name)+'</b><button type="button" data-f="raceAgain">Change</button></div></fieldset>'
   +'<fieldset><legend>When is it?</legend><input id="raceDate" class="q" type="date" aria-label="Race date" min="'+today()+'" value="'+esc(f.date)+'"></fieldset>'
   +'<button type="button" class="go" id="raceSave" data-f="race"'+(ok?'':' disabled')+'>Save my race</button></div>'}
-function openRaceForm(lead){S.rf={name:ME.race?ME.race.name:'',date:ME.race?ME.race.date:''};S.msgs=S.msgs.filter(function(m){return!(m.kind==='raceform'&&!m.done)&&!m.forRace});
+function openRaceForm(lead){S.rf=ME.race?{name:ME.race.name,date:ME.race.date,picked:true}:{name:'',date:'',picked:false};S.msgs=S.msgs.filter(function(m){return!(m.kind==='raceform'&&!m.done)&&!m.forRace});
  mo(function(){return[msg('mo','text',{text:lead,forRace:true}),msg('mo','raceform')]},{stage:'rform'})}
 function saveRace(){
  var f=S.rf;if(!(f.name.trim().length>1&&f.date)||S.typing)return;
@@ -451,7 +464,7 @@ function mflow(act,label){
  if(act==='opts'){if(!S.cur||!S.cur.role)return say('I don’t have shoes for that kind of run in my catalog yet.',{stage:'mdone'});if(ME.budget==null)return say('What’s your budget for this one?',{stage:'mbudget'});showMine()}
  else if(act==='force')showMine(true);
  else if(act==='later'){say('No problem. Your shoe is saved in this browser, so I’ll remember it next time.',{stage:'mdone'});later(900,settle)}
- else if(act==='raceYes')openRaceForm('Which race, and when is it?');
+ else if(act==='raceYes')openRaceForm('Search for it and I’ll fill in the date when I know it.');
  else if(act==='raceNo'){ME.raceAsked=true;saveMe();say('No problem. Tell me if that changes.',{stage:'mdone'})}
  else if(act==='gapYes'){S.cur={gap:true,name:null,role:'race',label:'Race day',use:'race day',miles:null,brand:topBrand()};if(ME.budget==null)return say('What’s your budget for a race shoe?',{stage:'mbudget'});showMine()}
  else if(act==='gapNo'){ME.noRaceShoe=true;saveMe();say('Got it. I won’t bring it up again.',{stage:'mdone'})}
@@ -467,7 +480,7 @@ function msend(t,q){
  if(st==='rask')return mflow(/\bno\b|not|nah|nope/.test(q)?'raceNo':'raceYes',t);
  if(st==='rgap')return mflow(/\bno\b|not|nah|else|other/.test(q)?'gapNo':'gapYes',t);
  if(st==='rform'){if(!S.rf.name){S.rf.name=t;$('ask').value='';return render()}return}
- if(/\brace\b|marathon|\b5k\b|\b10k\b/.test(q)&&st==='mdone'){you(t);return openRaceForm(ME.race?'Sure. Here’s your race.':'Which race, and when is it?')}
+ if(/\brace\b|marathon|\b5k\b|\b10k\b/.test(q)&&st==='mdone'){you(t);return openRaceForm(ME.race?'Sure. Here’s your race.':'Search for it and I’ll fill in the date when I know it.')}
  if(st==='mdone'&&/add|another|new shoe/.test(q))return mflow('another',t);
  you(t);say(st==='wait'?'One second, I’m not done yet.':'I can add another shoe to your rotation whenever you like.');
 }
@@ -532,13 +545,14 @@ document.addEventListener('click',function(e){
  var b=e.target.closest('button');if(!b)return;
  if(b.dataset.f)return formAct(b);
  if(b.dataset.shoe)return pickName(b.dataset.shoe);
+ if(b.dataset.race)return pickRace(b.dataset.race,b.dataset.date||'');
  if(b.dataset.act==='addshoe'){view='chat';if(S.stage!=='add'&&!S.typing){S.form=newForm();S.msgs.push(msg('mo','text',{text:'Sure. Tell me about the next one.',forForm:true}),msg('mo','addshoe'));S.stage='add'}render();return scroll()}
  if(b.dataset.act==='rotation'){S.confirm=false;view='home';render();return setTimeout(function(){$('rotation').scrollIntoView({behavior:window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})},60)}
  if(b.dataset.act==='suggest'){var sg=ME.shoes.filter(function(x){return x.name===b.dataset.name})[0];if(!sg||S.typing)return;
   S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();S.cur=sg;S.confirm=false;view='chat';
   you('What do you suggest for my '+sg.name+'?');if(ME.budget==null)say('What’s your budget for this one?',{stage:'mbudget'});else showMine();return scroll()}
  if(b.dataset.act==='sample'){ME={shoes:SAMPLE.map(function(x){var o={added:Date.now()};for(var k in x)o[k]=x[k];return o})};saveMe();return start()}
- if(b.dataset.act==='race'){if(S.typing)return;S.confirm=false;view='chat';S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();openRaceForm(ME.race?'Sure. Here’s your race.':'Which race, and when is it?');return scroll()}
+ if(b.dataset.act==='race'){if(S.typing)return;S.confirm=false;view='chat';S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();openRaceForm(ME.race?'Sure. Here’s your race.':'Search for it and I’ll fill in the date when I know it.');return scroll()}
  if(b.dataset.act==='forget'){ME={shoes:[]};saveMe();return start()}
  if(b.dataset.act==='chat'){view='chat';render();scroll();return setTimeout(function(){$('ask').focus()},50)}
  if(b.id==='goHome'){S.confirm=false;view='home';return render()}
@@ -550,8 +564,8 @@ document.addEventListener('click',function(e){
 });
 $('logo').innerHTML=rabbit(48,'idle','',false,true);
 $('backdrop').addEventListener('click',function(){S.confirm=false;view='home';render()});
-$('chat').addEventListener('input',function(e){if(e.target.id==='raceName'||e.target.id==='raceDate'){S.rf[e.target.id==='raceName'?'name':'date']=e.target.value;var sv=$('raceSave');if(sv)sv.disabled=!(S.rf.name.trim().length>1&&S.rf.date);return}if(e.target.id==='shoeQ'){S.form.q=e.target.value;$('shoeRes').innerHTML=resHTML(S.form.q)}});
-$('chat').addEventListener('keydown',function(e){if(e.target.id==='shoeQ'&&e.key==='Enter'){e.preventDefault();var first=$('shoeRes').querySelector('button');if(first)pickName(first.dataset.shoe)}});
+$('chat').addEventListener('input',function(e){if(e.target.id==='raceName'){S.rf.name=e.target.value;$('raceRes').innerHTML=raceRes(S.rf.name);return}if(e.target.id==='raceDate'){S.rf.date=e.target.value;var sv=$('raceSave');if(sv)sv.disabled=!S.rf.date;return}if(e.target.id==='shoeQ'){S.form.q=e.target.value;$('shoeRes').innerHTML=resHTML(S.form.q)}});
+$('chat').addEventListener('keydown',function(e){if(e.target.id==='raceName'&&e.key==='Enter'){e.preventDefault();var fr=$('raceRes').querySelector('button');if(fr)pickRace(fr.dataset.race,fr.dataset.date||'');return}if(e.target.id==='shoeQ'&&e.key==='Enter'){e.preventDefault();var first=$('shoeRes').querySelector('button');if(first)pickName(first.dataset.shoe)}});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&view==='chat'){S.confirm=false;view='home';render()}});
 $('form').addEventListener('submit',function(e){e.preventDefault();send()});
 $('askHome').addEventListener('submit',function(e){e.preventDefault();var t=$('askH').value.trim();$('askH').value='';view='chat';render();if(t){$('ask').value=t;send()}else scroll()});
