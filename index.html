@@ -58,6 +58,32 @@ button.yb:hover{background:#45302A}
 .pick .fl{font-size:13px;color:#5B6068}
 .lk{display:flex;flex-wrap:wrap;gap:0 16px;font-size:14px;font-weight:600}
 .lk a{display:inline-flex;align-items:center;min-height:32px;color:#9A3412;text-decoration:underline}
+.add{display:flex;flex-direction:column;gap:20px}
+.add fieldset{border:0;padding:0;margin:0;min-width:0;display:flex;flex-direction:column;gap:8px}
+.add legend{padding:0;margin-bottom:8px;font-size:16px;font-weight:600}
+.add .q{width:100%;height:48px;border:1px solid #D6D8DC;border-radius:12px;padding:0 14px;font-size:16px;background:#fff}
+.add .res{display:flex;flex-direction:column}
+.add .res button{min-height:44px;text-align:left;border:0;border-bottom:1px solid #EEF0F2;background:transparent;padding:8px 2px;font-size:15px}
+.add .res button:hover{background:#FBF6F2}
+.add .opts{display:flex;flex-wrap:wrap;gap:8px}
+.add .opts button{min-height:44px;padding:8px 16px;border-radius:999px;border:1px solid #D6D8DC;background:#fff;font-size:14px;font-weight:500}
+.add .opts button[aria-pressed="true"]{background:#2B1A12;border-color:#2B1A12;color:#fff}
+.add .picked{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:16px;font-weight:600}
+.add .picked button{min-height:44px;border:0;background:transparent;color:#9A3412;font-size:14px;font-weight:600;text-decoration:underline}
+.add .go{height:48px;border-radius:12px;border:0;background:#2B1A12;color:#fff;font-size:15px;font-weight:600}
+.add .go:disabled{background:#E3E5E8;color:#5B6068;cursor:not-allowed}
+.mine{background:#FFF1E8;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;min-height:132px}
+.mine.empty{background:#F7F8F9;color:#5B6068;justify-content:center}
+.mine .use{font-size:13px;font-weight:600;color:#9A3412}
+.mine h3{margin:0;font-size:22px;font-weight:700;line-height:1.2;letter-spacing:-0.01em}
+.mine .bar{height:10px;border-radius:999px;background:#fff;overflow:hidden}
+.mine .bar i{display:block;height:10px;border-radius:999px}
+.mine .ln{font-size:14px;color:#33373D}
+.pop{animation:mopop .35s ease-out}
+.grow{animation:mogrow .5s ease-out}
+@keyframes mopop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes mogrow{from{width:0}}
+@media (prefers-reduced-motion:reduce){.pop,.grow{animation:none}}
 .pick button{margin-top:auto;height:44px;border-radius:10px;font-size:14px;font-weight:600;background:#fff;border:1px solid #D6D8DC}
 .pick button.on{background:#E8F5EC;color:#1E6B3A;border-color:#A7D7B5}
 .note{font-size:14px;line-height:1.5;padding:10px 14px;border-radius:12px;margin-top:10px}
@@ -147,7 +173,7 @@ svg.r{flex-shrink:0}
 <input id="askH" type="text" autocomplete="off" placeholder="Ask Mo about your shoes" style="flex-grow: 1; min-width: 0; border: 0; outline: none; font-size: 16px; height: 48px; background: transparent; color: #2B1A12; font-family: inherit">
 <button type="submit" aria-label="Ask Mo" style="width: 48px; height: 48px; border-radius: 50%; border: 0; background: #2B1A12; color: #FFFFFF; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"></path><path d="M5 12l7-7 7 7"></path></svg></button>
 </form>
-<div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center">
+<div id="navRow" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center">
 <button type="button" data-act="chat" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid #2B1A12; background: #2B1A12; color: #FFFFFF; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; font-family: inherit">Shoes</button>
 <a href="#week" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px dashed #C4C8CE; background: transparent; color: #4A4F57; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">Apparel</a>
 <a href="#week" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px dashed #C4C8CE; background: transparent; color: #4A4F57; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">Fuel</a>
@@ -155,7 +181,7 @@ svg.r{flex-shrink:0}
 <a href="#near" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px dashed #C4C8CE; background: transparent; color: #4A4F57; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">Run clubs</a>
 <a href="#news" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px dashed #C4C8CE; background: transparent; color: #4A4F57; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">News</a>
 </div>
-<span style="font-size: 13px; color: #5B6068">Showing a sample runner who has already connected Strava: 28 miles a week, Miami Marathon on January 31, home in Miami, visiting Chicago.</span>
+<span id="sampleLine" style="font-size: 13px; color: #5B6068">Showing a sample runner who has already connected Strava: 28 miles a week, Miami Marathon on January 31, home in Miami, visiting Chicago.</span>
 <button type="button" id="modeBtn" data-act="mode" style="min-height: 44px; padding: 0 14px; border: 0; background: transparent; color: #9A3412; font-size: 14px; font-weight: 600; text-decoration: underline; cursor: pointer; font-family: inherit">See what a new runner sees</button>
 </div>
 <section id="lastrun" style="display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 96px">
@@ -184,9 +210,9 @@ svg.r{flex-shrink:0}
 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
 <h2 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">Your rotation</h2>
 
-<span style="font-size: 14px; color: #5B6068">From Strava, updated after every run</span>
+<span id="rotSub" style="font-size: 14px; color: #5B6068">From Strava, updated after every run</span>
 </div>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+<div id="rotGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
 <div style="cursor: default; background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
 <span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">EASY DAYS</span>
 <h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">On Cloudsurfer Max</h3>
@@ -302,7 +328,7 @@ svg.r{flex-shrink:0}
 </div>
 </div>
 </section>
-<span style="font-size: 13px; color: #5B6068">The shoe rotation flow is the part you can try today. The other rows show where Mo is headed. Events, routes and stories here are examples, not real listings.</span>
+<span id="homeNote" style="font-size: 13px; color: #5B6068">The shoe rotation flow is the part you can try today. The other rows show where Mo is headed. Events, routes and stories here are examples, not real listings.</span>
 </div>
 </div>
 <div id="sheetWrap" class="sheetWrap" hidden>
@@ -330,7 +356,12 @@ svg.r{flex-shrink:0}
 </div>
 <script>
 (function(){
-var S, n=0, timers=[], view='home', mode='known';
+// ----- A runner's own shoes, saved in this browser. -----
+var KEY='mo.runner';
+function loadMe(){try{var r=JSON.parse(localStorage.getItem(KEY)||'null');return r&&Array.isArray(r.shoes)?r:{shoes:[]}}catch(e){return{shoes:[]}}}
+function saveMe(){try{localStorage.setItem(KEY,JSON.stringify(ME))}catch(e){}}
+var ME=loadMe();
+var S, n=0, timers=[], view='home', mode=ME.shoes.length?'new':'known';
 var TOPIC=/\b(eat|food|fuel|gels?|nutrition|drink|hydrat\w*|apparel|jacket|shorts|cloth\w*|wear|weather|clubs?|events?|news|injur\w*|pain|workouts?|stretch\w*|sleep|weight)\b/;
 var OFF='I can’t help with that yet. Right now I can check your shoe rotation and recommend shoes. Fuel, apparel, events and news are coming.';
 // Mo's model lives behind a Supabase function. The key below is the publishable one, which is safe in a page.
@@ -440,6 +471,11 @@ function Q(k){return{start:'Want to connect Strava, or tell me yourself?',consen
 function fresh(){var s={msgs:[{id:0,who:'mo',kind:'text',text:'Hi, I’m Mo, your running partner. I’ll keep up with your training and help with the gear you need along the way.\nThe fastest way to start is to connect Strava, so I can see your training and your shoes. Or you can tell me yourself.'}],
  stage:'start',connected:false,flatName:null,resume:null,race:null,miles:null,daily:false,flat:false,shoeMiles:410,shoeName:'daily trainer',budget:null,replace:true,cheaper:false,cushion:false,avoid:false,chosen:{},typing:false,work:0,confirm:false,found:false};
  if(mode==='known'){s.sample=true;s.msgs[0].text='Hi, I’m Mo. Your On Cloudsurfer Max is over 400 miles, might want to change it soon. Most daily trainers last 300 to 500.\nWant to see some new options, or reorder the same shoe?';s.stage='alert';s.connected=true;s.race='full';s.miles=SR.weeklyMiles;s.budget=SR.budget}
+ else{s.mine=true;s.form=newForm();ME=loadMe();
+  if(!ME.shoes.length){s.msgs[0].text='Hi, I’m Mo. Tell me about the shoe you’re thinking of replacing. It takes three taps.';s.msgs.push({id:-1,who:'mo',kind:'addshoe'});s.stage='add'}
+  else{var due=ME.shoes.filter(function(x){return x.miles>=400})[0];
+   if(due){s.cur=due;s.msgs[0].text='Welcome back. Your '+due.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?';s.stage='mask'}
+   else{s.msgs[0].text='Welcome back. Nothing in your rotation looks due yet. Want to add another shoe?';s.stage='mdone'}}}
  return s}
 function set(p){for(var k in p)S[k]=p[k];render()}
 function later(ms,fn){timers.push(setTimeout(fn,ms))}
@@ -454,24 +490,25 @@ var SR={weeklyMiles:28,goal:'Miami Marathon on January 31, 2027',budget:200,shoe
  {name:'On Cloudeclipse',brand:'On',use:'easy and daily',miles:115},
  {name:'On Cloudmonster 3 Hyper',brand:'On',use:'long and tempo',miles:107},
  {name:'Adidas Adizero Finesse',brand:'Adidas',use:'track',miles:0}]};
+var PREF='On';
 var GAPQ='One more thing. You’re training for the Miami Marathon and you don’t have a race shoe. Want me to look at some?';
 // Comparisons are worked out here, so Mo never has to do the math or guess.
-function cand(c,ref){
- var cmp=[],same=SR.shoes.filter(function(x){return x.brand===c.brand});
- if(same.length===1)cmp.push('same brand as your '+same[0].name);else if(same.length)cmp.push('same brand as '+same.length+' of your '+SR.shoes.length+' shoes');
- SR.shoes.forEach(function(x){if(x.name!==c.name&&x.name.indexOf(c.name)===0)cmp.push('same family as your '+x.name+', which you use for '+x.use+' runs')});
- if(ref&&ref.w){var dw=c.w-ref.w,dd=c.d-ref.d;
+function cand(c,ref,shoes){
+ var cmp=[],same=shoes.filter(function(x){return x.brand&&x.brand===c.brand});
+ if(same.length===1)cmp.push('same brand as your '+same[0].name);else if(same.length)cmp.push('same brand as '+same.length+' of your '+shoes.length+' shoes');
+ shoes.forEach(function(x){if(x.name!==c.name&&x.name.indexOf(c.name)===0)cmp.push('same family as your '+x.name+', which you use for '+x.use+' runs')});
+ if(ref&&ref.w&&c.w){var dw=c.w-ref.w,dd=c.d-ref.d;
   cmp.push(dw===0?'same weight as your '+ref.name:Math.abs(dw)+'g '+(dw<0?'lighter':'heavier')+' than your '+ref.name);
   cmp.push(dd===0?'same '+c.d+'mm drop as your '+ref.name:Math.abs(dd)+'mm '+(dd<0?'lower':'higher')+' drop than your '+ref.name)}
- return{name:c.name,price:c.price,weight:c.w+'g',drop:c.d+'mm',feel:c.feel,about:c.why,compared:cmp}}
+ return{name:c.name,price:c.price,weight:c.w?c.w+'g':undefined,drop:c.d!=null?c.d+'mm':undefined,feel:c.feel,about:c.why,compared:cmp}}
 // Asks the model to choose and explain. Calls done(null) if it fails or is slow, so the scripted picks can step in.
-function askPicks(need,list,done){
- var mine=S,t0=Date.now(),fin=false;S.typing=true;render();scroll();
+function askPicks(need,list,done,rn){
+ rn=rn||SR;var mine=S,t0=Date.now(),fin=false;S.typing=true;render();scroll();
  function end(d){if(fin||S!==mine)return;fin=true;later(Math.max(0,900-(Date.now()-t0)),function(){done(d)})}
  if(!window.fetch||!MO_URL)return end(null);
  var ctl=window.AbortController?new AbortController():null,t=setTimeout(function(){if(ctl)ctl.abort()},9000);
  fetch(MO_URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':MO_KEY},signal:ctl?ctl.signal:undefined,
-  body:JSON.stringify({runner:{weeklyMiles:SR.weeklyMiles,goal:SR.goal,budget:SR.budget,shoes:SR.shoes.map(function(x){return{name:x.name,use:x.use,miles:x.miles,weight:x.weight,drop:x.drop}})},need:need,candidates:list.map(function(c){return cand(c,SR.shoes.filter(function(x){return x.name===need.replaces})[0])})})})
+  body:JSON.stringify({runner:{weeklyMiles:rn.weeklyMiles,goal:rn.goal,budget:rn.budget,shoes:rn.shoes.map(function(x){return{name:x.name,use:x.use,miles:x.miles==null?undefined:x.miles,weight:x.weight,drop:x.drop}})},need:need,candidates:list.map(function(c){return cand(c,rn.shoes.filter(function(x){return x.name===need.replaces})[0],rn.shoes)})})})
   .then(function(r){if(!r.ok)throw new Error('status '+r.status);return r.json()})
   .then(function(d){end(d)},function(e){console.warn('Mo is using its scripted picks:',e&&e.message);end(null)})
   .then(function(){clearTimeout(t)});
@@ -480,12 +517,13 @@ function askPicks(need,list,done){
 function optsMsgs(key,role,list,d,fallText,fallFit,note,ok){
  var by={},items=[],ai=false;list.forEach(function(c){by[c.name]=c});
  function tidy(t){return String(t).replace(/'/g,'’')}
- function make(c,fit){return{key:key,role:role,name:c.name,price:c.price,fit:tidy(fit),spec:c.w+'g · '+c.d+'mm drop',feel:c.feel,brand:c.brand,url:c.url,store:L.STORES[c.brand]}}
+ function make(c,fit){return{key:key,role:role,name:c.name,price:c.price,fit:tidy(fit),spec:c.w?c.w+'g · '+c.d+'mm drop':c.why,feel:c.feel,brand:c.brand,url:c.url,store:L.STORES[c.brand]}}
  if(d&&d.picks)d.picks.forEach(function(p){var c=p&&by[p.name];if(c&&p.reason&&items.length<3&&!items.some(function(i){return i.name===c.name}))items.push(make(c,String(p.reason)))});
- if(items.length)ai=true;else items=list.slice().sort(function(a,b){return(b.brand==='On')-(a.brand==='On')}).slice(0,3).map(function(c){return make(c,fallFit(c))});
+ if(items.length)ai=true;else items=list.slice().sort(function(a,b){return(b.brand===PREF)-(a.brand===PREF)}).slice(0,3).map(function(c){return make(c,fallFit(c))});
  items[0].top=true;
  return[msg('mo','text',{text:ai&&d.message?tidy(d.message):fallText}),msg('mo','opts',{items:items,note:note,ok:ok})]}
 function showEasy(){
+ PREF='On';
  var list=L.CAT.easy.filter(function(c){return c.price<=SR.budget});
  askPicks({type:'easy day',why:'On Cloudsurfer Max is at 410 miles. Most daily trainers last 300 to 500.',replaces:'On Cloudsurfer Max'},list,function(d){
   S.msgs=S.msgs.concat(optsMsgs('easy','REPLACES: EASY DAYS',list,d,
@@ -494,6 +532,7 @@ function showEasy(){
    'All of these are within your $'+SR.budget+' budget.',true));
   S.typing=false;set({stage:'wait'});scroll();later(1600,function(){say(GAPQ,{stage:'gap'})})})}
 function showRace(){
+ PREF='On';
  var list=L.CAT.race;
  askPicks({type:'race day',why:'Training for the Miami Marathon with no race shoe. Every race shoe is over the $'+SR.budget+' budget, and the runner asked to see them anyway.'},list,function(d){
   S.msgs=S.msgs.concat(optsMsgs('race','FILLS: RACE DAY',list,d,
@@ -523,6 +562,97 @@ function ssend(t,q){
 }
 function links(name,brand,url,store){
  return'<span class="lk">'+(url?'<a href="'+esc(url)+'" target="_blank" rel="noopener" aria-label="View the '+esc(name)+', opens in a new tab">View shoe</a>':'')+(store?'<a href="'+esc(store)+'" target="_blank" rel="noopener" aria-label="Find a store for '+esc(brand)+', opens in a new tab">Find a store</a>':'')+'</span>'}
+// ----- The three tap start: which shoe, about how many miles, what it's for. -----
+var BUCKETS=[['Under 200',150],['200 to 400',300],['Over 400',425],['Not sure',null]];
+var USES=[['Easy days','easy and daily','easy'],['Long and tempo','long and tempo','speed'],['Race day','race day','race'],['Track','track',null]];
+var BRANDS=['On','ASICS','Hoka','Nike','Adidas','New Balance','Puma','Brooks','Saucony','Mizuno','Altra'];
+var SPEC={},KNOWN=[];
+(function(){var seen={};function add(nm){if(!seen[nm]){seen[nm]=1;KNOWN.push(nm)}}
+ ['easy','speed','race'].forEach(function(k){L.CAT[k].forEach(function(c){add(c.name);if(c.w)SPEC[c.name]={w:c.w,d:c.d}})});
+ SR.shoes.forEach(function(x){add(x.name);if(x.w)SPEC[x.name]={w:x.w,d:x.d}});
+ ['Adidas Adizero Adios Pro 4','Nike Pegasus 42','Nike Pegasus 41','Nike Vomero 18','Hoka Clifton 11','Hoka Mach 7','Hoka Cielo X1 3.0','Brooks Glycerin Max 2','Brooks Hyperion Elite 5','Saucony Ride 19','Saucony Triumph 24','Saucony Endorphin Elite 3','Mizuno Wave Rider 30','Puma Velocity Nitro 4','Puma Deviate Nitro Elite 4','ASICS Gel-Kayano 33','ASICS Metaspeed Edge Tokyo','On Cloudsurfer 2','New Balance SC Elite v5','Altra Torin 8'].forEach(add)})();
+function brandOf(nm){var q=(nm+' ').toLowerCase();return BRANDS.filter(function(b){return q.indexOf(b.toLowerCase()+' ')===0})[0]||''}
+function newForm(){return{q:'',name:null,b:null,u:null,last:null}}
+function findShoes(q){q=q.trim().toLowerCase();if(q.length<2)return[];var w=q.split(/\s+/);return KNOWN.filter(function(nm){var l=nm.toLowerCase();return w.every(function(x){return l.indexOf(x)>-1})}).slice(0,5)}
+function resHTML(q){var t=q.trim(),r=findShoes(t),h=r.map(function(nm){return'<button type="button" data-shoe="'+esc(nm)+'">'+esc(nm)+'</button>'}).join('');
+ if(t.length>=3&&!r.some(function(nm){return nm.toLowerCase()===t.toLowerCase()}))h+='<button type="button" data-shoe="'+esc(t)+'">Use “'+esc(t)+'”</button>';return h}
+function wear(m){
+ if(m==null)return{pct:0,color:'#C9CDD2',badge:'Mileage unknown',bs:'background:#EEF0F2;color:#4A4F57',line:'No mileage yet, so Mo goes by feel'};
+ if(m>=400)return{pct:85,color:'#E08A00',badge:'Probably due',bs:'background:#FFF4E0;color:#8A4B00',line:'Over 400 miles, by your estimate'};
+ if(m>=200)return{pct:60,color:'#2E9B57',badge:'Good for now',bs:'background:#E8F5EC;color:#1E6B3A',line:'200 to 400 miles, by your estimate'};
+ return{pct:25,color:'#2E9B57',badge:'Fresh',bs:'background:#E8F5EC;color:#1E6B3A',line:'Under 200 miles, by your estimate'}}
+function mineCard(name,b,u,last){
+ if(!name)return'<div class="mine empty"><span>Your shoe shows up here as you answer.</span></div>';
+ var w=b==null?null:wear(BUCKETS[b][1]);
+ return'<div class="mine'+(last==='name'?' pop':'')+'">'+(u!=null?'<span class="use'+(last==='u'?' pop':'')+'">'+USES[u][0]+'</span>':'')+'<h3>'+esc(name)+'</h3>'
+  +(w?'<div class="bar"><i class="'+(last==='b'?'grow':'')+'" style="width:'+w.pct+'%;background:'+w.color+'"></i></div><span class="badge" style="'+w.bs+'">'+w.badge+'</span><span class="ln">'+w.line+'</span>':'')+'</div>'}
+function addForm(m,active){
+ if(m.done){var d=m.done,bi=BUCKETS.map(function(x){return x[1]}).indexOf(d.miles),ui=USES.map(function(x){return x[1]}).indexOf(d.use);return'<div class="ind">'+mineCard(d.name,bi,ui,null)+'</div>'}
+ if(!active)return'';
+ var f=S.form,h='<div class="ind card add" role="group" aria-label="Add a shoe">';
+ h+='<fieldset><legend>Which shoe are we replacing?</legend>'+(f.name?'<div class="picked"><span>'+esc(f.name)+'</span><button type="button" data-f="clear">Change</button></div>'
+   :'<input id="shoeQ" class="q" type="text" autocomplete="off" placeholder="Search, like Cloudsurfer Max" aria-label="Search for your shoe" value="'+esc(f.q)+'"><div class="res" id="shoeRes">'+resHTML(f.q)+'</div>')+'</fieldset>';
+ h+='<fieldset><legend>About how many miles are on it?</legend><div class="opts">'+BUCKETS.map(function(x,i){return'<button type="button" data-f="b" data-v="'+i+'" aria-pressed="'+(f.b===i)+'">'+x[0]+'</button>'}).join('')+'</div></fieldset>';
+ h+='<fieldset><legend>What do you use it for?</legend><div class="opts">'+USES.map(function(x,i){return'<button type="button" data-f="u" data-v="'+i+'" aria-pressed="'+(f.u===i)+'">'+x[0]+'</button>'}).join('')+'</div></fieldset>';
+ h+=mineCard(f.name,f.b,f.u,f.last)+'<button type="button" class="go" data-f="add"'+(f.name&&f.b!=null&&f.u!=null?'':' disabled')+'>Add shoe</button></div>';
+ f.last=null;return h}
+function pickName(nm){S.form.name=nm;S.form.last='name';render()}
+function formAct(b){
+ var f=S.form,k=b.dataset.f;
+ if(k==='clear'){f.name=null;f.q='';render();return setTimeout(function(){var q=$('shoeQ');if(q)q.focus()},30)}
+ if(k==='b'||k==='u'){f[k]=+b.dataset.v;f.last=k;return render()}
+ if(k==='add'&&f.name&&f.b!=null&&f.u!=null&&!S.typing){
+  var sh={name:f.name,brand:brandOf(f.name),label:USES[f.u][0],use:USES[f.u][1],role:USES[f.u][2],miles:BUCKETS[f.b][1],added:Date.now()};
+  ME.shoes=ME.shoes.filter(function(x){return x.name!==sh.name}).concat([sh]);saveMe();
+  S.msgs.forEach(function(m){if(m.kind==='addshoe'&&!m.done)m.done=sh});S.cur=sh;S.form=newForm();S.stage='wait';afterAdd(sh)}}
+function afterAdd(sh){
+ if(!sh.role)return say('Added. I don’t have track shoes in my catalog yet, so I’ll keep this one in your rotation for now.',{stage:'mdone'});
+ if(sh.miles==null)return say('Added. Without a mileage I’ll go by feel, so tell me when your '+sh.name+' starts to feel flat. Want to see what else is out there?',{stage:'mask'});
+ if(sh.miles>=400)return say('Added. Your '+sh.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?',{stage:'mask'});
+ say('Added. Your '+sh.name+' probably has '+(sh.miles>=200?'some':'plenty of')+' life left, so there’s no rush. Want to look at something new anyway?',{stage:'mask'})}
+function myRunner(){return{budget:ME.budget&&ME.budget<9000?ME.budget:undefined,shoes:ME.shoes.map(function(x){var sp=SPEC[x.name]||{};return{name:x.name,brand:x.brand,use:x.use,miles:x.miles,w:sp.w,d:sp.d,weight:sp.w?sp.w+'g':undefined,drop:sp.d!=null?sp.d+'mm':undefined}})}}
+function showMine(force){
+ var sh=S.cur,B=ME.budget||9999,all=L.CAT[sh.role].filter(function(c){return c.name!==sh.name}),inB=all.filter(function(c){return c.price<=B});
+ if(!inB.length&&!force){var min=Math.min.apply(null,all.map(function(c){return c.price}));return say('Nothing I have for '+sh.label.toLowerCase()+' is within $'+B+'. They start at $'+min+'. Want to see them anyway?',{stage:'mover'})}
+ var list=inB.length?inB:all,rn=myRunner(),ref=rn.shoes.filter(function(x){return x.name===sh.name})[0],due=sh.miles>=400;PREF=sh.brand;
+ askPicks({type:sh.use,why:due?sh.name+' is probably over 400 miles, by the runner’s own estimate.':'The runner wants to try something new for '+sh.use+' runs. Their '+sh.name+' still has life in it.',replaces:sh.name},list,function(d){
+  S.msgs=S.msgs.concat(optsMsgs(sh.role,(due?'REPLACES: ':'FOR: ')+sh.label.toUpperCase(),list,d,
+   due?'Here are the ones I’d look at to replace your '+sh.name+'.':'Here are a few that would be a change from your '+sh.name+'.',
+   function(c){return c.brand&&c.brand===sh.brand?'Same brand as your '+sh.name+', if you want to stay with what you know.':c.w&&ref.w?(c.w<ref.w?'Lighter than your '+sh.name+' for the same kind of run.':'More shoe underfoot than your '+sh.name+' for the same kind of run.'):'A different take on the same kind of run as your '+sh.name+'.'},
+   !inB.length?'These are over your $'+B+' budget. You asked to see them anyway.':B>=9000?'You set no budget limit, so these come from the full list.':'All of these are within your $'+B+' budget.',!!inB.length));
+  S.typing=false;set({stage:'mdone'});scroll()},rn)}
+function mflow(act,label){
+ if(S.typing)return;you(label);
+ if(act==='opts'){if(!S.cur||!S.cur.role)return say('I don’t have shoes for that kind of run in my catalog yet.',{stage:'mdone'});if(ME.budget==null)return say('What’s your budget for this one?',{stage:'mbudget'});showMine()}
+ else if(act==='force')showMine(true);
+ else if(act==='later')say('No problem. Your shoe is saved in this browser, so I’ll remember it next time.',{stage:'mdone'});
+ else if(act==='another'){S.form=newForm();mo(function(){return[msg('mo','text',{text:'Sure. Tell me about the next one.'}),msg('mo','addshoe')]},{stage:'add'})}
+}
+function mbudget(v,label){if(S.typing)return;you(label);ME.budget=v||9999;saveMe();showMine()}
+function msend(t,q){
+ var st=S.stage,v;
+ if(st==='add'){if(!S.form.name)return pickName(t);return}
+ if(st==='mask')return mflow(/\bno\b|not|later|nah/.test(q)?'later':'opts',t);
+ if(st==='mbudget'){v=L.parseBudget(t);if(v)return mbudget(v,t);you(t);return say('A dollar amount works, like $180.')}
+ if(st==='mover')return mflow(/\bno\b|not|later|nah/.test(q)?'later':'force',t);
+ if(st==='mdone'&&/add|another|new shoe/.test(q))return mflow('another',t);
+ you(t);say(st==='wait'?'One second, I’m not done yet.':'I can add another shoe to your rotation whenever you like.');
+}
+// The home screen shows the runner's own rotation once they have added a shoe.
+var ROT0=null;
+function home(){
+ var mine=mode!=='known',g=$('rotGrid');if(ROT0===null)ROT0=g.innerHTML;
+ ['lastrun','week','near','news'].forEach(function(id){$(id).style.display=mine?'none':'flex'});
+ [].forEach.call($('navRow').querySelectorAll('a'),function(a){a.style.display=mine?'none':'inline-flex'});
+ $('sampleLine').textContent=mine?'Showing your own rotation, saved in this browser on this device.':'Showing a sample runner who has already connected Strava: 28 miles a week, Miami Marathon on January 31, home in Miami, visiting Chicago.';
+ $('rotSub').textContent=mine?'Saved on this device':'From Strava, updated after every run';
+ $('homeNote').textContent=mine?'Mo estimates mileage from what you tell it, so it says “probably.” The sample runner shows where Mo is headed.':'The shoe rotation flow is the part you can try today. The other rows show where Mo is headed. Events, routes and stories here are examples, not real listings.';
+ if(!mine){if(g.dataset.k!=='s'){g.innerHTML=ROT0;g.dataset.k='s'}return}
+ var k='m'+JSON.stringify(ME.shoes);if(g.dataset.k===k)return;g.dataset.k=k;
+ var C='cursor: default; background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px',BT='margin-top: auto; height: 44px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; ';
+ g.innerHTML=ME.shoes.map(function(x){var w=wear(x.miles);
+  return'<div style="'+C+'"><span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">'+esc(x.label.toUpperCase())+'</span><h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">'+esc(x.name)+'</h3><div style="height: 8px; border-radius: 999px; background: #EEF0F2; overflow: hidden"><div style="height: 8px; width: '+w.pct+'%; background: '+w.color+'; border-radius: 999px"></div></div><span style="align-self: flex-start; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; '+w.bs+'">'+w.badge+'</span><span style="font-size: 14px; line-height: 1.45; color: #33373D">'+w.line+'</span>'+(x.miles>=400?'<button type="button" data-act="chat" style="'+BT+'border: 0; background: #2B1A12; color: #FFFFFF">See what Mo suggests</button>':'')+'</div>'}).join('')
+  +'<div style="'+C+'; border-style: dashed; background: transparent"><h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">'+(ME.shoes.length?'Add another shoe':'No shoes yet')+'</h3><span style="font-size: 14px; line-height: 1.45; color: #33373D">'+(ME.shoes.length?'Mo learns your rotation one shoe at a time.':'Add the one you’re thinking of replacing. It takes three taps.')+'</span><button type="button" data-act="addshoe" style="'+BT+'border: 1px solid #2B1A12; background: #FFFFFF; color: #2B1A12">Add a shoe</button>'+(ME.shoes.length?'<button type="button" data-act="forget" style="min-height: 44px; border: 0; background: transparent; color: #9A3412; font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer; font-family: inherit">Clear my shoes</button>':'')+'</div>'}
 function picksMsg(intro){return[msg('mo','text',{text:intro}),msg('mo','picks',{snap:L.snapOf(S)})]}
 // Asks the real model to write the reason on each card. If it fails or is slow, the scripted reasons stay.
 function askMo(m){
@@ -601,6 +731,11 @@ function refine(kind,text){
 }
 function replies(){
  if(S.typing)return[];
+ if(S.stage==='mask')return[['Show me new options','m','opts'],['Not now','m','later']];
+ if(S.stage==='mbudget')return[['$150','mb',150],['$200','mb',200],['$250','mb',250],['No limit','mb',0]];
+ if(S.stage==='mover')return[['Show me anyway','m','force'],['Not now','m','later']];
+ if(S.stage==='mdone')return[['Add another shoe','m','another']];
+ if(S.stage==='add'||S.stage==='wait')return[];
  if(S.stage==='alert')return[['Show me new options','x','options'],['Reorder the same shoe','x','reorder'],['Not yet','x','later']];
  if(S.stage==='gap')return[['Yes, show me','x','raceYes'],['No, I race in something else','x','raceNo']];
  if(S.stage==='over')return[['Show me anyway','x','raceShow'],['Not now','x','raceSkip']];
@@ -622,7 +757,8 @@ var current=[], latest=[], cheerUntil=0;
 var PEN='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16v4"/><path d="M13.5 6.5l4 4"/></svg>';
 function chosenList(){return ORDER.filter(function(k){return S.chosen[k]}).map(function(k){return S.chosen[k]})}
 function render(){
- var last=null,lastStatus=null,lastField={};S.msgs.forEach(function(m){if(m.kind==='picks'||m.kind==='opts')last=m.id;if(m.kind==='status')lastStatus=m.id;if(m.field)lastField[m.field]=m.id});
+ var last=null,lastStatus=null,lastField={};var lastAdd=null;S.msgs.forEach(function(m){if(m.kind==='addshoe')lastAdd=m.id});home();
+ S.msgs.forEach(function(m){if(m.kind==='picks'||m.kind==='opts')last=m.id;if(m.kind==='status')lastStatus=m.id;if(m.field)lastField[m.field]=m.id});
  var h='';latest=[];
  S.msgs.forEach(function(m){
   if(m.who==='you'){h+='<div class="you">'+(m.field&&lastField[m.field]===m.id?'<button type="button" class="yb" data-edit="'+m.field+'" aria-label="Edit your answer: '+esc(m.text)+'"><span>'+esc(m.text)+'</span>'+PEN+'</button>':'<div class="yb">'+esc(m.text)+'</div>')+'</div>';return}
@@ -632,6 +768,7 @@ function render(){
   else if(m.kind==='consent')h+='<div class="ind card"><h2 class="lab">WHAT MO WILL SEE</h2><div class="two"><div><b>Mo reads</b><ul><li>Your runs from the last 12 weeks</li><li>Distance, pace and run type</li><li>Heart rate from your watch</li><li>Your shoes and their mileage</li><li>Where your runs start, to find clubs and routes nearby</li></ul></div><div><b>Mo never</b><ul><li>Posts or changes anything</li><li>Tracks you between runs</li><li>Shares your data</li></ul></div></div><p class="cap">This is a demo. No real account is connected, and the data is a sample runner.</p></div>';
   else if(m.kind==='found')h+='<div class="ind card"><h2 class="lab">FROM STRAVA</h2><div class="rows"><div><span>Weekly miles</span><b>34 average</b></div><div><span>Runs per week</span><b>5, with 1 workout</b></div><div><span>Longest run</span><b>12 miles</b></div><div><span>Last run</span><b>Easy 5.2 miles, mostly zone 2</b></div><div><span>Nike Pegasus 41</span><b>412 miles</b></div><div><span>Nike Vaporfly 3</span><b>85 miles, races only</b></div></div></div>';
   else if(m.kind==='rotation'){h+='<div class="ind card"><h2 class="lab">ROTATION CHECK</h2><div class="slots">';L.slots(m.snap||S).forEach(function(x){h+='<div class="slot"><b>'+x[0]+'</b><span class="badge '+x[1][1]+'">'+x[1][0]+'</span><small>'+esc(x[1][2])+'</small></div>'});h+='</div></div>'}
+  else if(m.kind==='addshoe')h+=addForm(m,S.stage==='add'&&m.id===lastAdd);
   else if(m.kind==='links')h+='<div class="ind">'+links(m.name,m.brand,m.url,m.store)+'</div>';
   else if(m.kind==='opts'){
    if(m.id===last){latest=m.items;h+='<div class="ind"><h2 class="sr">Mo’s picks</h2><div class="picks">';m.items.forEach(function(p){var on=!!(S.chosen[p.key]&&S.chosen[p.key].name===p.name);
@@ -653,16 +790,18 @@ function render(){
   $('plan').innerHTML=ch.length?'<div class="plan"><div class="l">'+rabbit(40,'cheer','hop')+'<div><b>Your plan: '+ch.length+(ch.length===1?' shoe':' shoes')+', $'+ch.reduce(function(a,p){return a+p.price},0)+'</b><small>'+ch.map(function(p){return esc(p.name)}).join(' + ')+'</small></div></div>'+(S.found?'<span class="done">Plan ready</span>':'<button type="button" id="find">Find best prices</button>')+'</div>':''}
  var mood=view==='chat'&&(S.typing||S.stage==='working')?'think':(Date.now()<cheerUntil?'cheer':'idle');
  if(mood!==render.mood){render.mood=mood;$('logo2').innerHTML=mood==='think'?rabbit(48,'think','mo-pulse'):mood==='cheer'?rabbit(48,'cheer','mo-hop'):rabbit(48,'idle','',false,true)}
- $('status2').textContent=mood==='think'?(S.stage==='working'?'Working on it…':'Thinking…'):mood==='cheer'?'Nice pick':(S.stage==='done'||S.stage==='sdone'?'Ready when you are':'Your running partner');
+ $('status2').textContent=mood==='think'?(S.stage==='working'?'Working on it…':'Thinking…'):mood==='cheer'?'Nice pick':(S.stage==='done'||S.stage==='sdone'||S.stage==='mdone'?'Ready when you are':'Your running partner');
  $('modeBtn').textContent=mode==='known'?'See what a new runner sees':'Back to the sample runner';
  $('sheetWrap').hidden=view!=='chat';document.body.style.overflow=view==='chat'?'hidden':'';
  var ck=String(S.confirm)+view;
  if(ck!==render.hdrKey){render.hdrKey=ck;$('shdr').innerHTML=S.confirm?'<span class="cq">Start over and clear your plan?</span><button class="ghost" id="yes" type="button">Yes, start over</button><button class="ghost" id="no" type="button">Cancel</button>':'<button class="ghost" id="restart" type="button">Start over</button>'}
- $('ask').placeholder={start:'Connect Strava, or tell me yourself…',race:'Training for a half in March…',miles:'About 35 miles…',shoes:'Pegasus 41 with about 300 miles…',shoeMiles:'About 250 miles…',budget:'Around $350…',replace:'Replace it or keep it…',alert:'New options, or reorder…',gap:'Yes or no…',over:'Show me anyway, or not now…',sdone:'Ask why I picked these…',done:'Ask for cheaper, softer, another brand…'}[S.stage]||'Message Mo';
+ $('ask').placeholder={start:'Connect Strava, or tell me yourself…',race:'Training for a half in March…',miles:'About 35 miles…',shoes:'Pegasus 41 with about 300 miles…',shoeMiles:'About 250 miles…',budget:'Around $350…',replace:'Replace it or keep it…',add:'Or type your shoe’s name…',mask:'Yes or not now…',mbudget:'Around $180…',mover:'Show me anyway, or not now…',mdone:'Message Mo',alert:'New options, or reorder…',gap:'Yes or no…',over:'Show me anyway, or not now…',sdone:'Ask why I picked these…',done:'Ask for cheaper, softer, another brand…'}[S.stage]||'Message Mo';
 }
 function send(){
  var t=$('ask').value.trim();if(!t||S.typing||S.stage==='working')return;var q=t.toLowerCase(),v;
- if(TOPIC.test(q)||(!S.sample&&S.stage!=='done'&&/\?\s*$/.test(q)&&!/shoe|strava/.test(q))){you(t);return say(OFF+(S.stage!=='done'&&Q(S.stage)?'\nBack to your shoes: '+Q(S.stage):''))}
+ if(S.mine&&S.stage==='add'){$('ask').value='';return msend(t,q)}
+ if(TOPIC.test(q)||(!S.sample&&!S.mine&&S.stage!=='done'&&/\?\s*$/.test(q)&&!/shoe|strava/.test(q))){you(t);return say(OFF+(S.stage!=='done'&&Q(S.stage)?'\nBack to your shoes: '+Q(S.stage):''))}
+ if(S.mine)return msend(t,q);
  if(S.sample)return ssend(t,q);
  if(S.stage==='start'){if(/strava|connect|\byes\b|\bsure\b|\bok\b/.test(q))return flow('connect',t);if(/myself|manual|\bno\b|enter|type/.test(q))return flow('manual',t);you(t);return say('I can help with that. To get it right, I need to know a bit about your training first. Want to connect Strava, or tell me yourself?')}
  if(S.stage==='consent')return flow(/no|don|not/.test(q)?'manual':'allow',t);
@@ -682,6 +821,10 @@ function summary(){var ch=chosenList(),t=ch.reduce(function(a,p){return a+p.pric
 function start(){timers.forEach(clearTimeout);timers=[];S=fresh();render.planKey=null;render.hdrKey=null;render.mood=null;render();$('scroller').scrollTop=0}
 document.addEventListener('click',function(e){
  var b=e.target.closest('button');if(!b)return;
+ if(b.dataset.f)return formAct(b);
+ if(b.dataset.shoe)return pickName(b.dataset.shoe);
+ if(b.dataset.act==='addshoe'){view='chat';if(S.stage!=='add'&&!S.typing){S.form=newForm();S.msgs.push(msg('mo','text',{text:'Sure. Tell me about the next one.'}),msg('mo','addshoe'));S.stage='add'}render();return scroll()}
+ if(b.dataset.act==='forget'){ME={shoes:[]};saveMe();return start()}
  if(b.dataset.act==='chat'){view='chat';render();scroll();return setTimeout(function(){$('ask').focus()},50)}
  if(b.dataset.act==='mode'){mode=mode==='known'?'new':'known';start();if(mode==='new'){view='chat';render()}return}
  if(b.id==='goHome'){S.confirm=false;view='home';return render()}
@@ -692,10 +835,12 @@ document.addEventListener('click',function(e){
  if(b.dataset.edit)return edit(b.dataset.edit);
  if(b.dataset.pick){var pp=latest.filter(function(p){return p.name===b.dataset.pick})[0];if(!pp)return;if(S.chosen[pp.key]&&S.chosen[pp.key].name===pp.name)delete S.chosen[pp.key];else{S.chosen[pp.key]={name:pp.name,price:pp.price};cheerUntil=Date.now()+2600;setTimeout(render,2700)}S.found=false;return render()}
  if(b.dataset.add){var k=b.dataset.add,pk=latest.filter(function(p){return p.key===k})[0];if(!pk)return;if(S.chosen[k]&&S.chosen[k].name===pk.name)delete S.chosen[k];else{S.chosen[k]={name:pk.name,price:pk.price};cheerUntil=Date.now()+2600;setTimeout(render,2700)}S.found=false;return render()}
- if(b.dataset.i!==undefined){var c=current[+b.dataset.i];if(!c)return;if(c[1]==='r')refine(c[2]);else if(c[1]==='x')sflow(c[2],c[0]);else if(c[1]==='c')flow(c[2],c[0]);else answer(c[1],c[2],c[3]||c[0])}
+ if(b.dataset.i!==undefined){var c=current[+b.dataset.i];if(!c)return;if(c[1]==='r')refine(c[2]);else if(c[1]==='m')mflow(c[2],c[0]);else if(c[1]==='mb')mbudget(c[2],c[0]);else if(c[1]==='x')sflow(c[2],c[0]);else if(c[1]==='c')flow(c[2],c[0]);else answer(c[1],c[2],c[3]||c[0])}
 });
 $('logo').innerHTML=rabbit(48,'idle','',false,true);
 $('backdrop').addEventListener('click',function(){S.confirm=false;view='home';render()});
+$('chat').addEventListener('input',function(e){if(e.target.id==='shoeQ'){S.form.q=e.target.value;$('shoeRes').innerHTML=resHTML(S.form.q)}});
+$('chat').addEventListener('keydown',function(e){if(e.target.id==='shoeQ'&&e.key==='Enter'){e.preventDefault();var first=$('shoeRes').querySelector('button');if(first)pickName(first.dataset.shoe)}});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&view==='chat'){S.confirm=false;view='home';render()}});
 $('form').addEventListener('submit',function(e){e.preventDefault();send()});
 $('askHome').addEventListener('submit',function(e){e.preventDefault();var t=$('askH').value.trim();$('askH').value='';view='chat';render();if(t){$('ask').value=t;send()}else scroll()});
