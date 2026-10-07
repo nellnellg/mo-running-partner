@@ -99,6 +99,11 @@ button.yb:hover{background:#45302A}
 .racecard .rc-s{margin-top:6px;font-size:14px;font-weight:600;color:#FFF1E8}
 .racecard .rc-s.miss{color:#FFB37A}
 .racecard button{align-self:start;min-height:32px;border:0;background:transparent;padding:0;color:#FFF1E8;font-size:14px;font-weight:600;text-decoration:underline}
+.racecard .rc-pv{grid-column:1 / -1;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;padding-top:14px;border-top:1px solid #4A342A;font-size:13px;color:#E8CFC0}
+.racecard .rc-pv span{margin-right:4px}
+.racecard .rc-pv button{min-height:36px;padding:0 14px;border:1px solid #6B5346;border-radius:999px;text-decoration:none;font-size:13px}
+.racecard .rc-pv button:hover{background:#3A261C}
+.pvnote{align-self:center;font-size:13px;font-weight:600;color:#6B5A50;background:#F1E6DE;border-radius:999px;padding:6px 14px;margin:0 auto 4px;width:fit-content}
 @media(max-width:520px){.racecard{grid-template-columns:auto 1fr;padding:20px;gap:6px 18px}.racecard button{grid-column:1 / -1;justify-self:start}}
 .b1,.b2{height:44px;border-radius:10px;padding:0 16px;font-size:14px;font-weight:600}
 .b1{border:1.5px solid #2B1A12;background:#2B1A12;color:#fff}
@@ -470,6 +475,17 @@ function saveRace(){
  var n=daysTo(ME.race.date),when=n<=0?'is today':n===1?'is tomorrow':'is '+n+' days away';
  if(!hasRaceShoe()&&!ME.noRaceShoe)say('Saved. The '+ME.race.name+' '+when+', and you don’t have a race shoe in your rotation yet. Want me to look at some?',{stage:'rgap'});
  else say('Saved. The '+ME.race.name+' '+when+'.',{stage:'mdone'})}
+// Preview: the prototype can't move the calendar, so the race card opens Mo as if it were that day.
+function preview(k){
+ if(!ME.race)return;timers.forEach(clearTimeout);timers=[];S=fresh();view='chat';
+ var r=ME.race.name,rs=ME.shoes.filter(function(x){return x.role==='race'})[0],label,text,stage;
+ if(k==='6w'){label='6 weeks before the '+r;
+  if(rs){text='The '+r+' is 6 weeks away. Your race shoe is the '+rs.name+', so you’re set. Get a few runs in it before race day.';stage='mdone'}
+  else if(ME.noRaceShoe){text='The '+r+' is 6 weeks away. You told me you race in a shoe you already have, so there’s nothing to buy.';stage='mdone'}
+  else{text='The '+r+' is 6 weeks away. If you want a race shoe, now is the time, so you get a few runs in it before race day. Want to see some?';stage='rgap'}}
+ else if(k==='2w'){label='2 weeks before the '+r;text='Two weeks to the '+r+'. Do you know what you’re wearing on race day? Nothing new on the day is the safe rule.';stage='rfit'}
+ else{label='The day after the '+r;text='How did the '+r+' go?';stage='rafter'}
+ S.msgs=[msg('mo','note',{text:'Preview. '+label}),msg('mo','text',{text:text})];S.stage=stage;render.planKey=null;render();$('scroller').scrollTop=0}
 function mflow(act,label){
  if(S.typing)return;you(label);
  if(act==='opts'){if(!S.cur||!S.cur.role)return say('I don’t have shoes for that kind of run in my catalog yet.',{stage:'mdone'});if(ME.budget==null)return say('What’s your budget for this one?',{stage:'mbudget'});showMine()}
@@ -479,6 +495,10 @@ function mflow(act,label){
  else if(act==='raceNo'){ME.raceAsked=true;saveMe();say('No problem. Tell me if that changes.',{stage:'mdone'})}
  else if(act==='gapYes'){S.cur={gap:true,name:null,role:'race',label:'Race day',use:'race day',miles:null,brand:topBrand()};if(ME.budget==null)return say('What’s your budget for a race shoe?',{stage:'mbudget'});showMine()}
  else if(act==='gapNo'){ME.noRaceShoe=true;saveMe();say('Got it. I won’t bring it up again.',{stage:'mdone'})}
+ else if(act==='fitYes')say('Good. Then there’s nothing to buy. Enjoy the last two weeks.',{stage:'mdone'});
+ else if(act==='fitNo')say('Pick it this week and wear it on one run first. If it rubs, you want to find out now and not on race day.',{stage:'mdone'});
+ else if(act==='wentWell')say('Glad to hear it. Rest now. Your rotation is saved, and I’ll be here when you feel like running again.',{stage:'rest'});
+ else if(act==='wentRough')say('Sorry to hear that. You still got to the start line and that counts. Rest now. Your rotation is saved, and I’ll be here when you feel like running again.',{stage:'rest'});
  else if(act==='another'){S.form=newForm();mo(function(){return[msg('mo','text',{text:'Sure. Tell me about the next one.',forForm:true}),msg('mo','addshoe')]},{stage:'add'})}
 }
 function mbudget(v,label){if(S.typing)return;you(label);ME.budget=v||9999;saveMe();showMine()}
@@ -490,6 +510,8 @@ function msend(t,q){
  if(st==='mover')return mflow(/\bno\b|not|later|nah/.test(q)?'later':'force',t);
  if(st==='rask')return mflow(/\bno\b|not|nah|nope/.test(q)?'raceNo':'raceYes',t);
  if(st==='rgap')return mflow(/\bno\b|not|nah|else|other/.test(q)?'gapNo':'gapYes',t);
+ if(st==='rfit')return mflow(/\bno\b|not|nah|nope/.test(q)?'fitNo':'fitYes',t);
+ if(st==='rafter')return mflow(/rough|bad|hard|hurt|dnf|didn|awful|terrible|\bnot\b/.test(q)?'wentRough':'wentWell',t);
  if(st==='rform'){if(!S.rf.name){S.rf.name=t;$('ask').value='';return render()}return}
  if(/\brace\b|marathon|\b5k\b|\b10k\b/.test(q)&&st==='mdone'){you(t);return openRaceForm(ME.race?'Sure. Here’s your race.':'Search for it and I’ll fill in the date when I know it.')}
  if(st==='mdone'&&/add|another|new shoe/.test(q))return mflow('another',t);
@@ -503,7 +525,9 @@ function replies(){
  if(S.stage==='mdone')return[['Add another shoe','m','another']];
  if(S.stage==='rask')return[['Yes','m','raceYes'],['Not right now','m','raceNo']];
  if(S.stage==='rgap')return[['Yes, show me','m','gapYes'],['No, I race in something else','m','gapNo']];
- if(S.stage==='rform')return[];
+ if(S.stage==='rfit')return[['Yes, I’m set','m','fitYes'],['Not yet','m','fitNo']];
+ if(S.stage==='rafter')return[['It went well','m','wentWell'],['It was rough','m','wentRough']];
+ if(S.stage==='rform'||S.stage==='rest')return[];
  if(S.stage==='add'||S.stage==='wait')return[];
  return[];
 }
@@ -514,7 +538,8 @@ function render(){
  var h='';latest=[];
  S.msgs.forEach(function(m){
   if(m.who==='you'){h+='<div class="you"><div class="yb">'+esc(m.text)+'</div></div>';return}
-  if(m.kind==='text')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'</div></div>';
+  if(m.kind==='note')h+='<div class="pvnote">'+esc(m.text)+'</div>';
+  else if(m.kind==='text')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'</div></div>';
   else if(m.kind==='addshoe')h+=addForm(m,S.stage==='add'&&m.id===lastAdd);
   else if(m.kind==='raceform')h+=raceForm(m,S.stage==='rform');
   else if(m.kind==='opts'){
@@ -542,7 +567,7 @@ function home(){
  if(rl.dataset.k!==rk){rl.dataset.k=rk;var nd=ME.race?daysTo(ME.race.date):0;
   var rs=ME.shoes.filter(function(x){return x.role==='race'})[0];
   rl.className=ME.race?'racecard':'raceline';
-  rl.innerHTML=ME.race?'<div class="rc-n"><b>'+(nd>0?nd:nd===0?'Today':'Done')+'</b>'+(nd>0?'<span>'+(nd===1?'day':'days')+' to go</span>':'')+'</div><div class="rc-t"><span class="rc-k">Your race</span><h3>'+esc(ME.race.name)+'</h3><span>'+raceDate(ME.race.date)+'</span><span class="rc-s'+(rs||ME.noRaceShoe?'':' miss')+'">'+(rs?'Race shoe: '+esc(rs.name):ME.noRaceShoe?'Racing in a shoe you already have':'No race shoe in your rotation yet')+'</span></div><button type="button" data-act="race">Change</button>':ME.shoes.length?'<button type="button" data-act="race">Add a race</button>':''}
+  rl.innerHTML=ME.race?'<div class="rc-n"><b>'+(nd>0?nd:nd===0?'Today':'Done')+'</b>'+(nd>0?'<span>'+(nd===1?'day':'days')+' to go</span>':'')+'</div><div class="rc-t"><span class="rc-k">Your race</span><h3>'+esc(ME.race.name)+'</h3><span>'+raceDate(ME.race.date)+'</span><span class="rc-s'+(rs||ME.noRaceShoe?'':' miss')+'">'+(rs?'Race shoe: '+esc(rs.name):ME.noRaceShoe?'Racing in a shoe you already have':'No race shoe in your rotation yet')+'</span></div><button type="button" data-act="race">Change</button>'+(nd>0?'<div class="rc-pv"><span>Preview what Mo says</span><button type="button" data-pv="6w">6 weeks out</button><button type="button" data-pv="2w">2 weeks out</button><button type="button" data-pv="after">After the race</button></div>':''):ME.shoes.length?'<button type="button" data-act="race">Add a race</button>':''}
  var g=$('rotGrid'),k=JSON.stringify(ME.shoes);if(g.dataset.k===k)return;g.dataset.k=k;
  g.innerHTML=ME.shoes.map(function(x){var w=wear(x.miles);
   return shoeHTML({use:x.label,brand:x.brand,name:shortName(x.name,x.brand),mi:miText(x.miles),pct:w.pct,color:w.color,foot:w.due?'<span class="due">Probably due</span><button type="button" class="b1" data-act="suggest" data-name="'+esc(x.name)+'">See what Mo suggests</button>':w.line})}).join('')
@@ -566,6 +591,7 @@ document.addEventListener('click',function(e){
   you('What do you suggest for my '+sg.name+'?');if(ME.budget==null)say('What’s your budget for this one?',{stage:'mbudget'});else showMine();return scroll()}
  if(b.dataset.act==='sample'){ME={shoes:SAMPLE.map(function(x){var o={added:Date.now()};for(var k in x)o[k]=x[k];return o})};saveMe();return start()}
  if(b.dataset.act==='race'){if(S.typing)return;S.confirm=false;view='chat';S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();openRaceForm(ME.race?'Sure. Here’s your race.':'Search for it and I’ll fill in the date when I know it.');return scroll()}
+ if(b.dataset.pv){if(S.typing)return;return preview(b.dataset.pv)}
  if(b.dataset.act==='forget'){ME={shoes:[]};saveMe();return start()}
  if(b.dataset.act==='chat'){view='chat';render();scroll();return setTimeout(function(){$('ask').focus()},50)}
  if(b.id==='goHome'){S.confirm=false;view='home';return render()}
