@@ -200,132 +200,17 @@ svg.r{flex-shrink:0}
 <input id="askH" type="text" autocomplete="off" placeholder="Ask Mo about your shoes" style="flex-grow: 1; min-width: 0; border: 0; outline: none; font-size: 16px; height: 48px; background: transparent; color: #2B1A12; font-family: inherit">
 <button type="submit" aria-label="Ask Mo" style="width: 48px; height: 48px; border-radius: 50%; border: 0; background: #2B1A12; color: #FFFFFF; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"></path><path d="M5 12l7-7 7 7"></path></svg></button>
 </form>
-<div id="navRow" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center">
-<button type="button" data-act="chat" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid #2B1A12; background: #2B1A12; color: #FFFFFF; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; font-family: inherit">Shoes</button>
-<a href="#week" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px dashed #C4C8CE; background: transparent; color: #4A4F57; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">Apparel</a>
-<a href="#week" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px dashed #C4C8CE; background: transparent; color: #4A4F57; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">Fuel</a>
-<a href="#near" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px dashed #C4C8CE; background: transparent; color: #4A4F57; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">Events</a>
-<a href="#near" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px dashed #C4C8CE; background: transparent; color: #4A4F57; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">Run clubs</a>
-<a href="#news" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px dashed #C4C8CE; background: transparent; color: #4A4F57; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: inherit">News</a>
+<span style="font-size: 13px; color: #5B6068">Mo remembers your shoes in this browser, on this device.</span>
 </div>
-<span id="sampleLine" style="font-size: 13px; color: #5B6068">Showing a sample runner who has already connected Strava: 28 miles a week, Miami Marathon on January 31, home in Miami, visiting Chicago.</span>
-<button type="button" id="modeBtn" data-act="mode" style="min-height: 44px; padding: 0 14px; border: 0; background: transparent; color: #9A3412; font-size: 14px; font-weight: 600; text-decoration: underline; cursor: pointer; font-family: inherit">See what a new runner sees</button>
-</div>
-<section id="lastrun" style="display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 96px">
-<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
-<h2 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">Your last run</h2>
-<span style="font-size: 14px; color: #5B6068">Yesterday, from your watch through Strava</span>
-</div>
-<div style="cursor: default; background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px; gap: 16px; padding: 20px">
-<div style="display: flex; flex-wrap: wrap; gap: 12px 32px; align-items: flex-end">
-<div style="display: flex; flex-direction: column; gap: 4px; margin-right: auto"><span style="display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap"><span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">EASY RUN</span><span style="font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #FDEBDF; color: #9A3412">Mo ran with you</span></span><h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">Morning run along the lakefront</h3></div>
-<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 20px; font-weight: 700">5.2 mi</span><span style="font-size: 13px; color: #5B6068">Distance</span></div><div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 20px; font-weight: 700">48 min</span><span style="font-size: 13px; color: #5B6068">Time</span></div><div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 20px; font-weight: 700">9:14</span><span style="font-size: 13px; color: #5B6068">Pace per mile</span></div><div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 20px; font-weight: 700">214 mi</span><span style="font-size: 13px; color: #5B6068">Together with Mo</span></div>
-</div>
-<ol aria-label="What Mo did after your run" style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13px"><li class="mo-step" style="animation-delay: 0.4s; display: inline-flex; align-items: center; gap: 6px; color: #1E6B3A; font-weight: 600"><span style="width: 18px; height: 18px; border-radius: 50%; background: #1E6B3A; display: inline-flex; align-items: center; justify-content: center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span>Run synced</li><li class="mo-step" style="animation-delay: 1.3s; display: inline-flex; align-items: center; gap: 6px; color: #1E6B3A; font-weight: 600"><span style="width: 18px; height: 18px; border-radius: 50%; background: #1E6B3A; display: inline-flex; align-items: center; justify-content: center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span>Mo caught his breath</li><li class="mo-step" style="animation-delay: 2.2s; display: inline-flex; align-items: center; gap: 6px; color: #1E6B3A; font-weight: 600"><span style="width: 18px; height: 18px; border-radius: 50%; background: #1E6B3A; display: inline-flex; align-items: center; justify-content: center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span>Heart rate checked</li><li class="mo-step" style="animation-delay: 3.1s; display: inline-flex; align-items: center; gap: 6px; color: #1E6B3A; font-weight: 600"><span style="width: 18px; height: 18px; border-radius: 50%; background: #1E6B3A; display: inline-flex; align-items: center; justify-content: center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span>Run notes ready</li></ol>
-<div style="display: flex; flex-direction: column; gap: 10px">
-<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">HEART RATE ZONES</span>
-<div role="img" aria-label="Time in heart rate zones: 3 minutes in zone 1, 40 minutes in zone 2, 5 minutes in zone 3, none in zones 4 and 5" style="display: flex; height: 14px; border-radius: 999px; overflow: hidden; gap: 2px; background: #FFFFFF"><div style="width: 6.2%; background: #BCD7F3"></div><div style="width: 83.3%; background: #4F97DE"></div><div style="width: 10.4%; background: #F0B544"></div></div>
-<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: #4A4F57"><span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #BCD7F3"></span>Zone 1, 3 min</span><span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #4F97DE"></span>Zone 2, 40 min</span><span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #F0B544"></span>Zone 3, 5 min</span><span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #EF8040"></span>Zone 4, none</span><span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #D4463B"></span>Zone 5, none</span></div>
-</div>
-<div class="mo-in" style="display: flex; gap: 14px; align-items: center">
-<svg class="mo-breathe" width="56" height="89" viewBox="0 0 120 190" aria-hidden="true" style="flex-shrink: 0"><ellipse cx="60" cy="186" rx="40" ry="6" fill="url(#mo-s)"></ellipse><ellipse cx="28" cy="150" rx="8" ry="19" fill="url(#mo-e)" transform="rotate(12 28 150)"></ellipse><ellipse cx="92" cy="150" rx="8" ry="19" fill="url(#mo-e)" transform="rotate(-12 92 150)"></ellipse><ellipse cx="60" cy="146" rx="31" ry="35" fill="url(#mo-b)"></ellipse><ellipse cx="60" cy="151" rx="18" ry="22" fill="#FFE4D4"></ellipse><path d="M30 176 Q30 168 41 168 L54 168 Q58 168 58 174 L58 180 L30 180 Z" fill="#3E86E0"></path><rect x="28" y="178" width="32" height="6" rx="3" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"></rect><path d="M90 176 Q90 168 79 168 L66 168 Q62 168 62 174 L62 180 L90 180 Z" fill="#3E86E0"></path><rect x="60" y="178" width="32" height="6" rx="3" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"></rect><rect x="36" y="4" width="18" height="52" rx="9" fill="url(#mo-e)" transform="rotate(-24 45 56)"></rect><rect x="66" y="4" width="18" height="52" rx="9" fill="url(#mo-e)" transform="rotate(30 75 56)"></rect><circle cx="60" cy="82" r="44" fill="url(#mo-b)"></circle><path d="M52 42 Q56 30 60 40 Q63 29 68 42 Z" fill="#FF9A6B"></path><rect x="40" y="13" width="10" height="33" rx="5" fill="url(#mo-i)" transform="rotate(-24 45 56)"></rect><rect x="70" y="13" width="10" height="33" rx="5" fill="url(#mo-i)" transform="rotate(30 75 56)"></rect><ellipse cx="44" cy="60" rx="20" ry="13" fill="url(#mo-h)" transform="rotate(-28 44 60)"></ellipse><ellipse cx="60" cy="96" rx="20" ry="15" fill="url(#mo-m)"></ellipse><circle cx="34" cy="93" r="9" fill="url(#mo-c)"></circle><circle cx="86" cy="93" r="9" fill="url(#mo-c)"></circle><path d="M43 73 Q48.5 79 54 73" stroke="#2B1A12" stroke-width="3.5" fill="none" stroke-linecap="round"></path><path d="M67 73 Q72.5 79 78 73" stroke="#2B1A12" stroke-width="3.5" fill="none" stroke-linecap="round"></path><path d="M56.5 89 Q60 87 63.5 89 Q62 93 60 93.5 Q58 93 56.5 89 Z" fill="#E0655A"></path><ellipse cx="60" cy="99" rx="5" ry="4.5" fill="#2B1A12"></ellipse><path d="M97 58 Q103 68 97 72 Q91 68 97 58 Z" fill="#8CC8F2"></path><path d="M22 66 Q26 73 22 76 Q18 73 22 66 Z" fill="#8CC8F2"></path><path d="M104 44 Q112 58 104 63 Q96 58 104 44 Z" fill="#7CC0F0"></path><path d="M14 60 Q20 71 14 75 Q8 71 14 60 Z" fill="#7CC0F0"></path></svg>
-<div style="display: flex; flex-direction: column; gap: 6px"><div style="font-size: 16px; line-height: 1.5; background: #FFF1E8; padding: 10px 14px; border-radius: 4px 16px 16px 16px">Phew, good one. We kept 40 of 48 minutes in zone 2. That’s exactly what an easy day is for.</div><span style="font-size: 13px; color: #5B6068">Why: this was an easy day on your plan. Zones are estimates from wrist heart rate. That’s 214 miles we’ve run together since you joined.</span></div>
-</div>
-</div>
-</section>
 <section id="rotation" style="display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 96px">
 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
 <h2 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">Your rotation</h2>
 
-<span id="rotSub" style="font-size: 14px; color: #5B6068">From Strava, updated after every run</span>
+<span style="font-size: 14px; color: #5B6068">Saved on this device</span>
 </div>
-<div id="rotGrid" class="shelf">
-<article class="shoe"><span class="use">Easy days</span><h3 class="name"><span class="brand">On</span>Cloudsurfer Max</h3><p class="mi">410<small>mi</small></p><div class="wearbar"><i style="width:82%;background:#E08A00"></i></div><div class="sfoot"><span class="due">Probably due</span><button type="button" class="b1" data-act="chat">See what Mo suggests</button></div></article>
-<article class="shoe"><span class="use">Easy days</span><h3 class="name"><span class="brand">On</span>Cloudeclipse</h3><p class="mi">115<small>mi</small></p><div class="wearbar"><i style="width:23%;background:#1E6B3A"></i></div><div class="sfoot">Plenty left</div></article>
-<article class="shoe"><span class="use">Long and tempo</span><h3 class="name"><span class="brand">On</span>Cloudmonster 3 Hyper</h3><p class="mi">107<small>mi</small></p><div class="wearbar"><i style="width:21%;background:#1E6B3A"></i></div><div class="sfoot">Plenty left</div></article>
-<article class="shoe"><span class="use">Track</span><h3 class="name"><span class="brand">Adidas</span>Adizero Finesse</h3><p class="mi">0<small>mi</small></p><div class="wearbar"><i style="width:2%;background:#1E6B3A"></i></div><div class="sfoot">Brand new</div></article>
-<article class="shoe vacant"><span class="use">Race day</span><h3 class="name"><span class="brand">&nbsp;</span>Nothing yet</h3><p class="mi" style="visibility:hidden">0<small>mi</small></p><div class="wearbar" style="visibility:hidden"><i style="width:0%;background:#1E6B3A"></i></div><div class="sfoot"><span>No race shoe for Miami</span><button type="button" class="b2" data-act="chat">Find a race shoe</button></div></article>
-</div>
+<div id="rotGrid" class="shelf"></div>
 </section>
-<section id="week" style="display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 96px">
-<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
-<h2 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">For your week</h2>
-
-<span style="font-size: 14px; color: #5B6068">Based on your training</span>
-</div>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
-<div style="cursor: default; background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
-<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">FUEL</span>
-<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">Sunday: 14 mile long run</h3>
-<span style="font-size: 14px; line-height: 1.45; color: #33373D">Bring 3 gels and a bottle with electrolytes. Many runners take a gel every 30 to 45 minutes on runs this long.</span>
-<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: your longest run so far is 12 miles.</span>
-</div>
-<div style="cursor: default; background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
-<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">APPAREL</span>
-<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">Cooler mornings ahead</h3>
-<span style="font-size: 14px; line-height: 1.45; color: #33373D">Lows near 48°F next week. A long sleeve top and light gloves will cover it.</span>
-<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: you run before 7 am most days.</span>
-</div>
-<div style="cursor: default; background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
-<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">RACE PREP</span>
-<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">Miami Marathon, January 31</h3>
-<span style="font-size: 14px; line-height: 1.45; color: #33373D">Start testing your race day outfit and fuel on long runs now, so nothing is new on race day.</span>
-<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: your race is on your calendar.</span>
-</div>
-</div>
-</section>
-<section id="near" style="display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 96px">
-<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
-<h2 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">While you’re in Chicago</h2>
-
-<span style="font-size: 14px; color: #5B6068">Based on where your last runs started</span>
-</div>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
-<div style="cursor: default; background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
-<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">RUN CLUB</span>
-<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">Thursday night social run</h3>
-<span style="font-size: 14px; line-height: 1.45; color: #33373D">6:30 pm. 5 miles, all paces. 1.2 miles from where your last run started.</span>
-<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: Thursday is an easy day on your plan.</span>
-</div>
-<div style="cursor: default; background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
-<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">ROUTE</span>
-<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">Lakefront path, 6 miles</h3>
-<span style="font-size: 14px; line-height: 1.45; color: #33373D">A flat out and back near where your last run started. Popular with local runners.</span>
-<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: it matches tomorrow’s easy run.</span>
-</div>
-<div style="cursor: default; background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
-<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">BACK HOME</span>
-<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">A 10K in Miami in 3 weeks</h3>
-<span style="font-size: 14px; line-height: 1.45; color: #33373D">A good tune up race before your marathon. Registration is still open.</span>
-<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: it lands on a planned workout weekend.</span>
-</div>
-</div>
-</section>
-<section id="news" style="display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 96px">
-<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
-<h2 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">Running news</h2>
-
-<span style="font-size: 14px; color: #5B6068">Picked for what you run</span>
-</div>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
-<div style="cursor: default; background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
-<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">RACE GUIDE</span>
-<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">What to expect on the Miami Marathon course</h3>
-<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: it’s your race.</span>
-</div>
-<div style="cursor: default; background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
-<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">GEAR</span>
-<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">This month’s new daily trainers</h3>
-<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: your Cloudsurfer Max is close to done.</span>
-</div>
-<div style="cursor: default; background: #FFFFFF; border: 1px solid #E3E5E8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
-<span style="font-size: 12px; font-weight: 600; color: #5B6068; letter-spacing: 0.04em">TRAINING</span>
-<h3 style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25">How to taper in the final two weeks</h3>
-<span style="font-size: 13px; line-height: 1.4; color: #5B6068; margin-top: auto; padding-top: 4px">Why: your race is on January 31.</span>
-</div>
-</div>
-</section>
-<span id="homeNote" style="font-size: 13px; color: #5B6068">The shoe rotation flow is the part you can try today. The other rows show where Mo is headed. Events, routes and stories here are examples, not real listings.</span>
+<span style="font-size: 13px; color: #5B6068">Mo estimates mileage from what you tell it, so it says “probably.”</span>
 </div>
 </div>
 <div id="sheetWrap" class="sheetWrap" hidden>
@@ -358,7 +243,7 @@ var KEY='mo.runner';
 function loadMe(){try{var r=JSON.parse(localStorage.getItem(KEY)||'null');return r&&Array.isArray(r.shoes)?r:{shoes:[]}}catch(e){return{shoes:[]}}}
 function saveMe(){try{localStorage.setItem(KEY,JSON.stringify(ME))}catch(e){}}
 var ME=loadMe();
-var S, n=0, timers=[], view='home', mode=ME.shoes.length?'new':'known';
+var S, n=0, timers=[], view='home';
 var TOPIC=/\b(eat|food|fuel|gels?|nutrition|drink|hydrat\w*|apparel|jacket|shorts|cloth\w*|wear|weather|clubs?|events?|news|injur\w*|pain|workouts?|stretch\w*|sleep|weight)\b/;
 var OFF='I can’t help with that yet. Right now I can look after your shoe rotation and help you choose your next shoe. Fuel, apparel, events and news are coming.';
 // Mo's model lives behind a Supabase function. The key below is the publishable one, which is safe in a page.
@@ -409,13 +294,12 @@ return{CAT:CAT,STORES:STORES,parseBudget:parseBudget};
 
 })();
 var ORDER=['speed','easy','race'];
-function fresh(){var s={msgs:[{id:0,who:'mo',kind:'text',text:''}],stage:'alert',chosen:{},typing:false,confirm:false};
- if(mode==='known'){s.sample=true;s.msgs[0].text='Hi, I’m Mo. Your On Cloudsurfer Max is over 400 miles, might want to change it soon. Most daily trainers last 300 to 500.\nWant to see some new options, or reorder the same shoe?';s.stage='alert'}
- else{s.mine=true;s.form=newForm();ME=loadMe();
+function fresh(){var s={msgs:[{id:0,who:'mo',kind:'text',text:''}],stage:'add',chosen:{},typing:false,confirm:false};
+ {s.form=newForm();ME=loadMe();
   if(!ME.shoes.length){s.msgs[0].text='Hi, I’m Mo. Tell me about a shoe you run in. It takes three taps, and I’ll save it to your rotation so I remember it next time.';s.msgs.push({id:-1,who:'mo',kind:'addshoe'});s.stage='add'}
   else{var due=ME.shoes.filter(function(x){return x.miles>=400})[0];
-   if(due){s.cur=due;s.msgs[0].text='Welcome back. Your '+due.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?';s.stage='mask'}
-   else{s.msgs[0].text='Welcome back. Nothing in your rotation looks due yet. Want to add another shoe?';s.stage='mdone'}}}
+   if(due){s.cur=due;s.msgs[0].text='Your '+due.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?';s.stage='mask'}
+   else{s.msgs[0].text='Nothing in your rotation looks due yet. Want to add another shoe?';s.stage='mdone'}}}
  return s}
 function set(p){for(var k in p)S[k]=p[k];render()}
 function later(ms,fn){timers.push(setTimeout(fn,ms))}
@@ -424,14 +308,9 @@ function you(t,field){S.msgs.push(msg('you','text',{text:t,field:field||null}));
 function mo(build,patch,ms){S.typing=true;render();scroll();later(ms||800,function(){S.msgs=S.msgs.concat(build());S.typing=false;set(patch||{});scroll()})}
 function say(t,patch){mo(function(){return[msg('mo','text',{text:t})]},patch)}
 function scroll(){requestAnimationFrame(function(){requestAnimationFrame(function(){var el=$('scroller');el.scrollTo({top:el.scrollHeight,behavior:'smooth'})})})}
-// ----- The sample runner. Based on Nelson's own rotation, with the Cloudsurfer Max set to 410 miles and no race shoe. -----
-var SR={weeklyMiles:28,goal:'Miami Marathon on January 31, 2027',budget:200,shoes:[
- {name:'On Cloudsurfer Max',url:'https://www.on.com/en-us/products/cloudsurfer-max-m-3mf3043',brand:'On',use:'easy and daily',miles:410,weight:'290g',drop:'6mm',w:290,d:6,price:180},
- {name:'On Cloudeclipse',brand:'On',use:'easy and daily',miles:115},
- {name:'On Cloudmonster 3 Hyper',brand:'On',use:'long and tempo',miles:107},
- {name:'Adidas Adizero Finesse',brand:'Adidas',use:'track',miles:0}]};
-var PREF='On';
-var GAPQ='One more thing. You’re training for the Miami Marathon and you don’t have a race shoe. Want me to look at some?';
+// A ready made rotation for visitors who want to try Mo without adding their own shoes.
+var SAMPLE=[{name:'On Cloudsurfer Max',brand:'On',label:'Easy days',use:'easy and daily',role:'easy',miles:425},{name:'On Cloudeclipse',brand:'On',label:'Easy days',use:'easy and daily',role:'easy',miles:150},{name:'On Cloudmonster 3 Hyper',brand:'On',label:'Long and tempo',use:'long and tempo',role:'speed',miles:150},{name:'Adidas Adizero Finesse',brand:'Adidas',label:'Track',use:'track',role:null,miles:150}];
+var PREF='';
 // Comparisons are worked out here, so Mo never has to do the math or guess.
 function cand(c,ref,shoes){
  var cmp=[],same=shoes.filter(function(x){return x.brand&&x.brand===c.brand});
@@ -443,7 +322,7 @@ function cand(c,ref,shoes){
  return{name:c.name,price:c.price,weight:c.w?c.w+'g':undefined,drop:c.d!=null?c.d+'mm':undefined,feel:c.feel,about:c.why,compared:cmp}}
 // Asks the model to choose and explain. Calls done(null) if it fails or is slow, so the scripted picks can step in.
 function askPicks(need,list,done,rn){
- rn=rn||SR;var mine=S,t0=Date.now(),fin=false;S.typing=true;render();scroll();
+ var mine=S,t0=Date.now(),fin=false;S.typing=true;render();scroll();
  function end(d){if(fin||S!==mine)return;fin=true;later(Math.max(0,900-(Date.now()-t0)),function(){done(d)})}
  if(!window.fetch||!MO_URL)return end(null);
  var ctl=window.AbortController?new AbortController():null,t=setTimeout(function(){if(ctl)ctl.abort()},9000);
@@ -462,44 +341,6 @@ function optsMsgs(key,role,list,d,fallText,fallFit,note,ok){
  if(items.length)ai=true;else items=list.slice().sort(function(a,b){return(b.brand===PREF)-(a.brand===PREF)}).slice(0,3).map(function(c){return make(c,fallFit(c))});
  items[0].top=true;
  return[msg('mo','text',{text:ai&&d.message?tidy(d.message):fallText}),msg('mo','opts',{items:items,note:note,ok:ok})]}
-function showEasy(){
- PREF='On';
- var list=L.CAT.easy.filter(function(c){return c.price<=SR.budget});
- askPicks({type:'easy day',why:'On Cloudsurfer Max is at 410 miles. Most daily trainers last 300 to 500.',replaces:'On Cloudsurfer Max'},list,function(d){
-  S.msgs=S.msgs.concat(optsMsgs('easy','To replace your Cloudsurfer Max',list,d,
-   'You also have your On Cloudeclipse at 115 miles for easy days, so there’s no rush. When you’re ready, these are the three I’d look at.',
-   function(c){return c.brand==='On'?'You already run in On, and this is the daily version of your Cloudmonster 3 Hyper.':c.w<290?'Lighter than your Cloudsurfer Max for the same easy miles.':'More foam underfoot than your Cloudsurfer Max for the same easy miles.'},
-   'All of these are within your $'+SR.budget+' budget.',true));
-  S.typing=false;set({stage:'wait'});scroll();later(1600,function(){say(GAPQ,{stage:'gap'})})})}
-function showRace(){
- PREF='On';
- var list=L.CAT.race;
- askPicks({type:'race day',why:'Training for the Miami Marathon with no race shoe. Every race shoe is over the $'+SR.budget+' budget, and the runner asked to see them anyway.'},list,function(d){
-  S.msgs=S.msgs.concat(optsMsgs('race','For race day in Miami',list,d,
-   'Here are three I’d look at for Miami. I put On first, since that’s what you run in most.',
-   function(c){return c.brand==='On'?'You already run in On, and this is the least expensive of the five.':c.brand==='Adidas'?'You already have an Adidas shoe for the track, and this is their marathon racer.':'Built for the marathon, which is what you’re training for.'},
-   'These are over your $'+SR.budget+' budget. You asked to see them anyway.',false));
-  S.typing=false;set({stage:'sdone'});scroll()})}
-function sflow(act,label){
- if(S.typing)return;you(label);
- var old=SR.shoes[0];
- if(act==='options')showEasy();
- else if(act==='reorder'){S.chosen.easy={name:old.name,price:old.price,brand:old.brand,url:old.url,store:L.STORES[old.brand]};mo(function(){return[msg('mo','text',{text:'Easy. The '+old.name+' is $'+old.price+', which fits your $'+SR.budget+' budget, so I made it your pick.'}),msg('mo','links',{name:old.name,brand:old.brand,url:old.url,store:L.STORES[old.brand]})]},{stage:'wait'});later(2600,function(){say(GAPQ,{stage:'gap'})})}
- else if(act==='later'){say('No problem. You also have your On Cloudeclipse at 115 miles for easy days, so there’s no rush. I’ll check in again at 450 miles.',{stage:'wait'});later(2600,function(){say(GAPQ,{stage:'gap'})})}
- else if(act==='raceYes')say('Race shoes start around $230, which is over your $'+SR.budget+' budget. Want to see them anyway?',{stage:'over'});
- else if(act==='raceNo')say('Got it. I won’t bring it up again.',{stage:'sdone'});
- else if(act==='raceShow')showRace();
- else if(act==='raceSkip')say('Okay, I’ll leave it there. Tell me if your budget changes.',{stage:'sdone'});
- else if(act==='why')say('Here’s how I picked them:\nBrand: three of your four shoes are On, so I looked there first.\nJob: I matched each pick to the kind of run it’s for, like easy days for your Cloudsurfer Max.\nBudget: I only showed shoes within your $'+SR.budget+', and I asked before showing race shoes over it.',{stage:'sdone'});
-}
-function ssend(t,q){
- var st=S.stage;
- if(st==='alert')return sflow(/not yet|later|\bno\b|wait|nah/.test(q)?'later':/reorder|same|again/.test(q)?'reorder':'options',t);
- if(st==='gap')return sflow(/\bno\b|not|don|else|other|nah/.test(q)?'raceNo':'raceYes',t);
- if(st==='over')return sflow(/\bno\b|not|skip|later|nah/.test(q)?'raceSkip':'raceShow',t);
- if(st==='sdone'&&/why|how/.test(q))return sflow('why',t);
- you(t);say(st==='wait'?'One second, I’m not done yet.':'That’s the whole sample flow for now. You can choose a shoe, or start over.');
-}
 function pickHTML(p){
  var on=!!(S.chosen[p.key]&&S.chosen[p.key].name===p.name),
   btn='<button type="button" class="'+(p.top?'b1':'b2')+(on?' on':'')+'" data-pick="'+esc(p.name)+'" aria-pressed="'+on+'" aria-label="'+(on?'Your pick is the '+esc(p.name)+'. Select to undo':'Choose the '+esc(p.name))+'">'+(on?'Your pick':'Choose this one')+'</button>',
@@ -515,7 +356,7 @@ var BRANDS=['On','ASICS','Hoka','Nike','Adidas','New Balance','Puma','Brooks','S
 var SPEC={},KNOWN=[];
 (function(){var seen={};function add(nm){if(!seen[nm]){seen[nm]=1;KNOWN.push(nm)}}
  ['easy','speed','race'].forEach(function(k){L.CAT[k].forEach(function(c){add(c.name);if(c.w)SPEC[c.name]={w:c.w,d:c.d}})});
- SR.shoes.forEach(function(x){add(x.name);if(x.w)SPEC[x.name]={w:x.w,d:x.d}});
+ SAMPLE.forEach(function(x){add(x.name)});SPEC['On Cloudsurfer Max']={w:290,d:6};
  ['Adidas Adizero Adios Pro 4','Nike Pegasus 42','Nike Pegasus 41','Nike Vomero 18','Hoka Clifton 11','Hoka Mach 7','Hoka Cielo X1 3.0','Brooks Glycerin Max 2','Brooks Hyperion Elite 5','Saucony Ride 19','Saucony Triumph 24','Saucony Endorphin Elite 3','Mizuno Wave Rider 30','Puma Velocity Nitro 4','Puma Deviate Nitro Elite 4','ASICS Gel-Kayano 33','ASICS Metaspeed Edge Tokyo','On Cloudsurfer 2','New Balance SC Elite v5','Altra Torin 8'].forEach(add)})();
 function brandOf(nm){var q=(nm+' ').toLowerCase();return BRANDS.filter(function(b){return q.indexOf(b.toLowerCase()+' ')===0})[0]||''}
 function newForm(){return{q:'',name:null,b:null,u:null,last:null}}
@@ -588,21 +429,6 @@ function msend(t,q){
  if(st==='mdone'&&/add|another|new shoe/.test(q))return mflow('another',t);
  you(t);say(st==='wait'?'One second, I’m not done yet.':'I can add another shoe to your rotation whenever you like.');
 }
-// The home screen shows the runner's own rotation once they have added a shoe.
-var ROT0=null;
-function home(){
- var mine=mode!=='known',g=$('rotGrid');if(ROT0===null)ROT0=g.innerHTML;
- ['lastrun','week','near','news'].forEach(function(id){$(id).style.display=mine?'none':'flex'});
- [].forEach.call($('navRow').querySelectorAll('a'),function(a){a.style.display=mine?'none':'inline-flex'});
- $('sampleLine').textContent=mine?'Showing your own rotation, saved in this browser on this device.':'Showing a sample runner who has already connected Strava: 28 miles a week, Miami Marathon on January 31, home in Miami, visiting Chicago.';
- $('rotSub').textContent=mine?'Saved on this device':'From Strava, updated after every run';
- $('homeNote').textContent=mine?'Mo estimates mileage from what you tell it, so it says “probably.” The sample runner shows where Mo is headed.':'The shoe rotation flow is the part you can try today. The other rows show where Mo is headed. Events, routes and stories here are examples, not real listings.';
- if(!mine){if(g.dataset.k!=='s'){g.innerHTML=ROT0;g.dataset.k='s'}return}
-
- var k='m'+JSON.stringify(ME.shoes);if(g.dataset.k===k)return;g.dataset.k=k;
- g.innerHTML=ME.shoes.map(function(x){var w=wear(x.miles);
-  return shoeHTML({use:x.label,brand:x.brand,name:shortName(x.name,x.brand),mi:miText(x.miles),pct:w.pct,color:w.color,foot:w.due?'<span class="due">Probably due</span><button type="button" class="b1" data-act="suggest" data-name="'+esc(x.name)+'">See what Mo suggests</button>':w.line})}).join('')
-  +shoeHTML({cls:' vacant',name:ME.shoes.length?'Add another':'No shoes yet',foot:'<span>'+(ME.shoes.length?'Mo learns your rotation one shoe at a time.':'Add a shoe you run in. It takes three taps, and Mo saves it here.')+'</span><button type="button" class="b2" data-act="addshoe">Add a shoe</button>'+(ME.shoes.length?'<button type="button" class="txt" data-act="forget">Clear my shoes</button>':'')})}
 function replies(){
  if(S.typing)return[];
  if(S.stage==='mask')return[['Show me new options','m','opts'],['Not now','m','later']];
@@ -610,10 +436,6 @@ function replies(){
  if(S.stage==='mover')return[['Show me anyway','m','force'],['Not now','m','later']];
  if(S.stage==='mdone')return[['Add another shoe','m','another']];
  if(S.stage==='add'||S.stage==='wait')return[];
- if(S.stage==='alert')return[['Show me new options','x','options'],['Reorder the same shoe','x','reorder'],['Not yet','x','later']];
- if(S.stage==='gap')return[['Yes, show me','x','raceYes'],['No, I race in something else','x','raceNo']];
- if(S.stage==='over')return[['Show me anyway','x','raceShow'],['Not now','x','raceSkip']];
- if(S.stage==='sdone')return S.msgs.some(function(m){return m.kind==='opts'})?[['Why these?','x','why']]:[];
  return[];
 }
 var current=[], latest=[], cheerUntil=0;
@@ -625,7 +447,6 @@ function render(){
   if(m.who==='you'){h+='<div class="you"><div class="yb">'+esc(m.text)+'</div></div>';return}
   if(m.kind==='text')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'</div></div>';
   else if(m.kind==='addshoe')h+=addForm(m,S.stage==='add'&&m.id===lastAdd);
-  else if(m.kind==='links')h+='<div class="ind">'+links(m.name,m.brand,m.url,m.store)+'</div>';
   else if(m.kind==='opts'){
    if(m.id===last){latest=m.items;h+='<div class="ind pk"><h2 class="sr">Mo’s picks</h2><p class="forwhat">'+esc(m.items[0].role)+'</p><div class="grid'+(m.items.length===1?' solo':'')+'">'+m.items.map(pickHTML).join('')+'</div><p class="budget'+(m.ok?'':' warn')+'">'+esc(m.note)+'</p><div class="cap">List prices from fall 2026. Check retailers for current deals.</div></div>'}
    else h+='<div class="ind old"><span>Earlier picks</span><span>'+m.items.map(function(p){return esc(p.name)+' $'+p.price}).join(', ')+'</span></div>'}
@@ -639,19 +460,23 @@ function render(){
   $('plan').innerHTML=ch.length?'<div class="plan"><div class="l">'+rabbit(40,'cheer','hop')+'<div><b>'+(ch.length===1?'Your pick: '+esc(ch[0].name)+', $'+ch[0].price:'Your picks: '+ch.length+' shoes, $'+ch.reduce(function(a,p){return a+p.price},0))+'</b><small>'+(ch.length===1?'Next, see it or try it on':ch.map(function(p){return esc(p.name)}).join(' + '))+'</small></div></div>'+(ch.length===1?links(ch[0].name,ch[0].brand,ch[0].url,ch[0].store):'')+'</div>':''}
  var mood=view==='chat'&&S.typing?'think':(Date.now()<cheerUntil?'cheer':'idle');
  if(mood!==render.mood){render.mood=mood;$('logo2').innerHTML=mood==='think'?rabbit(48,'think','mo-pulse'):mood==='cheer'?rabbit(48,'cheer','mo-hop'):rabbit(48,'idle','',false,true)}
- $('status2').textContent=mood==='think'?'Thinking…':mood==='cheer'?'Nice pick':(S.stage==='sdone'||S.stage==='mdone'?'Ready when you are':'Your running partner');
- $('modeBtn').textContent=mode==='known'?'See what a new runner sees':'Back to the sample runner';
+ $('status2').textContent=mood==='think'?'Thinking…':mood==='cheer'?'Nice pick':(S.stage==='mdone'?'Ready when you are':'Your running partner');
  $('sheetWrap').hidden=view!=='chat';document.body.style.overflow=view==='chat'?'hidden':'';
  var ck=String(S.confirm)+view;
  if(ck!==render.hdrKey){render.hdrKey=ck;$('shdr').innerHTML=S.confirm?'<span class="cq">Start over and clear your pick?</span><button class="ghost" id="yes" type="button">Yes, start over</button><button class="ghost" id="no" type="button">Cancel</button>':'<button class="ghost" id="restart" type="button">Start over</button>'}
- $('ask').placeholder={add:'Or type your shoe’s name…',mask:'Yes or not now…',mbudget:'Around $180…',mover:'Show me anyway, or not now…',mdone:'Message Mo',alert:'New options, or reorder…',gap:'Yes or no…',over:'Show me anyway, or not now…',sdone:'Ask why I picked these…'}[S.stage]||'Message Mo';
+ $('ask').placeholder={add:'Or type your shoe’s name…',mask:'Yes or not now…',mbudget:'Around $180…',mover:'Show me anyway, or not now…',mdone:'Message Mo'}[S.stage]||'Message Mo';
 }
+// The home screen shows the runner's shelf, saved in this browser.
+function home(){
+ var g=$('rotGrid'),k=JSON.stringify(ME.shoes);if(g.dataset.k===k)return;g.dataset.k=k;
+ g.innerHTML=ME.shoes.map(function(x){var w=wear(x.miles);
+  return shoeHTML({use:x.label,brand:x.brand,name:shortName(x.name,x.brand),mi:miText(x.miles),pct:w.pct,color:w.color,foot:w.due?'<span class="due">Probably due</span><button type="button" class="b1" data-act="suggest" data-name="'+esc(x.name)+'">See what Mo suggests</button>':w.line})}).join('')
+  +shoeHTML({cls:' vacant',name:ME.shoes.length?'Add another':'No shoes yet',foot:'<span>'+(ME.shoes.length?'Mo learns your rotation one shoe at a time.':'Add a shoe you run in. It takes three taps, and Mo saves it here.')+'</span><button type="button" class="b2" data-act="addshoe">Add a shoe</button>'+(ME.shoes.length?'<button type="button" class="txt" data-act="forget">Clear my shoes</button>':'<button type="button" class="txt" data-act="sample">Try it with a sample rotation</button>')})}
 function send(){
  var t=$('ask').value.trim();if(!t||S.typing)return;var q=t.toLowerCase();
- if(S.mine&&S.stage==='add'){$('ask').value='';return msend(t,q)}
+ if(S.stage==='add'){$('ask').value='';return msend(t,q)}
  if(TOPIC.test(q)){you(t);return say(OFF)}
- if(S.mine)return msend(t,q);
- ssend(t,q);
+ msend(t,q);
 }
 function start(){timers.forEach(clearTimeout);timers=[];S=fresh();render.planKey=null;render.hdrKey=null;render.mood=null;render();$('scroller').scrollTop=0}
 document.addEventListener('click',function(e){
@@ -663,15 +488,15 @@ document.addEventListener('click',function(e){
  if(b.dataset.act==='suggest'){var sg=ME.shoes.filter(function(x){return x.name===b.dataset.name})[0];if(!sg||S.typing)return;
   S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();S.cur=sg;S.confirm=false;view='chat';
   you('What do you suggest for my '+sg.name+'?');if(ME.budget==null)say('What’s your budget for this one?',{stage:'mbudget'});else showMine();return scroll()}
+ if(b.dataset.act==='sample'){ME={shoes:SAMPLE.map(function(x){var o={added:Date.now()};for(var k in x)o[k]=x[k];return o})};saveMe();return start()}
  if(b.dataset.act==='forget'){ME={shoes:[]};saveMe();return start()}
  if(b.dataset.act==='chat'){view='chat';render();scroll();return setTimeout(function(){$('ask').focus()},50)}
- if(b.dataset.act==='mode'){mode=mode==='known'?'new':'known';start();if(mode==='new'){view='chat';render()}return}
  if(b.id==='goHome'){S.confirm=false;view='home';return render()}
  if(b.id==='restart'){if(chosenList().length)return set({confirm:true});return start()}
  if(b.id==='yes')return start();
  if(b.id==='no')return set({confirm:false});
  if(b.dataset.pick){var pp=latest.filter(function(p){return p.name===b.dataset.pick})[0];if(!pp)return;if(S.chosen[pp.key]&&S.chosen[pp.key].name===pp.name)delete S.chosen[pp.key];else{S.chosen[pp.key]={name:pp.name,price:pp.price,brand:pp.brand,url:pp.url,store:pp.store};cheerUntil=Date.now()+2600;setTimeout(render,2700)}return render()}
- if(b.dataset.i!==undefined){var c=current[+b.dataset.i];if(!c)return;if(c[1]==='m')mflow(c[2],c[0]);else if(c[1]==='mb')mbudget(c[2],c[0]);else sflow(c[2],c[0])}
+ if(b.dataset.i!==undefined){var c=current[+b.dataset.i];if(!c)return;if(c[1]==='mb')mbudget(c[2],c[0]);else mflow(c[2],c[0])}
 });
 $('logo').innerHTML=rabbit(48,'idle','',false,true);
 $('backdrop').addEventListener('click',function(){S.confirm=false;view='home';render()});
