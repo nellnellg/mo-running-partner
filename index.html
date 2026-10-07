@@ -645,7 +645,7 @@ function formAct(b){
  if(k==='add'&&f.name&&f.b!=null&&f.u!=null&&!S.typing){
   var sh={name:f.name,brand:brandOf(f.name),label:USES[f.u][0],use:USES[f.u][1],role:USES[f.u][2],miles:BUCKETS[f.b][1],added:Date.now()};
   ME.shoes=ME.shoes.filter(function(x){return x.name!==sh.name}).concat([sh]);saveMe();
-  S.msgs.forEach(function(m){if(m.kind==='addshoe'&&!m.done)m.done=sh});S.cur=sh;S.form=newForm();S.stage='wait';afterAdd(sh)}}
+  S.msgs.forEach(function(m){if(m.kind==='addshoe'&&!m.done)m.done=sh;if(m.forForm)m.forForm=false});S.cur=sh;S.form=newForm();S.stage='wait';afterAdd(sh)}}
 function afterAdd(sh){
  if(!sh.role)return say('Added to your rotation. I don’t have track shoes in my catalog yet, so I’ll keep this one in your rotation for now.',{stage:'mdone'});
  if(sh.miles==null)return say('Added to your rotation. Without a mileage I’ll go by feel, so tell me when your '+sh.name+' starts to feel flat. Want to see what else is out there?',{stage:'mask'});
@@ -667,7 +667,7 @@ function mflow(act,label){
  if(act==='opts'){if(!S.cur||!S.cur.role)return say('I don’t have shoes for that kind of run in my catalog yet.',{stage:'mdone'});if(ME.budget==null)return say('What’s your budget for this one?',{stage:'mbudget'});showMine()}
  else if(act==='force')showMine(true);
  else if(act==='later')say('No problem. Your shoe is saved in this browser, so I’ll remember it next time.',{stage:'mdone'});
- else if(act==='another'){S.form=newForm();mo(function(){return[msg('mo','text',{text:'Sure. Tell me about the next one.'}),msg('mo','addshoe')]},{stage:'add'})}
+ else if(act==='another'){S.form=newForm();mo(function(){return[msg('mo','text',{text:'Sure. Tell me about the next one.',forForm:true}),msg('mo','addshoe')]},{stage:'add'})}
 }
 function mbudget(v,label){if(S.typing)return;you(label);ME.budget=v||9999;saveMe();showMine()}
 function msend(t,q){
@@ -692,7 +692,7 @@ function home(){
 
  var k='m'+JSON.stringify(ME.shoes);if(g.dataset.k===k)return;g.dataset.k=k;
  g.innerHTML=ME.shoes.map(function(x){var w=wear(x.miles);
-  return shoeHTML({use:x.label,brand:x.brand,name:shortName(x.name,x.brand),mi:miText(x.miles),pct:w.pct,color:w.color,foot:w.due?'<span class="due">Probably due</span><button type="button" class="b1" data-act="chat">See what Mo suggests</button>':w.line})}).join('')
+  return shoeHTML({use:x.label,brand:x.brand,name:shortName(x.name,x.brand),mi:miText(x.miles),pct:w.pct,color:w.color,foot:w.due?'<span class="due">Probably due</span><button type="button" class="b1" data-act="suggest" data-name="'+esc(x.name)+'">See what Mo suggests</button>':w.line})}).join('')
   +shoeHTML({cls:' vacant',name:ME.shoes.length?'Add another':'No shoes yet',foot:'<span>'+(ME.shoes.length?'Mo learns your rotation one shoe at a time.':'Add a shoe you run in. It takes three taps, and Mo saves it here.')+'</span><button type="button" class="b2" data-act="addshoe">Add a shoe</button>'+(ME.shoes.length?'<button type="button" class="txt" data-act="forget">Clear my shoes</button>':'')})}
 function picksMsg(intro){return[msg('mo','text',{text:intro}),msg('mo','picks',{snap:L.snapOf(S)})]}
 // Asks the real model to write the reason on each card. If it fails or is slow, the scripted reasons stay.
@@ -863,8 +863,11 @@ document.addEventListener('click',function(e){
  var b=e.target.closest('button');if(!b)return;
  if(b.dataset.f)return formAct(b);
  if(b.dataset.shoe)return pickName(b.dataset.shoe);
- if(b.dataset.act==='addshoe'){view='chat';if(S.stage!=='add'&&!S.typing){S.form=newForm();S.msgs.push(msg('mo','text',{text:'Sure. Tell me about the next one.'}),msg('mo','addshoe'));S.stage='add'}render();return scroll()}
+ if(b.dataset.act==='addshoe'){view='chat';if(S.stage!=='add'&&!S.typing){S.form=newForm();S.msgs.push(msg('mo','text',{text:'Sure. Tell me about the next one.',forForm:true}),msg('mo','addshoe'));S.stage='add'}render();return scroll()}
  if(b.dataset.act==='rotation'){S.confirm=false;view='home';render();return setTimeout(function(){$('rotation').scrollIntoView({behavior:window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})},60)}
+ if(b.dataset.act==='suggest'){var sg=ME.shoes.filter(function(x){return x.name===b.dataset.name})[0];if(!sg||S.typing)return;
+  S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();S.cur=sg;S.confirm=false;view='chat';
+  you('What do you suggest for my '+sg.name+'?');if(ME.budget==null)say('What’s your budget for this one?',{stage:'mbudget'});else showMine();return scroll()}
  if(b.dataset.act==='forget'){ME={shoes:[]};saveMe();return start()}
  if(b.dataset.act==='chat'){view='chat';render();scroll();return setTimeout(function(){$('ask').focus()},50)}
  if(b.dataset.act==='mode'){mode=mode==='known'?'new':'known';start();if(mode==='new'){view='chat';render()}return}
