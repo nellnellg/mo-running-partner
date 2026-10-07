@@ -89,6 +89,17 @@ button.yb:hover{background:#45302A}
 .raceline b{font-weight:600}
 .raceline button,.racedone button{min-height:32px;border:0;background:transparent;padding:0;color:#9A3412;font-size:14px;font-weight:600;text-decoration:underline}
 .racedone{font-size:15px;font-weight:600}
+.racecard{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px 28px;background:#2B1A12;color:#FFF1E8;border-radius:20px;padding:22px 28px}
+.racecard .rc-n{display:flex;flex-direction:column;align-items:flex-start;line-height:1}
+.racecard .rc-n b{font-stretch:66%;font-weight:760;font-size:clamp(64px,17vw,104px);letter-spacing:-0.02em;color:#F26B3A;font-variant-numeric:tabular-nums}
+.racecard .rc-n span{font-size:13px;font-weight:600;color:#E8CFC0;margin-top:2px}
+.racecard .rc-t{display:flex;flex-direction:column;gap:3px;min-width:0;font-size:15px;color:#E8CFC0}
+.racecard .rc-k{font-size:13px;font-weight:600}
+.racecard h3{margin:0;font-stretch:68%;font-weight:740;font-size:clamp(26px,6vw,36px);line-height:1.05;color:#FFF1E8}
+.racecard .rc-s{margin-top:6px;font-size:14px;font-weight:600;color:#FFF1E8}
+.racecard .rc-s.miss{color:#FFB37A}
+.racecard button{align-self:start;min-height:32px;border:0;background:transparent;padding:0;color:#FFF1E8;font-size:14px;font-weight:600;text-decoration:underline}
+@media(max-width:520px){.racecard{grid-template-columns:auto 1fr;padding:20px;gap:6px 18px}.racecard button{grid-column:1 / -1;justify-self:start}}
 .b1,.b2{height:44px;border-radius:10px;padding:0 16px;font-size:14px;font-weight:600}
 .b1{border:1.5px solid #2B1A12;background:#2B1A12;color:#fff}
 .b2{border:1.5px solid #2B1A12;background:transparent;color:#2B1A12}
@@ -212,6 +223,7 @@ svg.r{flex-shrink:0}
 </form>
 <span style="font-size: 13px; color: #5B6068">Mo remembers your shoes in this browser, on this device.</span>
 </div>
+<div id="raceLine" class="raceline"></div>
 <section id="rotation" style="display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 96px">
 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
 <h2 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">Your rotation</h2>
@@ -220,7 +232,6 @@ svg.r{flex-shrink:0}
 </div>
 <div id="rotGrid" class="shelf"></div>
 </section>
-<div id="raceLine" class="raceline"></div>
 <span style="font-size: 13px; color: #5B6068">Mo estimates mileage from what you tell it, so it says “probably.”</span>
 </div>
 </div>
@@ -529,7 +540,9 @@ function render(){
 function home(){
  var rl=$('raceLine'),rk=JSON.stringify(ME.race||0)+ME.shoes.length+today();
  if(rl.dataset.k!==rk){rl.dataset.k=rk;var nd=ME.race?daysTo(ME.race.date):0;
-  rl.innerHTML=ME.race?'<span>Training for the <b>'+esc(ME.race.name)+'</b> on '+raceDate(ME.race.date)+(nd>1?', '+nd+' days away':nd===1?', tomorrow':nd===0?', today':'')+'</span><button type="button" data-act="race">Change</button>':ME.shoes.length?'<button type="button" data-act="race">Add a race</button>':''}
+  var rs=ME.shoes.filter(function(x){return x.role==='race'})[0];
+  rl.className=ME.race?'racecard':'raceline';
+  rl.innerHTML=ME.race?'<div class="rc-n"><b>'+(nd>0?nd:nd===0?'Today':'Done')+'</b>'+(nd>0?'<span>'+(nd===1?'day':'days')+' to go</span>':'')+'</div><div class="rc-t"><span class="rc-k">Your race</span><h3>'+esc(ME.race.name)+'</h3><span>'+raceDate(ME.race.date)+'</span><span class="rc-s'+(rs||ME.noRaceShoe?'':' miss')+'">'+(rs?'Race shoe: '+esc(rs.name):ME.noRaceShoe?'Racing in a shoe you already have':'No race shoe in your rotation yet')+'</span></div><button type="button" data-act="race">Change</button>':ME.shoes.length?'<button type="button" data-act="race">Add a race</button>':''}
  var g=$('rotGrid'),k=JSON.stringify(ME.shoes);if(g.dataset.k===k)return;g.dataset.k=k;
  g.innerHTML=ME.shoes.map(function(x){var w=wear(x.miles);
   return shoeHTML({use:x.label,brand:x.brand,name:shortName(x.name,x.brand),mi:miText(x.miles),pct:w.pct,color:w.color,foot:w.due?'<span class="due">Probably due</span><button type="button" class="b1" data-act="suggest" data-name="'+esc(x.name)+'">See what Mo suggests</button>':w.line})}).join('')
