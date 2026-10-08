@@ -372,7 +372,7 @@ function pickHTML(p){
  var on=!!(S.chosen[p.key]&&S.chosen[p.key].name===p.name),
   btn='<button type="button" class="'+(p.top?'b1':'b2')+(on?' on':'')+'" data-pick="'+esc(p.name)+'" aria-pressed="'+on+'" aria-label="'+(on?'Your pick is the '+esc(p.name)+'. Select to undo':'Choose the '+esc(p.name))+'">'+(on?'Your pick':'Choose this one')+'</button>',
   head='<h3 class="name"><span class="brand">'+esc(p.brand||'')+'</span>'+esc(p.short)+'</h3>',acts='<div class="acts">'+btn+links(p.name,p.brand,p.url,p.top?p.store:null)+'</div>';
- if(p.top)return'<article class="top"><span class="tag">Top pick</span>'+head+'<p class="why">'+esc(p.fit)+'</p><div class="spec"><div><b>$'+p.price+'</b><span>Price</span></div>'+(p.w?'<div><b>'+p.w+'g</b><span>Weight</span></div><div><b>'+p.d+'mm</b><span>Drop</span></div>':'')+'</div><p class="feel">Feels '+esc(p.feel.toLowerCase())+'</p>'+acts+'</article>';
+ if(p.top)return'<article class="top">'+(p.same?'':'<span class="tag">Top pick</span>')+head+'<p class="why">'+esc(p.fit)+'</p><div class="spec">'+(p.price?'<div><b>$'+p.price+'</b><span>Price</span></div>':'')+(p.w?'<div><b>'+p.w+'g</b><span>Weight</span></div><div><b>'+p.d+'mm</b><span>Drop</span></div>':'')+'</div>'+(p.feel?'<p class="feel">Feels '+esc(p.feel.toLowerCase())+'</p>':'')+acts+'</article>';
  return'<article class="alt">'+head+'<p class="why">'+esc(p.fit)+'</p><div class="row"><div>$'+p.price+'</div>'+(p.w?'<div>'+p.w+'g</div><div>'+p.d+'mm<span>drop</span></div>':'')+'</div>'+acts+'</article>'}
 function links(name,brand,url,store){
  return'<span class="lk">'+(url?'<a href="'+esc(url)+'" target="_blank" rel="noopener" aria-label="View the '+esc(name)+', opens in a new tab">View shoe</a>':'')+(store?'<a href="'+esc(store)+'" target="_blank" rel="noopener" aria-label="Find a store for '+esc(brand)+', opens in a new tab">Find a store</a>':'')+'</span>'}
@@ -383,7 +383,8 @@ var BRANDS=['On','ASICS','Hoka','Nike','Adidas','New Balance','Puma','Brooks','S
 var SPEC={},KNOWN=[];
 (function(){var seen={};function add(nm){if(!seen[nm]){seen[nm]=1;KNOWN.push(nm)}}
  ['easy','speed','race'].forEach(function(k){L.CAT[k].forEach(function(c){add(c.name);if(c.w)SPEC[c.name]={w:c.w,d:c.d}})});
- SAMPLE.forEach(function(x){add(x.name)});SPEC['On Cloudsurfer Max']={w:290,d:6};
+ SAMPLE.forEach(function(x){add(x.name)});SPEC['On Cloudsurfer Max']={w:292,d:6,price:180,url:'https://www.roadrunnersports.com/product/48405/mens-on-cloudsurfer-max'};
+ ['easy','race'].forEach(function(k){L.CAT[k].forEach(function(c){SPEC[c.name].price=c.price;SPEC[c.name].url=c.url;SPEC[c.name].feel=c.feel})});
  ['Adidas Adizero Adios Pro 4','Nike Pegasus 42','Nike Pegasus 41','Nike Vomero 18','Hoka Clifton 11','Hoka Mach 7','Hoka Cielo X1 3.0','Brooks Glycerin Max 2','Brooks Hyperion Elite 5','Saucony Ride 19','Saucony Triumph 24','Saucony Endorphin Elite 3','Mizuno Wave Rider 30','Puma Velocity Nitro 4','Puma Deviate Nitro Elite 4','ASICS Gel-Kayano 33','ASICS Metaspeed Edge Tokyo','On Cloudsurfer 2','New Balance SC Elite v5','Altra Torin 8'].forEach(add)})();
 function brandOf(nm){var q=(nm+' ').toLowerCase();return BRANDS.filter(function(b){return q.indexOf(b.toLowerCase()+' ')===0})[0]||''}
 function newForm(){return{q:'',name:null,b:null,u:null,last:null}}
@@ -431,6 +432,15 @@ function afterAdd(sh){
  if(sh.miles>=400)return say('Added to your rotation. Your '+sh.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?',{stage:'mask'});
  say('Added to your rotation. Your '+sh.name+' probably has '+(sh.miles>=200?'some':'plenty of')+' life left, so there’s no rush. Want to look at something new anyway?',{stage:'mask'})}
 function myRunner(){return{goal:ME.race?ME.race.name+' on '+raceDate(ME.race.date):undefined,budget:ME.budget&&ME.budget<9000?ME.budget:undefined,shoes:ME.shoes.map(function(x){var sp=SPEC[x.name]||{};return{name:x.name,brand:x.brand,use:x.use,miles:x.miles,w:sp.w,d:sp.d,weight:sp.w?sp.w+'g':undefined,drop:sp.d!=null?sp.d+'mm':undefined}})}}
+// Reorder: the runner wants the same shoe again. No model call, the facts are the runner's own.
+// When a shoe has a newer version, Mo says so, since a new version can fit differently.
+var NEWER={'Nike Pegasus 41':'Nike Pegasus 42'};
+function reorder(){
+ var sh=S.cur,nx=NEWER[sh.name],nm=nx||sh.name,sp=SPEC[nm]||{},B=ME.budget,brand=sh.brand||brandOf(sh.name),
+  item={same:true,key:sh.role||'same',role:nx?'The newer version of your shoe':'The same shoe, again',name:nm,short:shortName(nm,brand),price:sp.price,w:sp.w,d:sp.d,feel:sp.feel,brand:brand,url:sp.url,store:L.STORES[brand],top:true,
+   fit:nx?'Same line as your '+shortName(sh.name,brand)+'. Try it on first, since a new version can fit differently.':'You know how it fits and how it feels at mile 10, so there’s nothing new to break in.'},
+  note=!sp.price?'I don’t have a price for this one, so check the store.':!B?'':B>=9000?'You set no budget limit.':sp.price<=B?'Within your $'+B+' budget.':'$'+sp.price+' is over your $'+B+' budget.';
+ mo(function(){return[msg('mo','text',{text:(nx?'Makes sense if it’s been working for you. The '+sh.name+' has a newer version now, the '+shortName(nx,brand)+'.':'Makes sense if it’s been working for you. Here’s the '+sh.name+' again.')+' When the new pair arrives, add it to your rotation and I’ll start its miles from zero.'}),msg('mo','opts',{items:[item],note:note,ok:!sp.price||!B||sp.price<=B,same:true})]},{stage:'mdone'});later(900,settle)}
 function showMine(force){
  var sh=S.cur,B=ME.budget||9999,all=L.CAT[sh.role].filter(function(c){return c.name!==sh.name}),inB=all.filter(function(c){return c.price<=B});
  if(!inB.length&&!force){var min=Math.min.apply(null,all.map(function(c){return c.price}));return say((sh.gap?'Race shoes start':'Shoes for '+sh.label.toLowerCase()+' start')+' around $'+min+', which is over your $'+B+'. Want to see them anyway?',{stage:'mover'})}
@@ -490,6 +500,7 @@ function mflow(act,label){
  if(S.typing)return;you(label);
  if(act==='opts'){if(!S.cur||!S.cur.role)return say('I don’t have shoes for that kind of run in my catalog yet.',{stage:'mdone'});if(ME.budget==null)return say('What’s your budget for this one?',{stage:'mbudget'});showMine()}
  else if(act==='force')showMine(true);
+ else if(act==='same')reorder();
  else if(act==='later'){say('No problem. Your shoe is saved in this browser, so I’ll remember it next time.',{stage:'mdone'});later(900,settle)}
  else if(act==='raceYes')openRaceForm('Search for it and I’ll fill in the date when I know it.');
  else if(act==='raceNo'){ME.raceAsked=true;saveMe();say('No problem. Tell me if that changes.',{stage:'mdone'})}
@@ -505,6 +516,7 @@ function mbudget(v,label){if(S.typing)return;you(label);ME.budget=v||9999;saveMe
 function msend(t,q){
  var st=S.stage,v;
  if(st==='add'){if(!S.form.name)return pickName(t);return}
+ if(st==='mask'&&/same|again|reorder|re-order/.test(q))return mflow('same',t);
  if(st==='mask')return mflow(/\bno\b|not|later|nah/.test(q)?'later':'opts',t);
  if(st==='mbudget'){v=L.parseBudget(t);if(v)return mbudget(v,t);you(t);return say('A dollar amount works, like $180.')}
  if(st==='mover')return mflow(/\bno\b|not|later|nah/.test(q)?'later':'force',t);
@@ -519,7 +531,7 @@ function msend(t,q){
 }
 function replies(){
  if(S.typing)return[];
- if(S.stage==='mask')return[['Show me new options','m','opts'],['Not now','m','later']];
+ if(S.stage==='mask')return[['Show me new options','m','opts'],['Reorder the same shoe','m','same'],['Not now','m','later']];
  if(S.stage==='mbudget')return[['$150','mb',150],['$200','mb',200],['$250','mb',250],['No limit','mb',0]];
  if(S.stage==='mover')return[['Show me anyway','m','force'],['Not now','m','later']];
  if(S.stage==='mdone')return[['Add another shoe','m','another']];
@@ -552,7 +564,7 @@ function render(){
  $('chips').innerHTML=current.map(function(c,i){return'<button type="button" data-i="'+i+'">'+esc(c[0])+'</button>'}).join('');
  var ch=chosenList(),key=ch.map(function(p){return p.name}).join();
  if(key!==render.planKey){render.planKey=key;
-  $('plan').innerHTML=ch.length?'<div class="plan"><div class="l">'+rabbit(40,'cheer','hop')+'<div><b>'+(ch.length===1?'Your pick: '+esc(ch[0].name)+', $'+ch[0].price:'Your picks: '+ch.length+' shoes, $'+ch.reduce(function(a,p){return a+p.price},0))+'</b><small>'+(ch.length===1?'Next, see it or try it on':ch.map(function(p){return esc(p.name)}).join(' + '))+'</small></div></div>'+(ch.length===1?links(ch[0].name,ch[0].brand,ch[0].url,ch[0].store):'')+'</div>':''}
+  $('plan').innerHTML=ch.length?'<div class="plan"><div class="l">'+rabbit(40,'cheer','hop')+'<div><b>'+(ch.length===1?'Your pick: '+esc(ch[0].name)+(ch[0].price?', $'+ch[0].price:''):'Your picks: '+ch.length+' shoes, $'+ch.reduce(function(a,p){return a+p.price},0))+'</b><small>'+(ch.length===1?'Next, see it or try it on':ch.map(function(p){return esc(p.name)}).join(' + '))+'</small></div></div>'+(ch.length===1?links(ch[0].name,ch[0].brand,ch[0].url,ch[0].store):'')+'</div>':''}
  var mood=view==='chat'&&S.typing?'think':(Date.now()<cheerUntil?'cheer':'idle');
  if(mood!==render.mood){render.mood=mood;$('logo2').innerHTML=mood==='think'?rabbit(48,'think','mo-pulse'):mood==='cheer'?rabbit(48,'cheer','mo-hop'):rabbit(48,'idle','',false,true)}
  $('status2').textContent=mood==='think'?'Thinking…':mood==='cheer'?'Nice pick':(S.stage==='mdone'?'Ready when you are':'Your running partner');
