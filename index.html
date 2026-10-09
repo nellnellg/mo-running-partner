@@ -133,7 +133,11 @@ button.yb:hover{background:#45302A}
 .pk .row span{font-stretch:100%;font-size:13px;font-weight:400;color:#5B6068;margin-left:4px}
 .pk .budget{margin:0;font-size:14px;font-weight:500;color:#1E6B3A}
 .pk .budget.warn{color:#8A4B00}
-.plan .lk a{color:#fff}
+.plan .lk a,.plan .lkb{color:#fff}
+.lkb{min-height:32px;border:0;background:transparent;padding:0;color:#9A3412;font:inherit;font-weight:600;text-decoration:underline;cursor:pointer}
+.lk .stock{flex-basis:100%;font-size:13px;font-weight:400;color:#6B5A50}
+.plan .lk .stock{color:#E8CFC0}
+.b .lk{margin-top:8px}
 @media (max-width:720px){
 .shelf{display:block;padding:0;border-radius:18px 18px 0 0;overflow:visible}
 .shelf .shoe{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto;column-gap:12px;row-gap:4px;padding:16px;border-left:0;border-bottom:1px solid #F2DDCF}
@@ -165,6 +169,7 @@ footer .wrap{padding-top:12px;padding-bottom:16px;display:flex;flex-direction:co
 .plan small{font-size:13px;color:#C9CDD2}
 .plan .done{font-size:14px;font-weight:600;color:#C9CDD2;padding:0 8px}
 .plan button{height:44px;padding:0 16px;border-radius:10px;border:0;background:#fff;color:#2B1A12;font-size:14px;font-weight:600}
+.plan .lk .lkb{height:auto;min-height:32px;padding:0;border-radius:0;background:transparent;color:#fff;text-decoration:underline}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips button{min-height:44px;padding:8px 16px;border-radius:999px;border:1px solid #D6D8DC;background:#fff;font-size:14px;font-weight:500}
 .box{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #D6D8DC;border-radius:999px;padding:6px 6px 6px 22px;box-shadow:0 6px 24px rgba(43,26,18,.10)}
@@ -375,7 +380,20 @@ function pickHTML(p){
  if(p.top)return'<article class="top">'+(p.same?'':'<span class="tag">Top pick</span>')+head+'<p class="why">'+esc(p.fit)+'</p><div class="spec">'+(p.price?'<div><b>$'+p.price+'</b><span>Price</span></div>':'')+(p.w?'<div><b>'+p.w+'g</b><span>Weight</span></div><div><b>'+p.d+'mm</b><span>Drop</span></div>':'')+'</div>'+(p.feel?'<p class="feel">Feels '+esc(p.feel.toLowerCase())+'</p>':'')+acts+'</article>';
  return'<article class="alt">'+head+'<p class="why">'+esc(p.fit)+'</p><div class="row"><div>$'+p.price+'</div>'+(p.w?'<div>'+p.w+'g</div><div>'+p.d+'mm<span>drop</span></div>':'')+'</div>'+acts+'</article>'}
 function links(name,brand,url,store){
- return'<span class="lk">'+(url?'<a href="'+esc(url)+'" target="_blank" rel="noopener" aria-label="View the '+esc(name)+', opens in a new tab">View shoe</a>':'')+(store?'<a href="'+esc(store)+'" target="_blank" rel="noopener" aria-label="Find a store for '+esc(brand)+', opens in a new tab">Find a store</a>':'')+'</span>'}
+ return'<span class="lk">'+(url?'<a href="'+esc(url)+'" target="_blank" rel="noopener" aria-label="View the '+esc(name)+', opens in a new tab">View shoe</a>':'')+(store&&brand?storeLink(brand):'')+'</span>'}
+// Local stores: Mo asks for a ZIP once, saves it with the shoes, and never asks for location permission.
+function mapsURL(brand,zip){return'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('running stores that carry '+brand+' shoes near '+zip)}
+function storeLink(brand){
+ return(ME.zip?'<a href="'+mapsURL(brand,ME.zip)+'" target="_blank" rel="noopener" aria-label="Find running stores near '+ME.zip+' that carry '+esc(brand)+', opens Google Maps in a new tab">Find a store</a><button type="button" class="lkb" data-act="zip">Change ZIP</button>'
+  :'<button type="button" class="lkb" data-store="'+esc(brand)+'">Find a store</button>')+'<span class="stock">I can’t see what’s in stock, so call ahead to check your size.</span>'}
+function askZip(brand){if(S.typing)return;S.zipFor=brand||null;S.zipBack=S.stage==='zip'?(S.zipBack||'mdone'):S.stage;say(ME.zip?'What’s your new ZIP code?':'What’s your ZIP code? I’ll find running stores near you.',{stage:'zip'})}
+function saveZip(t){
+ var z=(t.match(/\b\d{5}\b/)||[])[0];you(t);
+ if(!z)return say('A 5 digit ZIP works, like 33130.');
+ ME.zip=z;saveMe();render.planKey=null;var br=S.zipFor,back=S.zipBack||'mdone';S.zipFor=null;
+ if(br){try{window.open(mapsURL(br,z),'_blank','noopener')}catch(e){}
+  mo(function(){return[msg('mo','store',{text:'Saved. Here are running stores near '+z+' that carry '+br+'.',brand:br,zip:z})]},{stage:back})}
+ else say('Saved. I’ll look near '+z+' from now on.',{stage:back})}
 // ----- The three tap start: which shoe, about how many miles, what it's for. -----
 var BUCKETS=[['Under 200',150],['200 to 400',300],['Over 400',425],['Not sure',null]];
 var USES=[['Easy days','easy and daily','easy'],['Long and tempo','long and tempo','speed'],['Race day','race day','race'],['Track','track',null]];
@@ -501,6 +519,7 @@ function mflow(act,label){
  if(act==='opts'){if(!S.cur||!S.cur.role)return say('I don’t have shoes for that kind of run in my catalog yet.',{stage:'mdone'});if(ME.budget==null)return say('What’s your budget for this one?',{stage:'mbudget'});showMine()}
  else if(act==='force')showMine(true);
  else if(act==='same')reorder();
+ else if(act==='zipNo'){var bk=S.zipBack||'mdone';S.zipFor=null;say('No problem. Tap Find a store whenever you want it.',{stage:bk})}
  else if(act==='later'){say('No problem. Your shoe is saved in this browser, so I’ll remember it next time.',{stage:'mdone'});later(900,settle)}
  else if(act==='raceYes')openRaceForm('Search for it and I’ll fill in the date when I know it.');
  else if(act==='raceNo'){ME.raceAsked=true;saveMe();say('No problem. Tell me if that changes.',{stage:'mdone'})}
@@ -540,6 +559,7 @@ function replies(){
  if(S.stage==='rfit')return[['Yes, I’m set','m','fitYes'],['Not yet','m','fitNo']];
  if(S.stage==='rafter')return[['It went well','m','wentWell'],['It was rough','m','wentRough']];
  if(S.stage==='rform'||S.stage==='rest')return[];
+ if(S.stage==='zip')return[['Not now','m','zipNo']];
  if(S.stage==='add'||S.stage==='wait')return[];
  return[];
 }
@@ -551,6 +571,7 @@ function render(){
  S.msgs.forEach(function(m){
   if(m.who==='you'){h+='<div class="you"><div class="yb">'+esc(m.text)+'</div></div>';return}
   if(m.kind==='note')h+='<div class="pvnote">'+esc(m.text)+'</div>';
+  else if(m.kind==='store')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'<span class="lk"><a href="'+mapsURL(m.brand,m.zip)+'" target="_blank" rel="noopener">Open the map</a></span></div></div>';
   else if(m.kind==='text')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'</div></div>';
   else if(m.kind==='addshoe')h+=addForm(m,S.stage==='add'&&m.id===lastAdd);
   else if(m.kind==='raceform')h+=raceForm(m,S.stage==='rform');
@@ -587,6 +608,7 @@ function home(){
 function send(){
  var t=$('ask').value.trim();if(!t||S.typing)return;var q=t.toLowerCase();
  if(S.stage==='add'){$('ask').value='';return msend(t,q)}
+ if(S.stage==='zip')return saveZip(t);
  if(TOPIC.test(q)){you(t);return say(OFF)}
  msend(t,q);
 }
@@ -604,6 +626,8 @@ document.addEventListener('click',function(e){
  if(b.dataset.act==='sample'){ME={shoes:SAMPLE.map(function(x){var o={added:Date.now()};for(var k in x)o[k]=x[k];return o})};saveMe();return start()}
  if(b.dataset.act==='race'){if(S.typing)return;S.confirm=false;view='chat';S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();openRaceForm(ME.race?'Sure. Here’s your race.':'Search for it and I’ll fill in the date when I know it.');return scroll()}
  if(b.dataset.pv){if(S.typing)return;return preview(b.dataset.pv)}
+ if(b.dataset.store){view='chat';return askZip(b.dataset.store)}
+ if(b.dataset.act==='zip'){view='chat';return askZip(null)}
  if(b.dataset.act==='forget'){ME={shoes:[]};saveMe();return start()}
  if(b.dataset.act==='chat'){view='chat';render();scroll();return setTimeout(function(){$('ask').focus()},50)}
  if(b.id==='goHome'){S.confirm=false;view='home';return render()}
