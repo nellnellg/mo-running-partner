@@ -381,19 +381,39 @@ function pickHTML(p){
  return'<article class="alt">'+head+'<p class="why">'+esc(p.fit)+'</p><div class="row"><div>$'+p.price+'</div>'+(p.w?'<div>'+p.w+'g</div><div>'+p.d+'mm<span>drop</span></div>':'')+'</div>'+acts+'</article>'}
 function links(name,brand,url,store){
  return'<span class="lk">'+(url?'<a href="'+esc(url)+'" target="_blank" rel="noopener" aria-label="View the '+esc(name)+', opens in a new tab">View shoe</a>':'')+(store&&brand?storeLink(brand):'')+'</span>'}
-// Local stores: Mo asks for a ZIP once, saves it with the shoes, and never asks for location permission.
-function mapsURL(brand,zip){return'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('running stores that carry '+brand+' shoes near '+zip)}
+// Local stores: Mo asks for a ZIP or postal code once, saves it with the shoes, and never asks for location permission.
+// The country goes into the map search so 8001 means Zurich and not somewhere else. It comes from what the runner typed,
+// the code's format when only one country uses it, or the browser's language setting. If none of those settle it, Mo asks.
+var COUNTRY={US:'United States',GB:'United Kingdom',IE:'Ireland',NL:'Netherlands',BE:'Belgium',LU:'Luxembourg',DE:'Germany',AT:'Austria',CH:'Switzerland',FR:'France',ES:'Spain',PT:'Portugal',IT:'Italy',DK:'Denmark',SE:'Sweden',NO:'Norway',FI:'Finland',PL:'Poland',CZ:'Czech Republic',GR:'Greece'};
+var ALIAS={usa:'US','united states':'US',us:'US',america:'US',uk:'GB','united kingdom':'GB',england:'GB',scotland:'GB',wales:'GB',britain:'GB','great britain':'GB',ireland:'IE',netherlands:'NL',holland:'NL','the netherlands':'NL',belgium:'BE',luxembourg:'LU',germany:'DE',deutschland:'DE',austria:'AT',switzerland:'CH',france:'FR',spain:'ES','españa':'ES',portugal:'PT',italy:'IT',italia:'IT',denmark:'DK',sweden:'SE',norway:'NO',finland:'FI',poland:'PL',czechia:'CZ','czech republic':'CZ',greece:'GR'};
+var FIVE=['US','DE','FR','ES','IT','FI'],FOUR=['BE','LU','AT','CH','DK','NO'],THREE2=['SE','CZ','GR'];
+function localRegion(){try{var l=(navigator.languages&&navigator.languages[0])||navigator.language||'',m=l.match(/[-_]([A-Za-z]{2})$/);return m?m[1].toUpperCase():''}catch(e){return''}}
+function countryIn(t){var l=' '+t.toLowerCase().replace(/[,.]/g,' ')+' ',best='',hit='';for(var k in ALIAS){if(l.indexOf(' '+k+' ')>-1&&k.length>hit.length){hit=k;best=ALIAS[k]}}return{code:best,rest:hit?(' '+t+' ').replace(new RegExp('\\s'+hit.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s','i'),' ').replace(/,/g,' ').trim():t}}
+function guessCountry(z){var c=z.toUpperCase(),r=localRegion();
+ if(/^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/.test(c))return'GB';if(/^\d{4} ?[A-Z]{2}$/.test(c))return'NL';if(/^\d{4}-\d{3}$/.test(c))return'PT';if(/^\d{2}-\d{3}$/.test(c))return'PL';if(/^[A-Z]\d{2} ?[A-Z\d]{4}$/.test(c))return'IE';
+ if(/^\d{5}(-\d{4})?$/.test(c))return FIVE.indexOf(r)>-1?r:/-/.test(c)||!r?'US':'';
+ if(/^\d{4}$/.test(c))return FOUR.indexOf(r)>-1?r:'';if(/^\d{3} \d{2}$/.test(c))return THREE2.indexOf(r)>-1?r:'';return''}
+// Pulls the code out of whatever was typed, so "8001, Zurich" works. Most specific formats first.
+var CODES=[/\b[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}\b/i,/\b\d{4} ?[A-Z]{2}\b/i,/\b\d{4}-\d{3}\b/,/\b\d{2}-\d{3}\b/,/\b[A-Z]\d{2} ?[A-Z\d]{4}\b/i,/\b\d{5}(-\d{4})?\b/,/\b\d{3} \d{2}\b/,/\b\d{4,6}\b/];
+function pickCode(t){for(var i=0;i<CODES.length;i++){var m=t.match(CODES[i]);if(m)return m[0]}return''}
+function place(){return ME.zip+(ME.country?', '+ME.country:'')}
+function mapsURL(brand,where){return'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('running stores that carry '+brand+' shoes near '+where)}
 function storeLink(brand){
- return(ME.zip?'<a href="'+mapsURL(brand,ME.zip)+'" target="_blank" rel="noopener" aria-label="Find running stores near '+ME.zip+' that carry '+esc(brand)+', opens Google Maps in a new tab">Find a store</a><button type="button" class="lkb" data-act="zip">Change ZIP</button>'
+ return(ME.zip?'<a href="'+mapsURL(brand,place())+'" target="_blank" rel="noopener" aria-label="Find running stores near '+esc(place())+' that carry '+esc(brand)+', opens Google Maps in a new tab">Find a store</a><button type="button" class="lkb" data-act="zip">Change location</button>'
   :'<button type="button" class="lkb" data-store="'+esc(brand)+'">Find a store</button>')+'<span class="stock">I can’t see what’s in stock, so call ahead to check your size.</span>'}
-function askZip(brand){if(S.typing)return;S.zipFor=brand||null;S.zipBack=S.stage==='zip'?(S.zipBack||'mdone'):S.stage;say(ME.zip?'What’s your new ZIP code?':'What’s your ZIP code? I’ll find running stores near you.',{stage:'zip'})}
+function askZip(brand){if(S.typing)return;S.zipFor=brand||null;S.zipBack=S.stage==='zip'||S.stage==='zipc'?(S.zipBack||'mdone'):S.stage;say(ME.zip?'What’s your new ZIP or postal code?':'What’s your ZIP or postal code? I’ll find running stores near you.',{stage:'zip'})}
 function saveZip(t){
- var z=(t.match(/\b\d{5}\b/)||[])[0];you(t);
- if(!z)return say('A 5 digit ZIP works, like 33130.');
- ME.zip=z;saveMe();render.planKey=null;var br=S.zipFor,back=S.zipBack||'mdone';S.zipFor=null;
- if(br){try{window.open(mapsURL(br,z),'_blank','noopener')}catch(e){}
-  mo(function(){return[msg('mo','store',{text:'Saved. Here are running stores near '+z+' that carry '+br+'.',brand:br,zip:z})]},{stage:back})}
- else say('Saved. I’ll look near '+z+' from now on.',{stage:back})}
+ you(t);var f=countryIn(t),z=pickCode(f.rest.replace(/\s+/g,' ').trim());
+ if(!z)return say('A ZIP or postal code works, like 33130, 1012 AB or 8001.');
+ var c=f.code||guessCountry(z);S.pz=z.toUpperCase();
+ if(!c)return say('Which country is '+S.pz+' in?',{stage:'zipc'});
+ doneZip(COUNTRY[c])}
+function saveCountry(t){you(t);var c=countryIn(t).code;doneZip(c?COUNTRY[c]:t.trim())}
+function doneZip(country){
+ ME.zip=S.pz;ME.country=country;saveMe();render.planKey=null;var br=S.zipFor,back=S.zipBack||'mdone',w=place();S.zipFor=null;S.pz=null;
+ if(br){try{window.open(mapsURL(br,w),'_blank','noopener')}catch(e){}
+  mo(function(){return[msg('mo','store',{text:'Saved. Here are running stores near '+w+' that carry '+br+'.',brand:br,where:w})]},{stage:back})}
+ else say('Saved. I’ll look near '+w+' from now on.',{stage:back})}
 // ----- The three tap start: which shoe, about how many miles, what it's for. -----
 var BUCKETS=[['Under 200',150],['200 to 400',300],['Over 400',425],['Not sure',null]];
 var USES=[['Easy days','easy and daily','easy'],['Long and tempo','long and tempo','speed'],['Race day','race day','race'],['Track','track',null]];
@@ -519,7 +539,7 @@ function mflow(act,label){
  if(act==='opts'){if(!S.cur||!S.cur.role)return say('I don’t have shoes for that kind of run in my catalog yet.',{stage:'mdone'});if(ME.budget==null)return say('What’s your budget for this one?',{stage:'mbudget'});showMine()}
  else if(act==='force')showMine(true);
  else if(act==='same')reorder();
- else if(act==='zipNo'){var bk=S.zipBack||'mdone';S.zipFor=null;say('No problem. Tap Find a store whenever you want it.',{stage:bk})}
+ else if(act==='zipNo'){var bk=S.zipBack||'mdone';S.zipFor=null;S.pz=null;say('No problem. Tap Find a store whenever you want it.',{stage:bk})}
  else if(act==='later'){say('No problem. Your shoe is saved in this browser, so I’ll remember it next time.',{stage:'mdone'});later(900,settle)}
  else if(act==='raceYes')openRaceForm('Search for it and I’ll fill in the date when I know it.');
  else if(act==='raceNo'){ME.raceAsked=true;saveMe();say('No problem. Tell me if that changes.',{stage:'mdone'})}
@@ -559,7 +579,7 @@ function replies(){
  if(S.stage==='rfit')return[['Yes, I’m set','m','fitYes'],['Not yet','m','fitNo']];
  if(S.stage==='rafter')return[['It went well','m','wentWell'],['It was rough','m','wentRough']];
  if(S.stage==='rform'||S.stage==='rest')return[];
- if(S.stage==='zip')return[['Not now','m','zipNo']];
+ if(S.stage==='zip'||S.stage==='zipc')return[['Not now','m','zipNo']];
  if(S.stage==='add'||S.stage==='wait')return[];
  return[];
 }
@@ -571,7 +591,7 @@ function render(){
  S.msgs.forEach(function(m){
   if(m.who==='you'){h+='<div class="you"><div class="yb">'+esc(m.text)+'</div></div>';return}
   if(m.kind==='note')h+='<div class="pvnote">'+esc(m.text)+'</div>';
-  else if(m.kind==='store')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'<span class="lk"><a href="'+mapsURL(m.brand,m.zip)+'" target="_blank" rel="noopener">Open the map</a></span></div></div>';
+  else if(m.kind==='store')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'<span class="lk"><a href="'+mapsURL(m.brand,m.where)+'" target="_blank" rel="noopener">Open the map</a></span></div></div>';
   else if(m.kind==='text')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'</div></div>';
   else if(m.kind==='addshoe')h+=addForm(m,S.stage==='add'&&m.id===lastAdd);
   else if(m.kind==='raceform')h+=raceForm(m,S.stage==='rform');
@@ -609,6 +629,7 @@ function send(){
  var t=$('ask').value.trim();if(!t||S.typing)return;var q=t.toLowerCase();
  if(S.stage==='add'){$('ask').value='';return msend(t,q)}
  if(S.stage==='zip')return saveZip(t);
+ if(S.stage==='zipc')return saveCountry(t);
  if(TOPIC.test(q)){you(t);return say(OFF)}
  msend(t,q);
 }
