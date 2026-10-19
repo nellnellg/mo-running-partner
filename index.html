@@ -563,7 +563,10 @@ function msend(t,q){
  if(st==='rgap')return mflow(/\bno\b|not|nah|else|other/.test(q)?'gapNo':'gapYes',t);
  if(st==='rfit')return mflow(/\bno\b|not|nah|nope/.test(q)?'fitNo':'fitYes',t);
  if(st==='rafter')return mflow(/rough|bad|hard|hurt|dnf|didn|awful|terrible|\bnot\b/.test(q)?'wentRough':'wentWell',t);
- if(st==='rform'){if(!S.rf.name){S.rf.name=t;$('ask').value='';return render()}return}
+ // Race search is open. A race name typed in the chat goes into the search. Anything else closes the search and gets a normal answer.
+ if(st==='rform'){if(!S.rf.picked&&findRaces(t).length){S.rf.name=t;$('ask').value='';render();var rn=$('raceName');if(rn)rn.focus();return}
+  S.msgs=S.msgs.filter(function(m){return!(m.kind==='raceform'&&!m.done)});S.msgs.forEach(function(m){if(m.forRace)m.forRace=false});S.stage=st='mdone';
+  if(/\brace\b|marathon|\b5k\b|\b10k\b/.test(q)){you(t);return openRaceForm('Search for it and I’ll fill in the date when I know it.')}}
  if(/\brace\b|marathon|\b5k\b|\b10k\b/.test(q)&&st==='mdone'){you(t);return openRaceForm(ME.race?'Sure. Here’s your race.':'Search for it and I’ll fill in the date when I know it.')}
  if(st==='mdone'&&/add|another|new shoe/.test(q))return mflow('another',t);
  you(t);say(st==='wait'?'One second, I’m not done yet.':'I can add another shoe to your rotation whenever you like.');
@@ -630,7 +633,7 @@ function send(){
  if(S.stage==='add'){$('ask').value='';return msend(t,q)}
  if(S.stage==='zip')return saveZip(t);
  if(S.stage==='zipc')return saveCountry(t);
- if(TOPIC.test(q)){you(t);return say(OFF)}
+ if(TOPIC.test(q)){if(S.stage==='rform'){S.msgs=S.msgs.filter(function(m){return!(m.kind==='raceform'&&!m.done)});S.msgs.forEach(function(m){if(m.forRace)m.forRace=false});S.stage='mdone'}you(t);return say(OFF)}
  msend(t,q);
 }
 function start(){timers.forEach(clearTimeout);timers=[];S=fresh();render.planKey=null;render.hdrKey=null;render.mood=null;render();$('scroller').scrollTop=0}
