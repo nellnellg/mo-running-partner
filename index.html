@@ -3,253 +3,289 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mo, your running partner</title>
-<meta name="description" content="A prototype of Mo, an AI running partner that checks your shoe rotation and recommends what to buy next.">
+<title>Mo, a shopping agent for running shoes</title>
+<meta name="description" content="A prototype of Mo, an independent shopping agent that keeps an eye on your running shoes and helps you choose the next pair.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
 <style>
+:root{--bg:#F6F1E8;--raised:#FFFDF9;--ink:#14244F;--ink2:#52607F;--ink3:#A3ADC2;--line:#E3D7C2;--line2:#A3ADC2;--cobalt:#1F55D6;--cobalt-h:#1A45AD;--c50:#EEF3FF;--c100:#DCE6FE;--c200:#B9CDFC;--ro:#DC440D;--ro7:#9A2D09;--ro50:#FFF0EA;--green:#7ABA5C;--greenink:#3F7A2A;--sun:#EBCE78;--rail:96px;--tab:68px}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{scroll-behavior:smooth}
-body{margin:0;background:#FBF6F2;font-family:'Archivo',system-ui,sans-serif;color:#2B1A12}
+body{margin:0;background:var(--bg);font-family:'Archivo',system-ui,sans-serif;color:var(--ink)}
 button,input{font-family:inherit;color:inherit}
 button{cursor:pointer}
-button:focus-visible,input:focus-visible{outline:2px solid #B5461C;outline-offset:2px}
-.app{min-height:100vh;display:flex;flex-direction:column}
-.wrap{width:100%;max-width:720px;margin:0 auto;padding-left:20px;padding-right:20px}
-header{background:#fff;border-bottom:1px solid #E3E5E8;position:sticky;top:0;z-index:5}
-header .wrap{padding-top:12px;padding-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{display:flex;align-items:center;gap:10px}
-.brand h1{margin:0;font-size:16px;font-weight:700}
-.hdr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.cq{font-size:14px;font-weight:600}
+a{color:inherit}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--cobalt);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 h2,h3{margin:0}
-.brand span{font-size:13px;color:#5B6068}
-.ghost{height:44px;padding:0 16px;border-radius:10px;border:1px solid #D6D8DC;background:#fff;font-size:14px;font-weight:600}
-main{flex-grow:1;padding-top:28px;padding-bottom:24px;display:flex;flex-direction:column;gap:14px}
-.you{display:flex;justify-content:flex-end}
-.yb{max-width:78%;background:#2B1A12;color:#fff;font-size:15px;line-height:1.5;padding:10px 14px;border-radius:16px 16px 4px 16px;border:0;text-align:left;display:inline-flex;align-items:center;gap:8px;min-height:44px}
-button.yb svg{flex-shrink:0;opacity:.8}
-button.yb:hover{background:#45302A}
-.mo{display:flex;gap:12px;align-items:flex-start}
-.mo .b{max-width:82%;font-size:16px;line-height:1.55;white-space:pre-line;background:#FFF1E8;padding:10px 14px;border-radius:4px 16px 16px 16px;margin-top:6px}
-.ind{margin-left:48px}
-.card{background:#fff;border:1px solid #E3E5E8;border-radius:16px;padding:16px}
-.step{display:flex;justify-content:space-between;gap:12px;padding:10px 0;font-size:14px;color:#33373D}
-.step b{font-size:13px;font-weight:600}
-.bad{background:#FEECEB;color:#B42318}.warn{background:#FFF4E0;color:#8A4B00}.ok{background:#E8F5EC;color:#1E6B3A}
+.wrap{width:100%;max-width:720px;margin:0 auto;padding-left:20px;padding-right:20px}
+/* Navigation: a rail on desktop, a top bar and a tab bar on phones. */
+.rail{position:fixed;left:0;top:0;bottom:0;width:var(--rail);background:var(--raised);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 10px;z-index:30}
+.logo{display:inline-flex}
+.logo svg{display:block;height:30px;width:auto}
+.rail .logo{margin-bottom:22px}
+.nav{width:76px;border:0;background:transparent;border-radius:14px;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink2)}
+.nav svg{width:26px;height:26px}
+.nav:hover{background:var(--c50)}
+.nav[aria-current="page"]{background:var(--c50);color:var(--cobalt)}
+.push{flex:1}
+.prof{width:40px;height:40px;border-radius:50%;border:0;background:var(--ro);color:#fff;display:flex;align-items:center;justify-content:center;cursor:default}
+.prof svg{width:22px;height:22px}
+.topbar{display:none}
+.tabbar{display:none}
+#home,.sheetWrap{margin-left:var(--rail)}
+#home{max-width:calc(960px + var(--rail));padding-left:calc(20px);padding-right:20px;width:auto}
+#home>.inner{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:34px;padding:44px 0 64px}
+/* Mo speaks first */
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:0}
+.mofig{position:relative;width:170px;height:170px}
+.mofig img,.moimg img{-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 86%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 86%,transparent 100%)}
+.mofig img{position:absolute;inset:0;width:170px;height:170px}
+.mofig .closed{opacity:0}
+.mofig.blink .closed{opacity:1}
+.says{position:relative;margin-top:10px;max-width:520px;background:var(--raised);border-radius:20px;padding:20px 26px 22px;box-shadow:0 6px 20px rgba(20,36,79,.10);display:flex;flex-direction:column;align-items:center;gap:16px}
+.says:before{content:'';position:absolute;top:-8px;left:50%;width:18px;height:18px;background:var(--raised);transform:translateX(-50%) rotate(45deg);border-radius:3px}
+.says p{position:relative;margin:0;font-size:20px;line-height:1.4}
+.says .acts{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.says .txt{flex-basis:100%}
+.b1,.b2{min-height:44px;border-radius:12px;padding:0 18px;font-size:15px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.b1{border:1.5px solid var(--cobalt);background:var(--cobalt);color:#fff}
+.b1:hover{background:var(--cobalt-h);border-color:var(--cobalt-h)}
+.b2{border:1px solid var(--line2);background:var(--raised);color:var(--ink)}
+.b2:hover{background:var(--c50)}
+.b1.on,.b2.on{background:#EEF7E9;color:var(--greenink);border-color:#B9DCA8}
+.txt{min-height:32px;border:0;background:transparent;padding:0;color:var(--cobalt);font-size:14px;font-weight:600;text-decoration:underline}
+/* Race */
+.raceline{display:flex;flex-wrap:wrap;align-items:center;gap:2px 12px;font-size:15px;min-height:32px}
+.raceline:empty{display:none}
+.raceline button,.racedone button{min-height:32px;border:0;background:transparent;padding:0;color:var(--cobalt);font-size:14px;font-weight:600;text-decoration:underline}
+.racedone{font-size:15px;font-weight:600}
+.racecard{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px 28px;background:var(--ink);color:#fff;border-radius:20px;padding:22px 28px}
+.racecard .rc-n{display:flex;flex-direction:column;align-items:flex-start;line-height:1}
+.racecard .rc-n b{font-stretch:66%;font-weight:760;font-size:clamp(64px,17vw,104px);letter-spacing:-0.02em;color:var(--ro);font-variant-numeric:tabular-nums}
+.racecard .rc-n span{font-size:13px;font-weight:600;color:#D7DCEA;margin-top:2px}
+.racecard .rc-t{display:flex;flex-direction:column;gap:3px;min-width:0;font-size:15px;color:#D7DCEA}
+.racecard .rc-k{font-size:13px;font-weight:600}
+.racecard h3{margin:0;font-stretch:68%;font-weight:740;font-size:clamp(26px,6vw,38px);line-height:1.05;color:#fff}
+.racecard .rc-s{margin-top:6px;font-size:14px;font-weight:600;color:#fff}
+.racecard .rc-s.miss{color:var(--sun)}
+.racecard button{align-self:start;min-height:32px;border:0;background:transparent;padding:0;color:#fff;font-size:14px;font-weight:600;text-decoration:underline}
+.racecard .rc-pv{grid-column:2 / -1;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:#D7DCEA}
+.racecard .rc-pv span{margin-right:4px}
+.racecard .rc-pv button{min-height:36px;padding:0 14px;border:1px solid rgba(255,255,255,.7);border-radius:999px;text-decoration:none;font-size:13px}
+.racecard .rc-pv button:hover{background:rgba(255,255,255,.1)}
+/* Rotation */
+.rhead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.rhead h2{display:inline;font-size:21px;font-weight:700;letter-spacing:-0.01em;margin-right:10px}
+.rhead span{font-size:14px;color:var(--ink2)}
+.rhead .b2{min-height:40px;font-size:14px}
+.shelf{background:var(--c50);border-radius:20px 20px 0 0;border-bottom:4px solid var(--ink);display:grid;grid-template-rows:repeat(5,auto);grid-auto-flow:column;grid-auto-columns:minmax(168px,1fr);padding:8px 8px 0;overflow-x:auto}
+.shelf.one{grid-auto-columns:minmax(0,1fr)}
+.shelf .shoe{position:relative;grid-row:span 5;display:grid;grid-template-rows:subgrid;row-gap:6px;padding:18px 16px 20px;min-width:0;border-radius:12px}
+.shelf .shoe + .shoe:before{content:'';position:absolute;left:0;top:12px;bottom:12px;border-left:1px solid var(--c200)}
+.shelf .shoe.just{background:var(--raised);box-shadow:inset 0 0 0 2px var(--cobalt)}
+.shelf .shoe.just:before{display:none}
+.shelf .shoe.just + .shoe:before{display:none}
+.shelf .talk{position:absolute;inset:0;border:0;background:transparent;border-radius:12px;z-index:1}
+.shelf .talk:hover{background:rgba(31,85,214,.05)}
+.shelf .tag{position:absolute;top:-2px;left:14px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--cobalt);color:#fff;z-index:2}
+.shelf .use{font-size:14px;font-weight:500;color:var(--ink2);min-height:21px}
+.shelf .name{margin:0;font-stretch:68%;font-weight:760;font-size:28px;line-height:1.02}
+.shelf .name .brand{display:block;font-stretch:100%;font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:5px;min-height:18px}
+.shelf .mi{margin:14px 0 0;font-stretch:66%;font-weight:720;font-size:64px;line-height:.9;font-variant-numeric:tabular-nums;align-self:end}
+.shelf .mi small{font-stretch:100%;font-size:15px;font-weight:500;color:var(--ink2);margin-left:5px}
+.shelf .wearbar{height:6px;border-radius:3px;background:var(--c100);overflow:hidden;align-self:center}
+.shelf .wearbar i{display:block;height:6px;border-radius:3px}
+.shelf .sfoot{display:flex;flex-direction:column;gap:10px;min-height:44px;font-size:14px;color:var(--ink2)}
+.shelf.one .sfoot{min-height:21px}
+.shelf .sfoot .due{font-weight:600;color:var(--ro7)}
+.shelf .vacant .name{color:var(--ink2)}
+.next{position:relative;z-index:2;background:var(--raised);border:1px solid var(--cobalt);border-radius:12px;padding:10px 12px 8px;display:flex;flex-direction:column;gap:2px}
+.next small{font-size:12px;font-weight:600;color:var(--cobalt)}
+.next b{font-size:14px;font-weight:600;color:var(--ink)}
+.next .lk{gap:0 12px;font-size:13px}
+.empty{background:var(--c50);border-radius:20px 20px 0 0;border-bottom:4px solid var(--ink);padding:30px 28px}
+.empty b{display:block;font-size:22px;color:var(--ink2);margin-bottom:6px}
+.empty span{font-size:15px;color:var(--ink2)}
+.foot{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:4px 24px;font-size:13px;color:var(--ink2)}
+.foot .txt{font-size:13px;color:var(--ink2);font-weight:500}
+/* Links */
 .lk{display:flex;flex-wrap:wrap;gap:0 16px;font-size:14px;font-weight:600}
-.lk a{display:inline-flex;align-items:center;min-height:32px;color:#9A3412;text-decoration:underline}
+.lk a{display:inline-flex;align-items:center;min-height:32px;color:var(--cobalt);text-decoration:underline}
+.lkb{min-height:32px;border:0;background:transparent;padding:0;color:var(--cobalt);font:inherit;font-weight:600;text-decoration:underline;cursor:pointer}
+.lk .stock{flex-basis:100%;font-size:13px;font-weight:400;color:var(--ink2)}
+.b .lk{margin-top:8px}
+/* Chat */
+.sheetWrap{position:fixed;top:0;right:0;bottom:0;left:0;z-index:20}
+.sheet{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.stop{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px 8px;max-width:820px;width:100%;margin:0 auto}
+.stop .brand{display:flex;align-items:center;gap:10px}
+.stop .brand b{display:block;font-size:17px;font-weight:700}
+.stop .brand span#status2{display:block;font-size:13px;color:var(--ink2)}
+.stop .hdr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.stop .lead{width:48px}
+.cq{font-size:14px;font-weight:600}
+.ghost{height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line2);background:var(--raised);font-size:14px;font-weight:600}
+.round{width:44px;height:44px;border-radius:50%;border:1px solid var(--line2);background:var(--raised);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.scroller{flex:1;overflow-y:auto;min-height:0}
+main{flex-grow:1;padding-top:20px;padding-bottom:24px;display:flex;flex-direction:column;gap:14px}
+.av{border-radius:50%;flex-shrink:0;object-fit:cover;background:var(--c50)}
+.you{display:flex;justify-content:flex-end}
+.yb{max-width:78%;background:var(--ink);color:#fff;font-size:15px;line-height:1.5;padding:10px 14px;border-radius:16px 16px 4px 16px;border:0;text-align:left;display:inline-flex;align-items:center;gap:8px;min-height:44px}
+.mo{display:flex;gap:12px;align-items:flex-start}
+.mo .b{max-width:82%;font-size:16px;line-height:1.55;white-space:pre-line;background:var(--c50);padding:10px 14px;border-radius:4px 16px 16px 16px;margin-top:2px}
+.ind{margin-left:48px}
+.moimg img{display:block;width:200px;height:200px}
+.card{background:var(--raised);border:1px solid var(--line);border-radius:16px;padding:16px}
+.pvnote{align-self:center;font-size:13px;font-weight:600;color:var(--ink2);background:#EFE7D8;border-radius:999px;padding:6px 14px;margin:0 auto 4px;width:fit-content}
+.typing{display:flex;gap:12px;align-items:center;font-size:14px;color:var(--ink2)}
+.old{border:1px dashed var(--line2);border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--ink2)}
+.cap{font-size:12px;color:var(--ink2);margin-top:8px}
+footer{background:transparent}
+footer .wrap{padding-top:12px;padding-bottom:16px;display:flex;flex-direction:column;gap:10px}
+.plan{background:var(--ink);color:#fff;border-radius:14px;padding:12px 12px 12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.plan .l{display:flex;align-items:center;gap:12px}
+.plan b{display:block;font-size:15px;font-weight:600}
+.plan small{font-size:13px;color:#C9D1E6}
+.plan .lk a,.plan .lkb{color:#fff}
+.plan .lk .stock{color:#C9D1E6}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{min-height:44px;padding:8px 16px;border-radius:999px;border:1px solid var(--line2);background:var(--raised);font-size:14px;font-weight:500}
+.box{display:flex;gap:8px;align-items:center;background:var(--raised);border:1px solid var(--line2);border-radius:999px;padding:6px 6px 6px 22px;box-shadow:0 6px 24px rgba(20,36,79,.08)}
+.box input{flex-grow:1;min-width:0;border:0;outline:none;font-size:15px;height:44px;background:transparent}
+.box button{width:44px;height:44px;border-radius:50%;border:0;background:var(--cobalt);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* Forms */
 .add{display:flex;flex-direction:column;gap:20px}
 .add fieldset{border:0;padding:0;margin:0;min-width:0;display:flex;flex-direction:column;gap:8px}
 .add legend{padding:0;margin-bottom:8px;font-size:16px;font-weight:600}
-.add .q{width:100%;height:48px;border:1px solid #D6D8DC;border-radius:12px;padding:0 14px;font-size:16px;background:#fff}
+.add .q{width:100%;height:48px;border:1px solid var(--line2);border-radius:12px;padding:0 14px;font-size:16px;background:var(--raised)}
 .add .res{display:flex;flex-direction:column}
-.add .res button{min-height:44px;text-align:left;border:0;border-bottom:1px solid #EEF0F2;background:transparent;padding:8px 2px;font-size:15px}
-.add .res button:hover{background:#FBF6F2}
+.add .res button{min-height:44px;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;padding:8px 2px;font-size:15px}
+.add .res button:hover{background:var(--c50)}
 .add .races button{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0 12px}
 .add .races b{font-weight:600}
-.add .races span{font-size:13px;color:#6B5A50}
+.add .races span{font-size:13px;color:var(--ink2)}
 .add .chosen{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:16px}
-.add .chosen button{min-height:32px;border:0;background:transparent;padding:0;color:#9A3412;font-size:14px;font-weight:600;text-decoration:underline}
+.add .chosen button,.add .picked button{min-height:44px;border:0;background:transparent;padding:0;color:var(--cobalt);font-size:14px;font-weight:600;text-decoration:underline}
 .add .opts{display:flex;flex-wrap:wrap;gap:8px}
-.add .opts button{min-height:44px;padding:8px 16px;border-radius:999px;border:1px solid #D6D8DC;background:#fff;font-size:14px;font-weight:500}
-.add .opts button[aria-pressed="true"]{background:#2B1A12;border-color:#2B1A12;color:#fff}
+.add .opts button{min-height:44px;padding:8px 16px;border-radius:999px;border:1px solid var(--line2);background:var(--raised);font-size:14px;font-weight:500}
+.add .opts button[aria-pressed="true"]{background:var(--cobalt);border-color:var(--cobalt);color:#fff}
 .add .picked{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:16px;font-weight:600}
-.add .picked button{min-height:44px;border:0;background:transparent;color:#9A3412;font-size:14px;font-weight:600;text-decoration:underline}
-.add .go{height:48px;border-radius:12px;border:0;background:#2B1A12;color:#fff;font-size:15px;font-weight:600}
-.add .go:disabled{background:#E3E5E8;color:#5B6068;cursor:not-allowed}
+.add .go{height:48px;border-radius:12px;border:0;background:var(--cobalt);color:#fff;font-size:15px;font-weight:600}
+.add .go:disabled{background:#E3E5EA;color:var(--ink2);cursor:not-allowed}
 .rot{display:flex;flex-direction:column;gap:8px}
-.rot .rl{font-size:14px;font-weight:600;color:#5B6068}
-.saved{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:8px;font-size:13px;color:#5B6068}
-.saved button{min-height:32px;border:0;background:transparent;padding:0;color:#9A3412;font-size:13px;font-weight:600;text-decoration:underline}
-.pop{animation:mopop .35s ease-out}
-.grow{animation:mogrow .5s ease-out}
-@keyframes mopop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-@keyframes mogrow{from{width:0}}
-@media (prefers-reduced-motion:reduce){.pop,.grow{animation:none}}
-.shelf{background:#FFF1E8;border-radius:20px 20px 0 0;border-bottom:4px solid #2B1A12;display:grid;grid-template-rows:repeat(5,auto);grid-auto-flow:column;grid-auto-columns:minmax(168px,1fr);padding:8px 8px 0;overflow-x:auto}
-.shelf.one{grid-auto-columns:minmax(0,1fr)}
-.shelf .shoe{grid-row:span 5;display:grid;grid-template-rows:subgrid;row-gap:6px;padding:18px 16px 20px;min-width:0}
-.shelf .shoe + .shoe{border-left:1px solid #F2DDCF}
-.shelf .use{font-size:14px;font-weight:500;color:#6B5A50;min-height:21px}
-.shelf .name{margin:0;font-stretch:68%;font-weight:760;font-size:28px;line-height:1.02}
-.shelf .name .brand{display:block;font-stretch:100%;font-size:13px;font-weight:600;color:#6B5A50;margin-bottom:5px;min-height:18px}
-.shelf .mi{margin:14px 0 0;font-stretch:66%;font-weight:720;font-size:64px;line-height:.9;font-variant-numeric:tabular-nums;align-self:end}
-.shelf .mi small{font-stretch:100%;font-size:15px;font-weight:500;color:#6B5A50;margin-left:5px}
-.shelf .wearbar{height:6px;border-radius:3px;background:#F2DDCF;overflow:hidden;align-self:center}
-.shelf .wearbar i{display:block;height:6px;border-radius:3px}
-.shelf .sfoot{display:flex;flex-direction:column;gap:10px;min-height:76px;font-size:14px;color:#6B5A50}
-.shelf.one .sfoot{min-height:21px}
-.shelf .sfoot .due{font-weight:600;color:#8A4B00}
-.shelf .vacant .name{color:#6B5A50}
-.shelf .txt{min-height:32px;border:0;background:transparent;padding:0;color:#9A3412;font-size:13px;font-weight:600;text-decoration:underline;text-align:left}
-.raceline{display:flex;flex-wrap:wrap;align-items:center;gap:2px 12px;font-size:15px;min-height:32px}
-.raceline:empty{display:none}
-.raceline b{font-weight:600}
-.raceline button,.racedone button{min-height:32px;border:0;background:transparent;padding:0;color:#9A3412;font-size:14px;font-weight:600;text-decoration:underline}
-.racedone{font-size:15px;font-weight:600}
-.racecard{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px 28px;background:#2B1A12;color:#FFF1E8;border-radius:20px;padding:22px 28px}
-.racecard .rc-n{display:flex;flex-direction:column;align-items:flex-start;line-height:1}
-.racecard .rc-n b{font-stretch:66%;font-weight:760;font-size:clamp(64px,17vw,104px);letter-spacing:-0.02em;color:#F26B3A;font-variant-numeric:tabular-nums}
-.racecard .rc-n span{font-size:13px;font-weight:600;color:#E8CFC0;margin-top:2px}
-.racecard .rc-t{display:flex;flex-direction:column;gap:3px;min-width:0;font-size:15px;color:#E8CFC0}
-.racecard .rc-k{font-size:13px;font-weight:600}
-.racecard h3{margin:0;font-stretch:68%;font-weight:740;font-size:clamp(26px,6vw,36px);line-height:1.05;color:#FFF1E8}
-.racecard .rc-s{margin-top:6px;font-size:14px;font-weight:600;color:#FFF1E8}
-.racecard .rc-s.miss{color:#FFB37A}
-.racecard button{align-self:start;min-height:32px;border:0;background:transparent;padding:0;color:#FFF1E8;font-size:14px;font-weight:600;text-decoration:underline}
-.racecard .rc-pv{grid-column:1 / -1;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;padding-top:14px;border-top:1px solid #4A342A;font-size:13px;color:#E8CFC0}
-.racecard .rc-pv span{margin-right:4px}
-.racecard .rc-pv button{min-height:36px;padding:0 14px;border:1px solid #6B5346;border-radius:999px;text-decoration:none;font-size:13px}
-.racecard .rc-pv button:hover{background:#3A261C}
-.pvnote{align-self:center;font-size:13px;font-weight:600;color:#6B5A50;background:#F1E6DE;border-radius:999px;padding:6px 14px;margin:0 auto 4px;width:fit-content}
-@media(max-width:520px){.racecard{grid-template-columns:auto 1fr;padding:20px;gap:6px 18px}.racecard button{grid-column:1 / -1;justify-self:start}}
-.b1,.b2{height:44px;border-radius:10px;padding:0 16px;font-size:14px;font-weight:600}
-.b1{border:1.5px solid #2B1A12;background:#2B1A12;color:#fff}
-.b2{border:1.5px solid #2B1A12;background:transparent;color:#2B1A12}
-.b1.on,.b2.on{background:#E8F5EC;color:#1E6B3A;border-color:#A7D7B5}
-.shelf .sfoot .b1,.shelf .sfoot .b2{padding:0 8px;font-size:13.5px;white-space:nowrap}
+.rot .rl{font-size:14px;font-weight:600;color:var(--ink2)}
+.saved{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:8px;font-size:13px;color:var(--ink2)}
+.saved button{min-height:32px;border:0;background:transparent;padding:0;color:var(--cobalt);font-size:13px;font-weight:600;text-decoration:underline}
+/* Add a shoe sheet over Rotation */
+.addWrap{position:fixed;inset:0;z-index:40;display:flex;align-items:flex-start;justify-content:center;padding:56px 16px 16px}
+.addWrap .backdrop{position:absolute;inset:0;background:rgba(20,36,79,.45)}
+.addsheet{position:relative;width:100%;max-width:560px;max-height:calc(100vh - 72px);overflow-y:auto;background:var(--raised);border-radius:24px;padding:24px 28px 28px;box-shadow:0 24px 64px rgba(20,36,79,.35)}
+.addsheet .ahead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.addsheet h2{font-size:24px;font-weight:700}
+.addsheet .add{gap:22px}
+.addsheet .acts{display:flex;align-items:center;gap:16px}
+.addsheet .go{padding:0 24px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:45;background:var(--ink);color:#fff;border-radius:999px;padding:6px 22px 6px 8px;display:flex;align-items:center;gap:12px;font-size:15px;font-weight:600;box-shadow:0 8px 24px rgba(20,36,79,.25);margin-left:calc(var(--rail) / 2)}
+.toast img{width:44px;height:44px;border-radius:50%;object-fit:cover}
+/* Picks */
 .pk{display:flex;flex-direction:column;gap:12px}
-.pk .forwhat{margin:6px 0 0;font-size:15px;font-weight:600;color:#5B6068}
+.pk .forwhat{margin:6px 0 0;font-size:15px;font-weight:600;color:var(--ink2)}
 .pk .grid{display:grid;grid-template-columns:1.3fr 1fr;gap:12px}
 .pk .grid.solo{grid-template-columns:1fr}
-.pk .top{grid-row:span 2;background:#fff;border:2px solid #F26B3A;border-radius:18px;padding:24px 24px 20px;display:flex;flex-direction:column;gap:14px;min-width:0}
-.pk .tag{align-self:flex-start;font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;background:#FDEBDF;color:#9A3412}
+.pk .top{grid-row:span 2;background:var(--raised);border:2px solid var(--cobalt);border-radius:18px;padding:24px 24px 20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.pk .tag{align-self:flex-start;font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--c50);color:var(--cobalt)}
 .pk .name{margin:0;font-stretch:68%;font-weight:760;font-size:26px;line-height:1.02}
-.pk .name .brand{display:block;font-stretch:100%;font-size:13px;font-weight:600;color:#5B6068;margin-bottom:5px}
+.pk .name .brand{display:block;font-stretch:100%;font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:5px}
 .pk .top .name{font-size:44px;line-height:.98}
 .pk .why{margin:0;font-size:15px;line-height:1.45}
 .pk .top .why{font-size:18px;line-height:1.4;font-weight:500}
 .pk .top .spec{margin-top:auto}
-.pk .spec{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #EADFD6;border-bottom:1px solid #EADFD6;padding:12px 0}
-.pk .spec div + div{border-left:1px solid #EADFD6;padding-left:14px}
+.pk .spec{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0}
+.pk .spec div + div{border-left:1px solid var(--line);padding-left:14px}
 .pk .spec b{display:block;font-stretch:66%;font-weight:720;font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
-.pk .spec span{font-size:13px;color:#5B6068}
-.pk .feel{margin:0;font-size:14px;color:#5B6068}
+.pk .spec span{font-size:13px;color:var(--ink2)}
+.pk .feel{margin:0;font-size:14px;color:var(--ink2)}
 .pk .acts{display:flex;align-items:center;gap:6px 16px;flex-wrap:wrap}
-.pk .alt{background:#fff;border:1px solid #EADFD6;border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.pk .alt{background:var(--raised);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .pk .row{display:flex;gap:18px;font-stretch:66%;font-weight:720;font-size:22px;line-height:1;font-variant-numeric:tabular-nums;margin-top:auto;padding-top:2px}
-.pk .row span{font-stretch:100%;font-size:13px;font-weight:400;color:#5B6068;margin-left:4px}
-.pk .budget{margin:0;font-size:14px;font-weight:500;color:#1E6B3A}
-.pk .budget.warn{color:#8A4B00}
-.plan .lk a,.plan .lkb{color:#fff}
-.lkb{min-height:32px;border:0;background:transparent;padding:0;color:#9A3412;font:inherit;font-weight:600;text-decoration:underline;cursor:pointer}
-.lk .stock{flex-basis:100%;font-size:13px;font-weight:400;color:#6B5A50}
-.plan .lk .stock{color:#E8CFC0}
-.b .lk{margin-top:8px}
+.pk .row span{font-stretch:100%;font-size:13px;font-weight:400;color:var(--ink2);margin-left:4px}
+.pk .budget{margin:0;font-size:14px;font-weight:500;color:var(--greenink)}
+.pk .budget.warn{color:var(--ro7)}
+/* Motion */
+.pop{animation:mopop .35s ease-out}
+.grow{animation:mogrow .5s ease-out}
+@keyframes mopop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes mogrow{from{width:0}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.pulse,.mo-pulse{animation:pulse 1s ease-in-out infinite}
+.hop,.mo-hop{animation:hop .8s ease-in-out 3}
+@media (prefers-reduced-motion:reduce){.pop,.grow,.pulse,.mo-pulse,.hop,.mo-hop{animation:none}}
+/* Phones */
 @media (max-width:720px){
+.rail{display:none}
+#home,.sheetWrap{margin-left:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 6px}
+.topbar .logo svg{height:26px}
+.tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;height:var(--tab);background:var(--raised);border-top:1px solid var(--line);z-index:30;justify-content:space-around;align-items:center;padding-bottom:env(safe-area-inset-bottom)}
+.tabbar .nav{width:120px;flex-direction:column;padding:6px 0}
+.sheetWrap{bottom:var(--tab)}
+#home>.inner{padding:12px 0 calc(var(--tab) + 28px);gap:26px}
+.mofig,.mofig img{width:130px;height:130px}
+.says{padding:16px 18px 18px}
+.says p{font-size:17px}
+.toast{bottom:calc(var(--tab) + 16px);margin-left:0;width:max-content;max-width:calc(100vw - 32px)}
+.addWrap{padding:0;align-items:flex-end}
+.addsheet{border-radius:24px 24px 0 0;max-height:92vh;padding:22px 20px 28px}
 .shelf{display:block;padding:0;border-radius:18px 18px 0 0;overflow:visible}
-.shelf .shoe{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto;column-gap:12px;row-gap:4px;padding:16px;border-left:0;border-bottom:1px solid #F2DDCF}
-.shelf .shoe + .shoe{border-left:0}
+.shelf .shoe{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto;column-gap:12px;row-gap:4px;padding:16px;border-radius:0;border-bottom:1px solid var(--c200)}
+.shelf .shoe + .shoe:before{display:none}
+.shelf .shoe.just{border-radius:12px}
 .shelf .shoe .use{grid-column:1}
 .shelf .shoe .name{grid-column:1;font-size:26px}
 .shelf .shoe .mi{grid-column:2;grid-row:1 / span 2;font-size:52px;margin:0;align-self:center}
 .shelf .shoe .wearbar{grid-column:1 / -1;margin-top:8px}
 .shelf .shoe .sfoot{grid-column:1 / -1;min-height:0;margin-top:6px}
+.shelf .tag{top:6px;left:auto;right:16px}
 .pk .grid{grid-template-columns:1fr}
 .pk .top .name{font-size:40px}
+.racecard{grid-template-columns:auto 1fr;padding:20px;gap:6px 18px}
+.racecard>button{grid-column:1 / -1;justify-self:start}
+.racecard .rc-pv{grid-column:1 / -1}
 }
-.cap{font-size:12px;color:#5B6068;margin-top:8px}
-.old{border:1px dashed #C4C8CE;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:4px;font-size:14px;color:#5B6068}
-.typing{display:flex;gap:12px;align-items:center;font-size:14px;color:#5B6068}
-footer{background:transparent}
-.sheetWrap{position:fixed;inset:0;z-index:20}
-.backdrop{position:absolute;inset:0;background:rgba(43,26,18,.45)}
-.sheet{position:absolute;inset:12px;background:#FBF6F2;border-radius:28px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 64px rgba(43,26,18,.35)}
-.stop{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px 6px}
-.stop .brand b{display:block;font-size:16px;font-weight:700}
-.round{width:48px;height:48px;border-radius:50%;border:1px solid #E3E5E8;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.scroller{flex:1;overflow-y:auto;min-height:0}
-@media (max-width:600px){.sheet{inset:6px;border-radius:22px}#status2{display:none}}
-footer .wrap{padding-top:12px;padding-bottom:16px;display:flex;flex-direction:column;gap:10px}
-.plan{background:#2B1A12;color:#fff;border-radius:14px;padding:12px 12px 12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.plan .l{display:flex;align-items:center;gap:12px}
-.plan b{display:block;font-size:15px;font-weight:600}
-.plan small{font-size:13px;color:#C9CDD2}
-.plan .done{font-size:14px;font-weight:600;color:#C9CDD2;padding:0 8px}
-.plan button{height:44px;padding:0 16px;border-radius:10px;border:0;background:#fff;color:#2B1A12;font-size:14px;font-weight:600}
-.plan .lk .lkb{height:auto;min-height:32px;padding:0;border-radius:0;background:transparent;color:#fff;text-decoration:underline}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chips button{min-height:44px;padding:8px 16px;border-radius:999px;border:1px solid #D6D8DC;background:#fff;font-size:14px;font-weight:500}
-.box{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #D6D8DC;border-radius:999px;padding:6px 6px 6px 22px;box-shadow:0 6px 24px rgba(43,26,18,.10)}
-.box input{flex-grow:1;min-width:0;border:0;outline:none;font-size:15px;height:44px;background:transparent}
-.box button{width:44px;height:44px;border-radius:50%;border:0;background:#2B1A12;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-svg.r{flex-shrink:0}
-@keyframes mo-blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(0.1)}}
-@keyframes mo-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-.mo-eye{transform-box:fill-box;transform-origin:center;animation:mo-blink 4.5s infinite}
-@keyframes mo-twitchk{0%,88%,100%{transform:rotate(0)}91%{transform:rotate(-12deg)}94%{transform:rotate(5deg)}97%{transform:rotate(-4deg)}}
-.mo-twitch{transform-box:view-box;transform-origin:46px 50px;animation:mo-twitchk 6s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){.mo-twitch{animation:none}}
-@media (prefers-reduced-motion:reduce){.mo-eye,.mo-float,.mo-pulse,.mo-hop,.mo-ear{animation:none}}
-.mo-pulse{animation:pulse 1s ease-in-out infinite}
-.mo-hop{animation:hop .8s ease-in-out 3}
-@keyframes mo-stepk{from{opacity:.35;filter:grayscale(1)}to{opacity:1;filter:none}}
-@keyframes mo-ink{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@keyframes mo-breathek{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.025)}}
-.mo-step{animation:mo-stepk .45s ease backwards}
-.mo-in{animation:mo-ink .5s ease 3.6s backwards}
-.mo-breathe{transform-origin:50% 100%;animation:mo-breathek 1.8s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){.mo-step,.mo-in,.mo-breathe{animation:none}}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
-@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-8px)}}
-@keyframes ear{0%,100%{transform:rotate(0)}50%{transform:rotate(-14deg)}}
-.pulse{animation:pulse 1s ease-in-out infinite}
-.hop{animation:hop .8s ease-in-out 3}
-.ear{transform-box:view-box;transform-origin:46px 44px;animation:ear 1.2s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){.pulse,.hop,.ear{animation:none}}
 @media (max-width:520px){.ind{margin-left:0}}
 </style>
 </head>
 <body>
-<svg width="0" height="0" aria-hidden="true" style="position: absolute"><defs>
-<radialGradient id="mo-b" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#FFB089"></stop><stop offset="0.45" stop-color="#F26B3A"></stop><stop offset="1" stop-color="#C4481A"></stop></radialGradient>
-<linearGradient id="mo-e" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFA579"></stop><stop offset="0.6" stop-color="#F26B3A"></stop><stop offset="1" stop-color="#CC4E1E"></stop></linearGradient>
-<linearGradient id="mo-i" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE3D3"></stop><stop offset="1" stop-color="#F7B698"></stop></linearGradient>
-<radialGradient id="mo-s" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#2B1A12" stop-opacity="0.3"></stop><stop offset="1" stop-color="#2B1A12" stop-opacity="0"></stop></radialGradient>
-<radialGradient id="mo-c" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FF8A7A" stop-opacity="0.9"></stop><stop offset="1" stop-color="#FF8A7A" stop-opacity="0"></stop></radialGradient>
-<radialGradient id="mo-h" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
-<radialGradient id="mo-m" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#FFE9DC"></stop><stop offset="1" stop-color="#FFD0B5" stop-opacity="0.2"></stop></radialGradient>
-<filter id="mo-z" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="4" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
-<filter id="mo-g" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.35 1.3" numOctaves="3" seed="9"></feTurbulence><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 0.92  0 0 0 0 0.85  0 0 0 1.6 -0.75"></feColorMatrix></filter>
-<filter id="mo-gd" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.4 1.4" numOctaves="3" seed="21"></feTurbulence><feColorMatrix type="matrix" values="0 0 0 0 0.55  0 0 0 0 0.18  0 0 0 0 0.05  0 0 0 1.5 -0.8"></feColorMatrix></filter>
-<clipPath id="mo-clip"><circle cx="60" cy="82" r="44"></circle><rect x="36" y="4" width="18" height="52" rx="9"></rect><rect x="66" y="4" width="18" height="52" rx="9" transform="rotate(12 75 54)"></rect></clipPath>
-</defs></svg>
 <div class="app">
-<header><div class="wrap">
-<div class="brand"><span id="logo"></span><div><h1>Mo</h1></div></div>
-<div class="hdr"><button class="ghost" data-act="chat" type="button">Chat with Mo</button></div>
-</div></header>
-<div class="wrap" id="home" style="max-width: 960px">
-<div style="display: flex; flex-direction: column; gap: 36px; padding-bottom: 56px">
-<div style="display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 56px 0 4px; text-align: center">
-<h2 style="margin: 0; font-size: clamp(16px, 4.3vw, 30px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; white-space: nowrap">What do you need for your running today?</h2>
-<form id="askHome" style="display: flex; gap: 8px; align-items: center; background: #FFFFFF; border: 1px solid #D6D8DC; border-radius: 999px; padding: 6px 6px 6px 22px; width: 100%; max-width: 560px; box-sizing: border-box">
-<label class="sr" for="askH">Ask Mo</label>
-<input id="askH" type="text" autocomplete="off" placeholder="Ask Mo about your shoes" style="flex-grow: 1; min-width: 0; border: 0; outline: none; font-size: 16px; height: 48px; background: transparent; color: #2B1A12; font-family: inherit">
-<button type="submit" aria-label="Ask Mo" style="width: 48px; height: 48px; border-radius: 50%; border: 0; background: #2B1A12; color: #FFFFFF; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"></path><path d="M5 12l7-7 7 7"></path></svg></button>
-</form>
-<span style="font-size: 13px; color: #5B6068">Mo remembers your shoes in this browser, on this device.</span>
+<nav class="rail" aria-label="Main">
+<span class="logo" role="img" aria-label="Mo"><svg viewBox="10 5 1310 510" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(220,15) skewX(-20)"><path d="M700 332H1210V392H700Z" fill="#DC440D"/><path d="M0 410V0H150L245 240L340 0H490V410H365V190L295 360H195L125 190V410Z" fill="#1F55D6" stroke-width="16" paint-order="stroke" style="stroke:var(--raised)"/><path fill-rule="evenodd" d="M720 120C820 120 900 190 900 265C900 345 820 410 720 410C620 410 540 345 540 265C540 190 620 120 720 120ZM720 200C680 200 655 230 655 265C655 305 680 332 720 332C760 332 785 305 785 265C785 230 760 200 720 200Z" fill="#1F55D6" stroke-width="16" paint-order="stroke" style="stroke:var(--raised)"/><path d="M-20 432H1180V492H-20Z" fill="#DC440D"/></g></svg></span>
+<button type="button" class="nav" data-nav="chat"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4A2.5 2.5 0 0 1 4 13.5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>Chat</span></button>
+<button type="button" class="nav" data-nav="home"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2.5 17.5V8.2c0-.7.6-1.2 1.3-1L8 8.4l1.6-2.1 2.4 1.6c1.8 1.2 3.8 2.3 5.8 3.1l2.5 1c1.2.5 1.9 1.6 1.9 2.8v2.7H2.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M2.5 15.2h19" stroke="currentColor" stroke-width="2"/><path d="M10.5 9.5l1.5 1M12.5 8.3l1.5 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Rotation</span></button>
+<span class="push"></span>
+<button type="button" class="prof" aria-label="Profile, coming soon" title="Profile, coming soon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.6" stroke="currentColor" stroke-width="2"/><path d="M5.5 19.5c1.3-3 3.7-4.5 6.5-4.5s5.2 1.5 6.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+</nav>
+<div id="home">
+<header class="topbar"><span class="logo" role="img" aria-label="Mo"><svg viewBox="10 5 1310 510" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(220,15) skewX(-20)"><path d="M700 332H1210V392H700Z" fill="#DC440D"/><path d="M0 410V0H150L245 240L340 0H490V410H365V190L295 360H195L125 190V410Z" fill="#1F55D6" stroke-width="16" paint-order="stroke" style="stroke:var(--raised)"/><path fill-rule="evenodd" d="M720 120C820 120 900 190 900 265C900 345 820 410 720 410C620 410 540 345 540 265C540 190 620 120 720 120ZM720 200C680 200 655 230 655 265C655 305 680 332 720 332C760 332 785 305 785 265C785 230 760 200 720 200Z" fill="#1F55D6" stroke-width="16" paint-order="stroke" style="stroke:var(--raised)"/><path d="M-20 432H1180V492H-20Z" fill="#DC440D"/></g></svg></span><button type="button" class="prof" aria-label="Profile, coming soon" title="Profile, coming soon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.6" stroke="currentColor" stroke-width="2"/><path d="M5.5 19.5c1.3-3 3.7-4.5 6.5-4.5s5.2 1.5 6.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></header>
+<div class="inner">
+<div class="hero">
+<div class="mofig" id="moFig"><img src="img/mo-master.jpg" alt="Mo, a red orange rabbit in a 1970s running outfit, waving" width="170" height="170"><img class="closed" src="img/mo-master-closed.jpg" alt="" width="170" height="170"></div>
+<div class="says" id="moSays" aria-live="polite"></div>
 </div>
 <div id="raceLine" class="raceline"></div>
-<section id="rotation" style="display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 96px">
-<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
-<h2 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">Your rotation</h2>
-
-<span style="font-size: 14px; color: #5B6068">Saved on this device</span>
-</div>
-<div id="rotGrid" class="shelf"></div>
+<section id="rotation" style="scroll-margin-top: 24px">
+<div class="rhead"><div><h2>Your rotation</h2><span id="rotHint">Saved on this device. Tap a shoe to talk to Mo about it.</span></div><button type="button" class="b2" id="addTop" data-act="addshoe">+ Add a shoe</button></div>
+<div id="rotGrid"></div>
 </section>
-<span style="font-size: 13px; color: #5B6068">Mo estimates mileage from what you tell it, so it says “probably.”</span>
+<p class="foot"><span>Mo estimates mileage from what you tell it, so it says “probably.”</span><span id="footAct"></span></p>
 </div>
 </div>
 <div id="sheetWrap" class="sheetWrap" hidden>
-<div class="backdrop" id="backdrop"></div>
-<section class="sheet" role="dialog" aria-modal="true" aria-label="Chat with Mo">
+<section class="sheet" aria-label="Chat with Mo">
 <div class="stop">
-<button type="button" class="round" id="goHome" aria-label="Close chat"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<span class="lead"><button type="button" class="round" id="goHome" aria-label="Back to your rotation" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></span>
 <div class="brand"><span id="logo2"></span><div><b>Mo</b><span id="status2" aria-live="polite"></span></div></div>
 <div id="shdr" class="hdr"></div>
 </div>
@@ -267,6 +303,18 @@ svg.r{flex-shrink:0}
 </div></footer>
 </section>
 </div>
+<div id="addWrap" class="addWrap" hidden>
+<div class="backdrop" id="addBackdrop"></div>
+<section class="addsheet" role="dialog" aria-modal="true" aria-labelledby="addTitle">
+<div class="ahead"><h2 id="addTitle">Add a shoe you run in</h2><button type="button" class="round" data-act="closeadd" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div id="addBody"></div>
+</section>
+</div>
+<div id="toast" class="toast" role="status" hidden></div>
+<nav class="tabbar" aria-label="Main">
+<button type="button" class="nav" data-nav="chat"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4A2.5 2.5 0 0 1 4 13.5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>Chat</span></button>
+<button type="button" class="nav" data-nav="home"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2.5 17.5V8.2c0-.7.6-1.2 1.3-1L8 8.4l1.6-2.1 2.4 1.6c1.8 1.2 3.8 2.3 5.8 3.1l2.5 1c1.2.5 1.9 1.6 1.9 2.8v2.7H2.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M2.5 15.2h19" stroke="currentColor" stroke-width="2"/><path d="M10.5 9.5l1.5 1M12.5 8.3l1.5 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Rotation</span></button>
+</nav>
 </div>
 <script>
 (function(){
@@ -275,7 +323,7 @@ var KEY='mo.runner';
 function loadMe(){try{var r=JSON.parse(localStorage.getItem(KEY)||'null');return r&&Array.isArray(r.shoes)?r:{shoes:[]}}catch(e){return{shoes:[]}}}
 function saveMe(){try{localStorage.setItem(KEY,JSON.stringify(ME))}catch(e){}}
 var ME=loadMe();
-var S, n=0, timers=[], view='home';
+var S, n=0, timers=[], view='home', JUST=null, HUSH=false, AF=null, toastT=null;
 var TOPIC=/\b(eat|food|fuel|gels?|nutrition|drink|hydrat\w*|apparel|jacket|shorts|cloth\w*|wear|weather|clubs?|events?|news|injur\w*|pain|workouts?|stretch\w*|sleep|weight)\b/;
 var OFF='I can’t help with that yet. Right now I can look after your shoe rotation and help you choose your next shoe. Fuel, apparel, events and news are coming.';
 // Mo's model lives behind a Supabase function. The key below is the publishable one, which is safe in a page.
@@ -283,24 +331,7 @@ var MO_URL='https://yyafrhtslqepaehjmccs.supabase.co/functions/v1/rapid-function
 var MO_KEY='sb_publishable_9EKjd-osF2Cu635rVZJr-A_OIAB3ek5';
 var $=function(id){return document.getElementById(id)};
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function rabbit(w,kind,cls,big,live){
-  var ey=live?' class="mo-eye"':'';
-  var L=kind==='cheer'?['34','rotate(-14 43 54)']:['36',''],R=kind==='cheer'?['68','rotate(14 77 54)']:['66','rotate(12 75 54)'];
-  function ear(e,inner){var x=+e[0];return inner?'<rect x="'+(x+4)+'" y="13" width="10" height="33" rx="5" fill="url(#mo-i)"'+(e[1]?' transform="'+e[1]+'"':'')+'></rect>':'<rect x="'+x+'" y="4" width="18" height="52" rx="9" fill="url(#mo-e)"'+(e[1]?' transform="'+e[1]+'"':'')+'></rect>'}
-  var wrapL=function(s){return kind==='think'?'<g class="ear">'+s+'</g>':(live&&kind==='idle')?'<g class="mo-twitch">'+s+'</g>':s};
-  var nose='<path d="M56.5 89 Q60 87 63.5 89 Q62 93 60 93.5 Q58 93 56.5 89 Z" fill="#E0655A"></path>';
-  var face={idle:'<g'+ey+'><rect x="44" y="68" width="9" height="13" rx="4.5" fill="#2B1A12"></rect><rect x="68" y="68" width="9" height="13" rx="4.5" fill="#2B1A12"></rect><circle cx="50" cy="71.5" r="2" fill="#FFFFFF"></circle><circle cx="74" cy="71.5" r="2" fill="#FFFFFF"></circle></g>'+nose+'<path d="M60 93.5 L60 96 M60 96 Q55 101 51 97 M60 96 Q65 101 69 97" stroke="#2B1A12" stroke-width="2.6" fill="none" stroke-linecap="round"></path>',
-   think:'<rect x="44" y="73" width="9" height="5" rx="2.5" fill="#2B1A12"></rect><rect x="68" y="73" width="9" height="5" rx="2.5" fill="#2B1A12"></rect>'+nose+'<path d="M60 93.5 L60 96 M55 97.5 Q60 99.5 65 97.5" stroke="#2B1A12" stroke-width="2.6" fill="none" stroke-linecap="round"></path>',
-   cheer:'<path d="M43 77 Q48.5 67 54 77" stroke="#2B1A12" stroke-width="3.5" fill="none" stroke-linecap="round"></path><path d="M67 77 Q72.5 67 78 77" stroke="#2B1A12" stroke-width="3.5" fill="none" stroke-linecap="round"></path>'+nose+'<path d="M52 96 Q60 108 68 96 Z" fill="#2B1A12"></path>'}[kind];
-  var fur=wrapL(ear(L))+ear(R)+'<circle cx="60" cy="82" r="44" fill="url(#mo-b)"></circle><path d="M52 42 Q56 30 60 40 Q63 29 68 42 Z" fill="#FF9A6B"></path>';
-  var h=Math.round(w*(big?142:130)/120);
-  return '<svg class="r '+(cls||'')+'" width="'+w+'" height="'+h+'" viewBox="0 0 120 '+(big?142:130)+'" aria-hidden="true" style="flex-shrink: 0">'
-   +(big?'<ellipse cx="60" cy="134" rx="42" ry="8" fill="url(#mo-s)"></ellipse><g filter="url(#mo-z)">'+fur+'</g><g clip-path="url(#mo-clip)"><rect x="10" y="0" width="100" height="130" filter="url(#mo-g)" opacity="0.5"></rect><rect x="10" y="0" width="100" height="130" filter="url(#mo-gd)" opacity="0.35"></rect></g>':fur)
-   +wrapL(ear(L,true))+ear(R,true)
-   +'<ellipse cx="44" cy="60" rx="20" ry="13" fill="url(#mo-h)" transform="rotate(-28 44 60)"></ellipse>'
-   +'<ellipse cx="60" cy="96" rx="20" ry="15" fill="url(#mo-m)"'+(big?' filter="url(#mo-z)"':'')+'></ellipse>'
-   +'<circle cx="34" cy="93" r="9" fill="url(#mo-c)"></circle><circle cx="86" cy="93" r="9" fill="url(#mo-c)"></circle>'+face+'</svg>';
-}
+function rabbit(w,kind,cls){return'<img class="av '+(cls||'')+'" src="img/mo-head.jpg" width="'+w+'" height="'+w+'" alt="">'}
 var L=(function(){
 var CAT={
  speed:[{brand:'Saucony',name:'Saucony Endorphin Speed 5',price:175,soft:false,why:'A light, plated trainer that feels snappy on tempo runs and intervals.',feel:'Bouncy and fast'},
@@ -330,7 +361,7 @@ function fresh(){var s={msgs:[{id:0,who:'mo',kind:'text',text:''}],stage:'add',c
  {s.form=newForm();ME=loadMe();
   if(!ME.shoes.length){s.msgs[0].text='Hi, I’m Mo. Tell me about a shoe you run in. It takes three taps, and I’ll save it to your rotation so I remember it next time.';s.msgs.push({id:-1,who:'mo',kind:'addshoe'});s.stage='add'}
   else{var due=ME.shoes.filter(function(x){return x.miles>=400})[0];
-   if(due){s.cur=due;s.msgs[0].text='Your '+due.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?';s.stage='mask'}
+   if(due){s.cur=due;s.msgs[0].text='Your '+due.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?';s.stage='mask';s.msgs.unshift({id:-2,who:'mo',kind:'img',src:'img/mo-shoe-due.jpg',alt:'Mo holding up an old running shoe'})}
    else{s.msgs[0].text='Nothing in your rotation looks due yet. Want to add another shoe?';s.stage='mdone'}}}
  return s}
 function set(p){for(var k in p)S[k]=p[k];render()}
@@ -401,7 +432,7 @@ function mapsURL(brand,where){return'https://www.google.com/maps/search/?api=1&q
 function storeLink(brand){
  return(ME.zip?'<a href="'+mapsURL(brand,place())+'" target="_blank" rel="noopener" aria-label="Find running stores near '+esc(place())+' that carry '+esc(brand)+', opens Google Maps in a new tab">Find a store</a><button type="button" class="lkb" data-act="zip">Change location</button>'
   :'<button type="button" class="lkb" data-store="'+esc(brand)+'">Find a store</button>')+'<span class="stock">I can’t see what’s in stock, so call ahead to check your size.</span>'}
-function askZip(brand){if(S.typing)return;S.zipFor=brand||null;S.zipBack=S.stage==='zip'||S.stage==='zipc'?(S.zipBack||'mdone'):S.stage;say(ME.zip?'What’s your new ZIP or postal code?':'What’s your ZIP or postal code? I’ll find running stores near you.',{stage:'zip'})}
+function askZip(brand){if(S.typing)return;S.zipFor=brand||null;S.zipBack=S.stage==='zip'||S.stage==='zipc'?(S.zipBack||'mdone'):S.stage;say(ME.zip?'What’s your new ZIP or postal code?':'What’s your ZIP or postal code? I can’t see what’s in stock, but I can show you running stores near you.',{stage:'zip'})}
 function saveZip(t){
  you(t);var f=countryIn(t),z=pickCode(f.rest.replace(/\s+/g,' ').trim());
  if(!z)return say('A ZIP or postal code works, like 33130, 1012 AB or 8001.');
@@ -427,24 +458,24 @@ var SPEC={},KNOWN=[];
 function brandOf(nm){var q=(nm+' ').toLowerCase();return BRANDS.filter(function(b){return q.indexOf(b.toLowerCase()+' ')===0})[0]||''}
 function newForm(){return{q:'',name:null,b:null,u:null,last:null}}
 function findShoes(q){q=q.trim().toLowerCase();if(q.length<2)return[];var w=q.split(/\s+/);return KNOWN.filter(function(nm){var l=nm.toLowerCase();return w.every(function(x){return l.indexOf(x)>-1})}).slice(0,5)}
-function resHTML(q){var t=q.trim(),r=findShoes(t),h=r.map(function(nm){return'<button type="button" data-shoe="'+esc(nm)+'">'+esc(nm)+'</button>'}).join('');
- if(t.length>=3&&!r.some(function(nm){return nm.toLowerCase()===t.toLowerCase()}))h+='<button type="button" data-shoe="'+esc(t)+'">Use “'+esc(t)+'”</button>';return h}
+function resHTML(q,at){at=at||'shoe';var t=q.trim(),r=findShoes(t),h=r.map(function(nm){return'<button type="button" data-'+at+'="'+esc(nm)+'">'+esc(nm)+'</button>'}).join('');
+ if(t.length>=3&&!r.some(function(nm){return nm.toLowerCase()===t.toLowerCase()}))h+='<button type="button" data-'+at+'="'+esc(t)+'">Use “'+esc(t)+'”</button>';return h}
 function shortName(nm,brand){return brand&&(nm+' ').toLowerCase().indexOf(brand.toLowerCase()+' ')===0?nm.slice(brand.length+1):nm}
 function miText(m){return m==null?'?':m>=400?'400+':'~'+m}
 function shoeHTML(o){
- return'<article class="shoe'+(o.cls||'')+'"><span class="use'+(o.pu?' pop':'')+'">'+(o.use||'&nbsp;')+'</span><h3 class="name'+(o.pn?' pop':'')+'"><span class="brand">'+(o.brand?esc(o.brand):'&nbsp;')+'</span>'+esc(o.name)+'</h3>'
-  +'<p class="mi"'+(o.mi==null?' style="visibility:hidden"':'')+'>'+(o.mi==null?'0':o.mi)+'<small>mi</small></p><div class="wearbar"'+(o.mi==null?' style="visibility:hidden"':'')+'><i class="'+(o.pb?'grow':'')+'" style="width:'+(o.pct||0)+'%;background:'+(o.color||'#1E6B3A')+'"></i></div><div class="sfoot">'+(o.foot||'')+'</div></article>'}
+ return'<article class="shoe'+(o.cls||'')+'">'+(o.pre||'')+'<span class="use'+(o.pu?' pop':'')+'">'+(o.use||'&nbsp;')+'</span><h3 class="name'+(o.pn?' pop':'')+'"><span class="brand">'+(o.brand?esc(o.brand):'&nbsp;')+'</span>'+esc(o.name)+'</h3>'
+  +'<p class="mi"'+(o.mi==null?' style="visibility:hidden"':'')+'>'+(o.mi==null?'0':o.mi)+'<small>mi</small></p><div class="wearbar"'+(o.mi==null?' style="visibility:hidden"':'')+'><i class="'+(o.pb?'grow':'')+'" style="width:'+(o.pct||0)+'%;background:'+(o.color||'#7ABA5C')+'"></i></div><div class="sfoot">'+(o.foot||'')+'</div></article>'}
 function wear(m){
- if(m==null)return{pct:0,color:'#C9CDD2',badge:'Mileage unknown',bs:'background:#EEF0F2;color:#4A4F57',line:'No mileage yet, so Mo goes by feel'};
- if(m>=400)return{pct:85,color:'#E08A00',due:true,badge:'Probably due',bs:'background:#FFF4E0;color:#8A4B00',line:'Over 400 miles, by your estimate'};
- if(m>=200)return{pct:60,color:'#1E6B3A',badge:'Good for now',bs:'background:#E8F5EC;color:#1E6B3A',line:'200 to 400 miles, by your estimate'};
- return{pct:25,color:'#1E6B3A',badge:'Fresh',bs:'background:#E8F5EC;color:#1E6B3A',line:'Under 200 miles, by your estimate'}}
+ if(m==null)return{pct:0,color:'#A3ADC2',badge:'Mileage unknown',bs:'background:#EEF0F2;color:#4A4F57',line:'No mileage yet, so Mo goes by feel'};
+ if(m>=400)return{pct:85,color:'#DC440D',due:true,badge:'Probably due',bs:'background:#FFF4E0;color:#8A4B00',line:'Over 400 miles, by your estimate'};
+ if(m>=200)return{pct:60,color:'#7ABA5C',badge:'Good for now',bs:'background:#E8F5EC;color:#1E6B3A',line:'200 to 400 miles, by your estimate'};
+ return{pct:25,color:'#7ABA5C',badge:'Fresh',bs:'background:#E8F5EC;color:#1E6B3A',line:'Under 200 miles, by your estimate'}}
 function mineCard(name,b,u,last){
  if(!name)return'<div class="shelf one">'+shoeHTML({cls:' vacant',name:'Your shoe',foot:'Shows up here as you answer'})+'</div>';
  var w=b==null?null:wear(BUCKETS[b][1]),br=brandOf(name);
  return'<div class="shelf one">'+shoeHTML({use:u!=null?USES[u][0]:'',brand:br,name:shortName(name,br),mi:w?miText(BUCKETS[b][1]):null,pct:w?w.pct:0,color:w?w.color:'',foot:w?(w.due?'<span class="due">Probably due</span>':w.line):'',pn:last==='name',pb:last==='b',pu:last==='u'})+'</div>'}
 function addForm(m,active){
- if(m.done){var d=m.done,bi=BUCKETS.map(function(x){return x[1]}).indexOf(d.miles),ui=USES.map(function(x){return x[1]}).indexOf(d.use);return'<div class="ind">'+mineCard(d.name,bi,ui,null)+'<div class="saved"><span>In your rotation, saved on this device</span><button type="button" data-act="rotation">See my rotation</button></div></div>'}
+ if(m.done){var d=m.done,bi=BUCKETS.map(function(x){return x[1]}).indexOf(d.miles),ui=USES.map(function(x){return x[1]}).indexOf(d.use);return'<div class="ind">'+mineCard(d.name,bi,ui,null)+'<div class="saved"><span>In your rotation, saved on this device</span><button type="button" data-nav="home">See my rotation</button></div></div>'}
  if(!active)return'';
  var f=S.form,h='<div class="ind card add" role="group" aria-label="Add a shoe">';
  h+='<fieldset><legend>Which shoe do you run in?</legend>'+(f.name?'<div class="picked"><span>'+esc(f.name)+'</span><button type="button" data-f="clear">Change</button></div>'
@@ -461,9 +492,9 @@ function formAct(b){
  if(k==='clear'){f.name=null;f.q='';render();return setTimeout(function(){var q=$('shoeQ');if(q)q.focus()},30)}
  if(k==='b'||k==='u'){f[k]=+b.dataset.v;f.last=k;return render()}
  if(k==='add'&&f.name&&f.b!=null&&f.u!=null&&!S.typing){
-  var sh={name:f.name,brand:brandOf(f.name),label:USES[f.u][0],use:USES[f.u][1],role:USES[f.u][2],miles:BUCKETS[f.b][1],added:Date.now()};
-  ME.shoes=ME.shoes.filter(function(x){return x.name!==sh.name}).concat([sh]);saveMe();
-  S.msgs.forEach(function(m){if(m.kind==='addshoe'&&!m.done)m.done=sh;if(m.forForm)m.forForm=false});S.cur=sh;S.form=newForm();S.stage='wait';afterAdd(sh)}}
+  var sh=makeShoe(f);ME.shoes=ME.shoes.filter(function(x){return x.name!==sh.name}).concat([sh]);saveMe();JUST=sh.name;S.fromChatAdd=true;
+  S.msgs.forEach(function(m){if(m.kind==='addshoe'&&!m.done)m.done=sh;if(m.forForm)m.forForm=false});S.msgs.push(msg('mo','img',{src:'img/mo-shoe-added.jpg',alt:'Mo lacing up a new running shoe'}));S.cur=sh;S.form=newForm();S.stage='wait';afterAdd(sh)}}
+function makeShoe(f){return{name:f.name,brand:brandOf(f.name),label:USES[f.u][0],use:USES[f.u][1],role:USES[f.u][2],miles:BUCKETS[f.b][1],added:Date.now()}}
 function afterAdd(sh){
  if(!sh.role){say('Added to your rotation. I don’t have track shoes in my catalog yet, so I’ll keep this one in your rotation for now.',{stage:'mdone'});return later(900,settle)}
  if(sh.miles==null)return say('Added to your rotation. Without a mileage I’ll go by feel, so tell me when your '+sh.name+' starts to feel flat. Want to see what else is out there?',{stage:'mask'});
@@ -486,7 +517,7 @@ function showMine(force){
  var need=sh.gap?{type:sh.use,why:'The runner is training for the '+ME.race.name+' and has no race shoe in their rotation.'}
   :{type:sh.use,why:due?sh.name+' is probably over 400 miles, by the runner’s own estimate.':'The runner wants to try something new for '+sh.use+' runs. Their '+sh.name+' still has life in it.',replaces:sh.name};
  askPicks(need,list,function(d){
-  S.msgs=S.msgs.concat(optsMsgs(sh.role,sh.gap?'For the '+ME.race.name:due?'To replace your '+sh.name:'Something new for '+sh.label.toLowerCase(),list,d,
+  S.msgs=S.msgs.concat(optsMsgs(sh.role,sh.gap?'For the '+ME.race.name:due?'To replace your '+sh.name+', probably past 400 miles':'Something new for '+sh.label.toLowerCase(),list,d,
    sh.gap?'Here are the ones I’d look at for the '+ME.race.name+'.':due?'Here are the ones I’d look at to replace your '+sh.name+'.':'Here are a few that would be a change from your '+sh.name+'.',
    function(c){if(sh.gap)return c.brand&&c.brand===sh.brand?'Same brand as most of your rotation, built for race day.':'Built for race day, which is the one job your rotation doesn’t cover.';
     return c.brand&&c.brand===sh.brand?'Same brand as your '+sh.name+', if you want to stay with what you know.':c.w&&ref.w?(c.w<ref.w?'Lighter than your '+sh.name+' for the same kind of run.':'More shoe underfoot than your '+sh.name+' for the same kind of run.'):'A different take on the same kind of run as your '+sh.name+'.'},
@@ -533,7 +564,7 @@ function preview(k){
   else{text='The '+r+' is 6 weeks away. If you want a race shoe, now is the time, so you get a few runs in it before race day. Want to see some?';stage='rgap'}}
  else if(k==='2w'){label='2 weeks before the '+r;text='Two weeks to the '+r+'. Do you know what you’re wearing on race day? Nothing new on the day is the safe rule.';stage='rfit'}
  else{label='The day after the '+r;text='How did the '+r+' go?';stage='rafter'}
- S.msgs=[msg('mo','note',{text:'Preview. '+label}),msg('mo','text',{text:text})];S.stage=stage;render.planKey=null;render();$('scroller').scrollTop=0}
+ S.msgs=[msg('mo','note',{text:'Preview. '+label})].concat(k==='2w'?[]:[msg('mo','img',{src:k==='6w'?'img/mo-race.jpg':'img/mo-rest.jpg',alt:k==='6w'?'Mo jogging with a race bib':'Mo resting after the race with a medal'})],[msg('mo','text',{text:text})]);S.stage=stage;render.planKey=null;render();$('scroller').scrollTop=0}
 function mflow(act,label){
  if(S.typing)return;you(label);
  if(act==='opts'){if(!S.cur||!S.cur.role)return say('I don’t have shoes for that kind of run in my catalog yet.',{stage:'mdone'});if(ME.budget==null)return say('What’s your budget for this one?',{stage:'mbudget'});showMine()}
@@ -549,7 +580,9 @@ function mflow(act,label){
  else if(act==='fitNo')say('Pick it this week and wear it on one run first. If it rubs, you want to find out now and not on race day.',{stage:'mdone'});
  else if(act==='wentWell')say('Glad to hear it. Rest now. Your rotation is saved, and I’ll be here when you feel like running again.',{stage:'rest'});
  else if(act==='wentRough')say('Sorry to hear that. You still got to the start line and that counts. Rest now. Your rotation is saved, and I’ll be here when you feel like running again.',{stage:'rest'});
- else if(act==='another'){S.form=newForm();mo(function(){return[msg('mo','text',{text:'Sure. Tell me about the next one.',forForm:true}),msg('mo','addshoe')]},{stage:'add'})}
+ else if(act==='another'){S.stage='mdone';openAdd()}
+ else if(act==='sample'){ME={shoes:SAMPLE.map(function(x){var o={added:Date.now()};for(var k in x)o[k]=x[k];return o})};saveMe();JUST=null;start()}
+ else if(act==='home'){view='home';render();window.scrollTo(0,0)}
 }
 function mbudget(v,label){if(S.typing)return;you(label);ME.budget=v||9999;saveMe();showMine()}
 function msend(t,q){
@@ -573,7 +606,7 @@ function msend(t,q){
 }
 function replies(){
  if(S.typing)return[];
- if(S.stage==='mask')return[['Show me new options','m','opts'],['Reorder the same shoe','m','same'],['Not now','m','later']];
+ if(S.stage==='mask')return[['Show me new options','m','opts'],['Reorder the same shoe','m','same'],['Not now','m','later']].concat(S.fromChatAdd?[['See my rotation','m','home']]:[]);
  if(S.stage==='mbudget')return[['$150','mb',150],['$200','mb',200],['$250','mb',250],['No limit','mb',0]];
  if(S.stage==='mover')return[['Show me anyway','m','force'],['Not now','m','later']];
  if(S.stage==='mdone')return[['Add another shoe','m','another']];
@@ -583,7 +616,8 @@ function replies(){
  if(S.stage==='rafter')return[['It went well','m','wentWell'],['It was rough','m','wentRough']];
  if(S.stage==='rform'||S.stage==='rest')return[];
  if(S.stage==='zip'||S.stage==='zipc')return[['Not now','m','zipNo']];
- if(S.stage==='add'||S.stage==='wait')return[];
+ if(S.stage==='add')return ME.shoes.length?[]:[['Try it with a sample rotation','m','sample']];
+ if(S.stage==='wait')return[];
  return[];
 }
 var current=[], latest=[], cheerUntil=0;
@@ -594,6 +628,7 @@ function render(){
  S.msgs.forEach(function(m){
   if(m.who==='you'){h+='<div class="you"><div class="yb">'+esc(m.text)+'</div></div>';return}
   if(m.kind==='note')h+='<div class="pvnote">'+esc(m.text)+'</div>';
+  else if(m.kind==='img')h+='<div class="ind moimg"><img src="'+m.src+'" alt="'+esc(m.alt)+'" width="200" height="200"></div>';
   else if(m.kind==='store')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'<span class="lk"><a href="'+mapsURL(m.brand,m.where)+'" target="_blank" rel="noopener">Open the map</a></span></div></div>';
   else if(m.kind==='text')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'</div></div>';
   else if(m.kind==='addshoe')h+=addForm(m,S.stage==='add'&&m.id===lastAdd);
@@ -611,23 +646,57 @@ function render(){
   $('plan').innerHTML=ch.length?'<div class="plan"><div class="l">'+rabbit(40,'cheer','hop')+'<div><b>'+(ch.length===1?'Your pick: '+esc(ch[0].name)+(ch[0].price?', $'+ch[0].price:''):'Your picks: '+ch.length+' shoes, $'+ch.reduce(function(a,p){return a+p.price},0))+'</b><small>'+(ch.length===1?'Next, see it or try it on':ch.map(function(p){return esc(p.name)}).join(' + '))+'</small></div></div>'+(ch.length===1?links(ch[0].name,ch[0].brand,ch[0].url,ch[0].store):'')+'</div>':''}
  var mood=view==='chat'&&S.typing?'think':(Date.now()<cheerUntil?'cheer':'idle');
  if(mood!==render.mood){render.mood=mood;$('logo2').innerHTML=mood==='think'?rabbit(48,'think','mo-pulse'):mood==='cheer'?rabbit(48,'cheer','mo-hop'):rabbit(48,'idle','',false,true)}
- $('status2').textContent=mood==='think'?'Thinking…':mood==='cheer'?'Nice pick':(S.stage==='mdone'?'Ready when you are':'Your running partner');
+ $('status2').textContent=mood==='think'?'Thinking…':mood==='cheer'?'Nice pick':'';
+ Array.prototype.forEach.call(document.querySelectorAll('[data-nav]'),function(x){if(x.classList.contains('nav'))x.setAttribute('aria-current',x.dataset.nav===view?'page':'false')});
  $('sheetWrap').hidden=view!=='chat';document.body.style.overflow=view==='chat'?'hidden':'';
  var ck=String(S.confirm)+view;
  if(ck!==render.hdrKey){render.hdrKey=ck;$('shdr').innerHTML=S.confirm?'<span class="cq">Start over and clear your pick?</span><button class="ghost" id="yes" type="button">Yes, start over</button><button class="ghost" id="no" type="button">Cancel</button>':'<button class="ghost" id="restart" type="button">Start over</button>'}
  $('ask').placeholder={add:'Or type your shoe’s name…',mask:'Yes or not now…',mbudget:'Around $180…',rask:'Yes or not right now…',rgap:'Yes or no…',rform:'Type the race name…',mover:'Show me anyway, or not now…',mdone:'Message Mo'}[S.stage]||'Message Mo';
 }
-// The home screen shows the runner's shelf, saved in this browser.
+// Rotation: Mo speaks first, then the race, then the runner's shoes. Each shoe opens a chat about it.
+function storeBtn(brand,cls){return ME.zip?'<a class="'+cls+'" href="'+mapsURL(brand,place())+'" target="_blank" rel="noopener">Find a store</a>':'<button type="button" class="'+cls+'" data-store="'+esc(brand)+'">Find a store</button>'}
 function home(){
- var rl=$('raceLine'),rk=JSON.stringify(ME.race||0)+ME.shoes.length+today();
- if(rl.dataset.k!==rk){rl.dataset.k=rk;var nd=ME.race?daysTo(ME.race.date):0;
+ var due=ME.shoes.filter(function(x){return x.miles>=400})[0],nx=due&&ME.next&&ME.next[due.name],t,a='',nd=ME.race?daysTo(ME.race.date):0;
+ if(!ME.shoes.length){t='Hi, I’m Mo. Add a shoe you run in and I’ll keep an eye on it.';a='<button type="button" class="b1" data-act="addshoe">+ Add a shoe</button><button type="button" class="txt" data-act="sample">Try it with a sample rotation</button>'}
+ else if(HUSH)t='No problem. I’ll keep an eye on your rotation.';
+ else if(nx){t='Your '+nx.name+' is picked. Want to find a store where you can try it on?';a=storeBtn(nx.brand,'b1')+'<button type="button" class="b2" data-act="hush">Not now</button>'}
+ else if(due){t='Your '+due.name+' is probably over 400 miles. Want to see some new options?';a='<button type="button" class="b1" data-act="suggest" data-name="'+esc(due.name)+'">Show me new options</button><button type="button" class="b2" data-act="hush">Not now</button>'}
+ else t='Nothing in your rotation looks due yet.'+(ME.race&&nd>1?' The '+ME.race.name+' is '+nd+' days away.':'');
+ var ms=$('moSays'),sk=t+a;if(ms.dataset.k!==sk){ms.dataset.k=sk;ms.innerHTML='<p>'+esc(t)+'</p>'+(a?'<div class="acts">'+a+'</div>':'')}
+ $('addTop').hidden=!ME.shoes.length;$('rotHint').textContent=ME.shoes.length?'Saved on this device. Tap a shoe to talk to Mo about it.':'Saved on this device';
+ $('footAct').innerHTML=ME.shoes.length?'<button type="button" class="txt" data-act="forget">Clear my shoes</button>':'';
+ var rl=$('raceLine'),rk=JSON.stringify(ME.race||0)+ME.shoes.length+today()+ME.noRaceShoe;
+ if(rl.dataset.k!==rk){rl.dataset.k=rk;
   var rs=ME.shoes.filter(function(x){return x.role==='race'})[0];
   rl.className=ME.race?'racecard':'raceline';
   rl.innerHTML=ME.race?'<div class="rc-n"><b>'+(nd>0?nd:nd===0?'Today':'Done')+'</b>'+(nd>0?'<span>'+(nd===1?'day':'days')+' to go</span>':'')+'</div><div class="rc-t"><span class="rc-k">Your race</span><h3>'+esc(ME.race.name)+'</h3><span>'+raceDate(ME.race.date)+'</span><span class="rc-s'+(rs||ME.noRaceShoe?'':' miss')+'">'+(rs?'Race shoe: '+esc(rs.name):ME.noRaceShoe?'Racing in a shoe you already have':'No race shoe in your rotation yet')+'</span></div><button type="button" data-act="race">Change</button>'+(nd>0?'<div class="rc-pv"><span>Preview what Mo says</span><button type="button" data-pv="6w">6 weeks out</button><button type="button" data-pv="2w">2 weeks out</button><button type="button" data-pv="after">After the race</button></div>':''):ME.shoes.length?'<button type="button" data-act="race">Add a race</button>':''}
- var g=$('rotGrid'),k=JSON.stringify(ME.shoes);if(g.dataset.k===k)return;g.dataset.k=k;
- g.innerHTML=ME.shoes.map(function(x){var w=wear(x.miles);
-  return shoeHTML({use:x.label,brand:x.brand,name:shortName(x.name,x.brand),mi:miText(x.miles),pct:w.pct,color:w.color,foot:w.due?'<span class="due">Probably due</span><button type="button" class="b1" data-act="suggest" data-name="'+esc(x.name)+'">See what Mo suggests</button>':w.line})}).join('')
-  +shoeHTML({cls:' vacant',name:ME.shoes.length?'Add another':'No shoes yet',foot:'<span>'+(ME.shoes.length?'Mo learns your rotation one shoe at a time.':'Add a shoe you run in. It takes three taps, and Mo saves it here.')+'</span><button type="button" class="b2" data-act="addshoe">Add a shoe</button>'+(ME.shoes.length?'<button type="button" class="txt" data-act="forget">Clear my shoes</button>':'<button type="button" class="txt" data-act="sample">Try it with a sample rotation</button>')})}
+ var g=$('rotGrid'),k=JSON.stringify([ME.shoes,ME.next||0,JUST,ME.zip||0]);if(g.dataset.k===k)return;g.dataset.k=k;
+ if(!ME.shoes.length){g.className='';g.innerHTML='<div class="empty"><b>No shoes yet</b><span>Your shoes show up here once you add them. Mo keeps an estimate of their miles.</span></div>';return}
+ g.className='shelf';
+ g.innerHTML=ME.shoes.map(function(x){var w=wear(x.miles),n=ME.next&&ME.next[x.name];
+  var nextBox=n?'<div class="next"><small>Next pair</small><b>'+esc(n.name)+(n.price?', $'+n.price:'')+'</b><span class="lk">'+(n.url?'<a href="'+esc(n.url)+'" target="_blank" rel="noopener">View shoe</a>':'')+(ME.zip?'<a href="'+mapsURL(n.brand,place())+'" target="_blank" rel="noopener">Find a store</a>':'<button type="button" class="lkb" data-store="'+esc(n.brand)+'">Find a store</button>')+'</span></div>':'';
+  return shoeHTML({cls:x.name===JUST?' just':'',pre:'<button type="button" class="talk" data-talk="'+esc(x.name)+'" aria-label="Talk to Mo about your '+esc(x.name)+'"></button>'+(x.name===JUST?'<span class="tag">Just added</span>':''),use:x.label,brand:x.brand,name:shortName(x.name,x.brand),mi:miText(x.miles),pct:w.pct,color:w.color,foot:(w.due?'<span class="due">Probably due</span>':w.line)+nextBox})}).join('')}
+// Talking about one shoe: Mo picks up from what he knows about it.
+function talkAbout(nm){var sh=ME.shoes.filter(function(x){return x.name===nm})[0];if(!sh||S.typing)return;
+ S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();S.cur=sh;S.confirm=false;view='chat';
+ S.msgs.push(msg('mo','note',{text:'About your '+sh.name}));
+ var t=!sh.role?'I don’t have track shoes in my catalog yet, so I can’t suggest a new pair for your '+sh.name+' right now.':sh.miles==null?'Without a mileage I’ll go by feel, so tell me when your '+sh.name+' starts to feel flat. Want to see what else is out there?':sh.miles>=400?'Your '+sh.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?':'Your '+sh.name+' probably has '+(sh.miles>=200?'some':'plenty of')+' life left, around '+sh.miles+' miles by your estimate. Want to look at something new anyway?';
+ say(t,{stage:sh.role?'mask':'mdone'})}
+// Adding a shoe from Rotation happens in a sheet, then the runner is back on Rotation.
+function openAdd(){AF=newForm();view='home';$('addWrap').hidden=false;renderAdd();render();setTimeout(function(){var q=$('shoeQ2');if(q)q.focus()},40)}
+function closeAdd(){AF=null;$('addWrap').hidden=true}
+function renderAdd(){var f=AF,ok=f.name&&f.b!=null&&f.u!=null,h='<div class="add">';
+ h+='<fieldset><legend>Which shoe do you run in?</legend>'+(f.name?'<div class="picked"><span>'+esc(f.name)+'</span><button type="button" data-s="clear">Change</button></div>':'<input id="shoeQ2" class="q" type="text" autocomplete="off" placeholder="Search, like Cloudsurfer Max" aria-label="Search for your shoe" value="'+esc(f.q)+'"><div class="res" id="shoeRes2">'+resHTML(f.q,'sshoe')+'</div>')+'</fieldset>';
+ h+='<fieldset><legend>About how many miles are on it?</legend><div class="opts">'+BUCKETS.map(function(x,i){return'<button type="button" data-s="b" data-v="'+i+'" aria-pressed="'+(f.b===i)+'">'+x[0]+'</button>'}).join('')+'</div></fieldset>';
+ h+='<fieldset><legend>What do you use it for?</legend><div class="opts">'+USES.map(function(x,i){return'<button type="button" data-s="u" data-v="'+i+'" aria-pressed="'+(f.u===i)+'">'+x[0]+'</button>'}).join('')+'</div></fieldset>';
+ h+='<div class="acts"><button type="button" class="go" data-s="add"'+(ok?'':' disabled')+'>Add to my rotation</button><button type="button" class="txt" data-act="closeadd">Cancel</button></div></div>';
+ $('addBody').innerHTML=h}
+function sheetAct(b){var f=AF,k=b.dataset.s;if(!f)return;
+ if(k==='clear'){f.name=null;f.q='';renderAdd();return setTimeout(function(){var q=$('shoeQ2');if(q)q.focus()},30)}
+ if(k==='b'||k==='u'){f[k]=+b.dataset.v;return renderAdd()}
+ if(k==='add'&&f.name&&f.b!=null&&f.u!=null){var sh=makeShoe(f);ME.shoes=ME.shoes.filter(function(x){return x.name!==sh.name}).concat([sh]);saveMe();JUST=sh.name;HUSH=false;closeAdd();view='home';render();toast(sh.name+' added to your rotation');
+  setTimeout(function(){$('rotation').scrollIntoView({behavior:window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})},60)}}
+function toast(t){var el=$('toast');el.innerHTML='<img src="img/mo-shoe-added.jpg" alt="" width="44" height="44"><span>'+esc(t)+'</span>';el.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){el.hidden=true},3800)}
 function send(){
  var t=$('ask').value.trim();if(!t||S.typing)return;var q=t.toLowerCase();
  if(S.stage==='add'){$('ask').value='';return msend(t,q)}
@@ -636,40 +705,50 @@ function send(){
  if(TOPIC.test(q)){if(S.stage==='rform'){S.msgs=S.msgs.filter(function(m){return!(m.kind==='raceform'&&!m.done)});S.msgs.forEach(function(m){if(m.forRace)m.forRace=false});S.stage='mdone'}you(t);return say(OFF)}
  msend(t,q);
 }
-function start(){timers.forEach(clearTimeout);timers=[];S=fresh();render.planKey=null;render.hdrKey=null;render.mood=null;render();$('scroller').scrollTop=0}
+function start(v){timers.forEach(clearTimeout);timers=[];S=fresh();view=v||(ME.shoes.length?'home':'chat');render.planKey=null;render.hdrKey=null;render.mood=null;render();$('scroller').scrollTop=0;window.scrollTo(0,0)}
 document.addEventListener('click',function(e){
  var b=e.target.closest('button');if(!b)return;
  if(b.dataset.f)return formAct(b);
+ if(b.dataset.s)return sheetAct(b);
+ if(b.dataset.sshoe){if(AF){AF.name=b.dataset.sshoe;renderAdd()}return}
  if(b.dataset.shoe)return pickName(b.dataset.shoe);
+ if(b.dataset.nav){if(S.typing&&b.dataset.nav==='chat'){view='chat';return render()}S.confirm=false;view=b.dataset.nav;render();if(view==='chat')scroll();else window.scrollTo(0,0);return}
+ if(b.dataset.talk)return talkAbout(b.dataset.talk);
+ if(b.dataset.act==='hush'){HUSH=true;return render()}
+ if(b.dataset.act==='closeadd')return closeAdd();
  if(b.dataset.race)return pickRace(b.dataset.race,b.dataset.date||'');
- if(b.dataset.act==='addshoe'){view='chat';if(S.stage!=='add'&&!S.typing){S.form=newForm();S.msgs.push(msg('mo','text',{text:'Sure. Tell me about the next one.',forForm:true}),msg('mo','addshoe'));S.stage='add'}render();return scroll()}
+ if(b.dataset.act==='addshoe')return openAdd();
  if(b.dataset.act==='rotation'){S.confirm=false;view='home';render();return setTimeout(function(){$('rotation').scrollIntoView({behavior:window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})},60)}
  if(b.dataset.act==='suggest'){var sg=ME.shoes.filter(function(x){return x.name===b.dataset.name})[0];if(!sg||S.typing)return;
   S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();S.cur=sg;S.confirm=false;view='chat';
   you('What do you suggest for my '+sg.name+'?');if(ME.budget==null)say('What’s your budget for this one?',{stage:'mbudget'});else showMine();return scroll()}
- if(b.dataset.act==='sample'){ME={shoes:SAMPLE.map(function(x){var o={added:Date.now()};for(var k in x)o[k]=x[k];return o})};saveMe();return start()}
+ if(b.dataset.act==='sample'){ME={shoes:SAMPLE.map(function(x){var o={added:Date.now()};for(var k in x)o[k]=x[k];return o})};saveMe();JUST=null;HUSH=false;return start()}
  if(b.dataset.act==='race'){if(S.typing)return;S.confirm=false;view='chat';S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();openRaceForm(ME.race?'Sure. Here’s your race.':'Search for it and I’ll fill in the date when I know it.');return scroll()}
  if(b.dataset.pv){if(S.typing)return;return preview(b.dataset.pv)}
  if(b.dataset.store){view='chat';return askZip(b.dataset.store)}
  if(b.dataset.act==='zip'){view='chat';return askZip(null)}
- if(b.dataset.act==='forget'){ME={shoes:[]};saveMe();return start()}
- if(b.dataset.act==='chat'){view='chat';render();scroll();return setTimeout(function(){$('ask').focus()},50)}
+ if(b.dataset.act==='forget'){ME={shoes:[]};saveMe();JUST=null;HUSH=false;return start()}
  if(b.id==='goHome'){S.confirm=false;view='home';return render()}
- if(b.id==='restart'){if(chosenList().length)return set({confirm:true});return start()}
- if(b.id==='yes')return start();
+ if(b.id==='restart'){if(chosenList().length)return set({confirm:true});return start('chat')}
+ if(b.id==='yes')return start('chat');
  if(b.id==='no')return set({confirm:false});
- if(b.dataset.pick){var pp=latest.filter(function(p){return p.name===b.dataset.pick})[0];if(!pp)return;if(S.chosen[pp.key]&&S.chosen[pp.key].name===pp.name)delete S.chosen[pp.key];else{S.chosen[pp.key]={name:pp.name,price:pp.price,brand:pp.brand,url:pp.url,store:pp.store};cheerUntil=Date.now()+2600;setTimeout(render,2700)}return render()}
+ if(b.dataset.pick){var pp=latest.filter(function(p){return p.name===b.dataset.pick})[0];if(!pp)return;if(S.chosen[pp.key]&&S.chosen[pp.key].name===pp.name)delete S.chosen[pp.key];else{S.chosen[pp.key]={name:pp.name,price:pp.price,brand:pp.brand,url:pp.url,store:pp.store};cheerUntil=Date.now()+2600;setTimeout(render,2700)}
+  if(S.cur&&!S.cur.gap&&S.cur.name){ME.next=ME.next||{};if(S.chosen[pp.key]&&S.chosen[pp.key].name===pp.name){ME.next[S.cur.name]={name:pp.name,price:pp.price,brand:pp.brand,url:pp.url};HUSH=false}else delete ME.next[S.cur.name];saveMe()}
+  return render()}
  if(b.dataset.i!==undefined){var c=current[+b.dataset.i];if(!c)return;if(c[1]==='mb')mbudget(c[2],c[0]);else mflow(c[2],c[0])}
 });
-$('logo').innerHTML=rabbit(48,'idle','',false,true);
-$('backdrop').addEventListener('click',function(){S.confirm=false;view='home';render()});
+$('addBackdrop').addEventListener('click',closeAdd);
+$('addBody').addEventListener('input',function(e){if(e.target.id==='shoeQ2'&&AF){AF.q=e.target.value;$('shoeRes2').innerHTML=resHTML(AF.q,'sshoe')}});
+$('addBody').addEventListener('keydown',function(e){if(e.target.id==='shoeQ2'&&e.key==='Enter'){e.preventDefault();var first=$('shoeRes2').querySelector('button');if(first){AF.name=first.dataset.sshoe;renderAdd()}}});
 $('chat').addEventListener('input',function(e){if(e.target.id==='raceName'){S.rf.name=e.target.value;$('raceRes').innerHTML=raceRes(S.rf.name);return}if(e.target.id==='raceDate'){S.rf.date=e.target.value;var sv=$('raceSave');if(sv)sv.disabled=!S.rf.date;return}if(e.target.id==='shoeQ'){S.form.q=e.target.value;$('shoeRes').innerHTML=resHTML(S.form.q)}});
 $('chat').addEventListener('keydown',function(e){if(e.target.id==='raceName'&&e.key==='Enter'){e.preventDefault();var fr=$('raceRes').querySelector('button');if(fr)pickRace(fr.dataset.race,fr.dataset.date||'');return}if(e.target.id==='shoeQ'&&e.key==='Enter'){e.preventDefault();var first=$('shoeRes').querySelector('button');if(first)pickName(first.dataset.shoe)}});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'&&view==='chat'){S.confirm=false;view='home';render()}});
+document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;if(AF){closeAdd();return}if(view==='chat'&&ME.shoes.length){S.confirm=false;view='home';render()}});
 $('form').addEventListener('submit',function(e){e.preventDefault();send()});
-$('askHome').addEventListener('submit',function(e){e.preventDefault();var t=$('askH').value.trim();$('askH').value='';view='chat';render();if(t){$('ask').value=t;send()}else scroll()});
 
 start();
+(function(){var f=$('moFig');if(!f||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
+ function once(cb){f.classList.add('blink');setTimeout(function(){f.classList.remove('blink');if(cb)cb()},130)}
+ (function next(){setTimeout(function(){once(function(){if(Math.random()<.35)setTimeout(once,170)});next()},2600+Math.random()*3400)})()})();
 })();
 </script>
 </body>
