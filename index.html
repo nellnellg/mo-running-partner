@@ -134,8 +134,8 @@ main{flex-grow:1;padding-top:20px;padding-bottom:24px;display:flex;flex-directio
 .you{display:flex;justify-content:flex-end}
 .yb{max-width:78%;background:var(--ink);color:#fff;font-size:15px;line-height:1.5;padding:10px 14px;border-radius:16px 16px 4px 16px;border:0;text-align:left;display:inline-flex;align-items:center;gap:8px;min-height:44px}
 .mo{display:flex;gap:12px;align-items:flex-start}
-.mo .b{max-width:82%;font-size:16px;line-height:1.55;white-space:pre-line;background:var(--c50);padding:10px 14px;border-radius:4px 16px 16px 16px;margin-top:2px}
-.ind{margin-left:48px}
+.mo .b{max-width:86%;font-size:16px;line-height:1.55;white-space:pre-line;background:var(--c50);padding:10px 14px;border-radius:4px 16px 16px 16px;margin-top:2px}
+.ind{margin-left:0}
 .moimg img{display:block;width:200px;height:200px}
 .card{background:var(--raised);border:1px solid var(--line);border-radius:16px;padding:16px}
 .pvnote{align-self:center;font-size:13px;font-weight:600;color:var(--ink2);background:#EFE7D8;border-radius:999px;padding:6px 14px;margin:0 auto 4px;width:fit-content}
@@ -629,15 +629,15 @@ function render(){
   if(m.who==='you'){h+='<div class="you"><div class="yb">'+esc(m.text)+'</div></div>';return}
   if(m.kind==='note')h+='<div class="pvnote">'+esc(m.text)+'</div>';
   else if(m.kind==='img')h+='<div class="ind moimg"><img src="'+m.src+'" alt="'+esc(m.alt)+'" width="200" height="200"></div>';
-  else if(m.kind==='store')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'<span class="lk"><a href="'+mapsURL(m.brand,m.where)+'" target="_blank" rel="noopener">Open the map</a></span></div></div>';
-  else if(m.kind==='text')h+='<div class="mo">'+rabbit(36,'idle')+'<div class="b">'+esc(m.text)+'</div></div>';
+  else if(m.kind==='store')h+='<div class="mo"><div class="b">'+esc(m.text)+'<span class="lk"><a href="'+mapsURL(m.brand,m.where)+'" target="_blank" rel="noopener">Open the map</a></span></div></div>';
+  else if(m.kind==='text')h+='<div class="mo"><div class="b">'+esc(m.text)+'</div></div>';
   else if(m.kind==='addshoe')h+=addForm(m,S.stage==='add'&&m.id===lastAdd);
   else if(m.kind==='raceform')h+=raceForm(m,S.stage==='rform');
   else if(m.kind==='opts'){
    if(m.id===last){latest=m.items;h+='<div class="ind pk"><h2 class="sr">Mo’s picks</h2><p class="forwhat">'+esc(m.items[0].role)+'</p><div class="grid'+(m.items.length===1?' solo':'')+'">'+m.items.map(pickHTML).join('')+'</div><p class="budget'+(m.ok?'':' warn')+'">'+esc(m.note)+'</p><div class="cap">List prices from fall 2026. Check retailers for current deals.</div></div>'}
    else h+='<div class="ind old"><span>Earlier picks</span><span>'+m.items.map(function(p){return esc(p.name)+' $'+p.price}).join(', ')+'</span></div>'}
  });
- if(S.typing)h+='<div class="typing">'+rabbit(36,'think','pulse')+'<span>Mo is thinking…</span></div>';
+ if(S.typing)h+='<div class="typing"><span>Mo is thinking…</span></div>';
  $('chat').innerHTML=h;
  current=replies();
  $('chips').innerHTML=current.map(function(c,i){return'<button type="button" data-i="'+i+'">'+esc(c[0])+'</button>'}).join('');
@@ -647,6 +647,7 @@ function render(){
  var mood=view==='chat'&&S.typing?'think':(Date.now()<cheerUntil?'cheer':'idle');
  if(mood!==render.mood){render.mood=mood;$('logo2').innerHTML=mood==='think'?rabbit(48,'think','mo-pulse'):mood==='cheer'?rabbit(48,'cheer','mo-hop'):rabbit(48,'idle','',false,true)}
  $('status2').textContent=mood==='think'?'Thinking…':mood==='cheer'?'Nice pick':'';
+ if(view!=='home'){$('toast').hidden=true}
  Array.prototype.forEach.call(document.querySelectorAll('[data-nav]'),function(x){if(x.classList.contains('nav'))x.setAttribute('aria-current',x.dataset.nav===view?'page':'false')});
  $('sheetWrap').hidden=view!=='chat';document.body.style.overflow=view==='chat'?'hidden':'';
  var ck=String(S.confirm)+view;
