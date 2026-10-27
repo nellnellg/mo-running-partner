@@ -119,11 +119,13 @@ h2,h3{margin:0}
 /* Chat */
 .sheetWrap{position:fixed;top:0;right:0;bottom:0;left:0;z-index:20}
 .sheet{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
-.stop{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px 8px;max-width:820px;width:100%;margin:0 auto}
-.stop .brand{display:flex;align-items:center;gap:10px}
-.stop .brand b{display:block;font-size:17px;font-weight:700}
-.stop .brand span#status2{display:block;font-size:13px;color:var(--ink2)}
-.stop .hdr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.stop{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:12px;padding:12px 20px 4px;max-width:820px;width:100%;margin:0 auto}
+.stop .brand{display:flex;flex-direction:column;align-items:center;gap:0}
+.stop .brand #logo2{display:block;line-height:0}
+.stop .brand>div{display:flex;flex-direction:column;align-items:center;margin-top:-12px;position:relative}
+.stop .brand b{display:block;font-size:15px;font-weight:700;color:#fff;background:var(--ink);border-radius:999px;padding:5px 16px;box-shadow:0 0 0 3px var(--bg)}
+.stop .brand span#status2{display:block;min-height:16px;margin-top:3px;font-size:12px;color:var(--ink2)}
+.stop .hdr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;justify-self:end}
 .stop .lead{width:48px}
 .cq{font-size:14px;font-weight:600}
 .ghost{height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line2);background:var(--raised);font-size:14px;font-weight:600}
@@ -645,7 +647,7 @@ function render(){
  if(key!==render.planKey){render.planKey=key;
   $('plan').innerHTML=ch.length?'<div class="plan"><div class="l">'+rabbit(40,'cheer','hop')+'<div><b>'+(ch.length===1?'Your pick: '+esc(ch[0].name)+(ch[0].price?', $'+ch[0].price:''):'Your picks: '+ch.length+' shoes, $'+ch.reduce(function(a,p){return a+p.price},0))+'</b><small>'+(ch.length===1?'Next, see it or try it on':ch.map(function(p){return esc(p.name)}).join(' + '))+'</small></div></div>'+(ch.length===1?links(ch[0].name,ch[0].brand,ch[0].url,ch[0].store):'')+'</div>':''}
  var mood=view==='chat'&&S.typing?'think':(Date.now()<cheerUntil?'cheer':'idle');
- if(mood!==render.mood){render.mood=mood;$('logo2').innerHTML=mood==='think'?rabbit(48,'think','mo-pulse'):mood==='cheer'?rabbit(48,'cheer','mo-hop'):rabbit(48,'idle','',false,true)}
+ if(mood!==render.mood){render.mood=mood;$('logo2').innerHTML=mood==='think'?rabbit(60,'think','mo-pulse'):mood==='cheer'?rabbit(60,'cheer','mo-hop'):rabbit(60,'idle')}
  $('status2').textContent=mood==='think'?'Thinking…':mood==='cheer'?'Nice pick':'';
  if(view!=='home'){$('toast').hidden=true}
  Array.prototype.forEach.call(document.querySelectorAll('[data-nav]'),function(x){if(x.classList.contains('nav'))x.setAttribute('aria-current',x.dataset.nav===view?'page':'false')});
