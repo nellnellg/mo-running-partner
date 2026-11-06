@@ -191,6 +191,30 @@ footer .wrap{padding-top:12px;padding-bottom:16px;display:flex;flex-direction:co
 .addsheet .go{padding:0 24px}
 .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:45;background:var(--ink);color:#fff;border-radius:999px;padding:6px 22px 6px 8px;display:flex;align-items:center;gap:12px;font-size:15px;font-weight:600;box-shadow:0 8px 24px rgba(20,36,79,.25);margin-left:calc(var(--rail) / 2)}
 .toast img{width:44px;height:44px;border-radius:50%;object-fit:cover}
+/* Running log */
+.log .lead{margin:0;font-size:16px;line-height:1.5}
+.log .file{display:inline-flex;align-items:center;justify-content:center;align-self:flex-start;padding:0 24px;cursor:pointer}
+.log .file:focus-within{outline:2px solid var(--ink);outline-offset:2px}
+.log .err{margin:0;font-size:14px;font-weight:600;color:var(--ro7)}
+.log .how details{border-top:1px solid var(--line);padding:10px 0}
+.log .how details:last-child{border-bottom:1px solid var(--line)}
+.log summary{cursor:pointer;font-size:15px;font-weight:600;min-height:28px;display:list-item}
+.log details p{margin:8px 0 2px;font-size:14px;line-height:1.5;color:var(--ink2)}
+.log .num{display:flex;gap:16px;align-items:center;background:var(--c50);border-radius:16px;padding:14px 18px}
+.log .num b{font-stretch:66%;font-weight:720;font-size:52px;line-height:1;color:var(--cobalt);font-variant-numeric:tabular-nums}
+.log .num span{font-size:14px;line-height:1.45}
+.lgl{list-style:none;margin:-8px 0 0;padding:0}
+.lgl li{display:flex;flex-direction:column;gap:8px;padding:14px 0;border-bottom:1px solid var(--line)}
+.lgl .lgn b{display:block;font-size:16px;font-weight:600}
+.lgl .lgn span{display:block;margin-top:2px;font-size:13px;line-height:1.4;color:var(--ink2)}
+.lgl .lgn .warn{color:var(--ro7);font-weight:600}
+.lgl .opts button{min-height:40px;padding:6px 14px;font-size:13px}
+.log .skip{margin:-8px 0 0;font-size:13px;color:var(--ink2)}
+.log .map{display:flex;flex-direction:column;gap:10px}
+.log .map label{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:15px;font-weight:600}
+.log select{height:44px;width:60%;border:1px solid var(--line2);border-radius:10px;padding:0 10px;font-size:15px;background:var(--raised);color:var(--ink)}
+.addsheet .alt{margin:-8px 0 0;font-size:14px;color:var(--ink2)}
+.addsheet .alt .lkb{font-size:14px}
 /* Picks */
 .pk{display:flex;flex-direction:column;gap:12px}
 .pk .forwhat{margin:6px 0 0;font-size:15px;font-weight:600;color:var(--ink2)}
@@ -281,7 +305,7 @@ footer .wrap{padding-top:12px;padding-bottom:16px;display:flex;flex-direction:co
 <div class="rhead"><div><h2>Your rotation</h2><span id="rotHint">Saved on this device. Tap a shoe to talk to Mo about it.</span></div><button type="button" class="b2" id="addTop" data-act="addshoe">+ Add a shoe</button></div>
 <div id="rotGrid"></div>
 </section>
-<p class="foot"><span>Mo estimates mileage from what you tell it, so it says “probably.”</span><span id="footAct"></span></p>
+<p class="foot"><span id="footNote">Mo estimates mileage from what you tell it, so it says “probably.”</span><span id="footAct"></span></p>
 </div>
 </div>
 <div id="sheetWrap" class="sheetWrap" hidden>
@@ -362,8 +386,8 @@ var ORDER=['speed','easy','race'];
 function fresh(){var s={msgs:[{id:0,who:'mo',kind:'text',text:''}],stage:'add',chosen:{},typing:false,confirm:false,rf:{name:'',date:''}};
  {s.form=newForm();ME=loadMe();
   if(!ME.shoes.length){s.msgs[0].text='Hi, I’m Mo. Tell me about a shoe you run in. It takes three taps, and I’ll save it to your rotation so I remember it next time.';s.msgs.push({id:-1,who:'mo',kind:'addshoe'});s.stage='add'}
-  else{var due=ME.shoes.filter(function(x){return x.miles>=400})[0];
-   if(due){s.cur=due;s.msgs[0].text='Your '+due.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?';s.stage='mask';s.msgs.unshift({id:-2,who:'mo',kind:'img',src:'img/mo-shoe-due.jpg',alt:'Mo holding up an old running shoe'})}
+  else{var due=ME.shoes.filter(isDue)[0];
+   if(due){s.cur=due;s.msgs[0].text=dueSay(due)+' Want to see some new options?';s.stage='mask';s.msgs.unshift({id:-2,who:'mo',kind:'img',src:'img/mo-shoe-due.jpg',alt:'Mo holding up an old running shoe'})}
    else{s.msgs[0].text='Nothing in your rotation looks due yet. Want to add another shoe?';s.stage='mdone'}}}
  return s}
 function set(p){for(var k in p)S[k]=p[k];render()}
@@ -463,15 +487,15 @@ function findShoes(q){q=q.trim().toLowerCase();if(q.length<2)return[];var w=q.sp
 function resHTML(q,at){at=at||'shoe';var t=q.trim(),r=findShoes(t),h=r.map(function(nm){return'<button type="button" data-'+at+'="'+esc(nm)+'">'+esc(nm)+'</button>'}).join('');
  if(t.length>=3&&!r.some(function(nm){return nm.toLowerCase()===t.toLowerCase()}))h+='<button type="button" data-'+at+'="'+esc(t)+'">Use “'+esc(t)+'”</button>';return h}
 function shortName(nm,brand){return brand&&(nm+' ').toLowerCase().indexOf(brand.toLowerCase()+' ')===0?nm.slice(brand.length+1):nm}
-function miText(m){return m==null?'?':m>=400?'400+':'~'+m}
+function miText(m,lg){return m==null?'?':lg?String(m):m>=400?'400+':'~'+m}
 function shoeHTML(o){
  return'<article class="shoe'+(o.cls||'')+'">'+(o.pre||'')+'<span class="use'+(o.pu?' pop':'')+'">'+(o.use||'&nbsp;')+'</span><h3 class="name'+(o.pn?' pop':'')+'"><span class="brand">'+(o.brand?esc(o.brand):'&nbsp;')+'</span>'+esc(o.name)+'</h3>'
   +'<p class="mi"'+(o.mi==null?' style="visibility:hidden"':'')+'>'+(o.mi==null?'0':o.mi)+'<small>mi</small></p><div class="wearbar"'+(o.mi==null?' style="visibility:hidden"':'')+'><i class="'+(o.pb?'grow':'')+'" style="width:'+(o.pct||0)+'%;background:'+(o.color||'#7ABA5C')+'"></i></div><div class="sfoot">'+(o.foot||'')+'</div></article>'}
-function wear(m){
- if(m==null)return{pct:0,color:'#A3ADC2',badge:'Mileage unknown',bs:'background:#EEF0F2;color:#4A4F57',line:'No mileage yet, so Mo goes by feel'};
- if(m>=400)return{pct:85,color:'#DC440D',due:true,badge:'Probably due',bs:'background:#FFF4E0;color:#8A4B00',line:'Over 400 miles, by your estimate'};
- if(m>=200)return{pct:60,color:'#7ABA5C',badge:'Good for now',bs:'background:#E8F5EC;color:#1E6B3A',line:'200 to 400 miles, by your estimate'};
- return{pct:25,color:'#7ABA5C',badge:'Fresh',bs:'background:#E8F5EC;color:#1E6B3A',line:'Under 200 miles, by your estimate'}}
+function wear(m,lg){var T=lim();
+ if(m==null)return{pct:0,color:'#A3ADC2',line:'No mileage yet, so Mo goes by feel'};
+ if(lg)return m>=T?{pct:100,color:'#DC440D',due:true,line:'Past the '+T+' miles your shoes usually last'}:{pct:Math.max(4,Math.round(m/T*100)),color:'#7ABA5C',line:(T-m)+' miles to go, by your log'};
+ var est=(m>=400?'Over 400 miles':m>=200?'200 to 400 miles':'Under 200 miles')+', by your estimate';
+ return m>=T?{pct:85,color:'#DC440D',due:true,line:est}:{pct:m>=200?60:25,color:'#7ABA5C',line:est}}
 function mineCard(name,b,u,last){
  if(!name)return'<div class="shelf one">'+shoeHTML({cls:' vacant',name:'Your shoe',foot:'Shows up here as you answer'})+'</div>';
  var w=b==null?null:wear(BUCKETS[b][1]),br=brandOf(name);
@@ -500,7 +524,7 @@ function makeShoe(f){return{name:f.name,brand:brandOf(f.name),label:USES[f.u][0]
 function afterAdd(sh){
  if(!sh.role){say('Added to your rotation. I don’t have track shoes in my catalog yet, so I’ll keep this one in your rotation for now.',{stage:'mdone'});return later(900,settle)}
  if(sh.miles==null)return say('Added to your rotation. Without a mileage I’ll go by feel, so tell me when your '+sh.name+' starts to feel flat. Want to see what else is out there?',{stage:'mask'});
- if(sh.miles>=400)return say('Added to your rotation. Your '+sh.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?',{stage:'mask'});
+ if(isDue(sh))return say('Added to your rotation. '+dueSay(sh)+' Want to see some new options?',{stage:'mask'});
  say('Added to your rotation. Your '+sh.name+' probably has '+(sh.miles>=200?'some':'plenty of')+' life left, so there’s no rush. Want to look at something new anyway?',{stage:'mask'})}
 function myRunner(){return{goal:ME.race?ME.race.name+' on '+raceDate(ME.race.date):undefined,budget:ME.budget&&ME.budget<9000?ME.budget:undefined,shoes:ME.shoes.map(function(x){var sp=SPEC[x.name]||{};return{name:x.name,brand:x.brand,use:x.use,miles:x.miles,w:sp.w,d:sp.d,weight:sp.w?sp.w+'g':undefined,drop:sp.d!=null?sp.d+'mm':undefined}})}}
 // Reorder: the runner wants the same shoe again. No model call, the facts are the runner's own.
@@ -513,15 +537,17 @@ function reorder(){
   note=!sp.price?'I don’t have a price for this one, so check the store.':!B?'':B>=9000?'You set no budget limit.':sp.price<=B?'Within your $'+B+' budget.':'$'+sp.price+' is over your $'+B+' budget.';
  mo(function(){return[msg('mo','text',{text:(nx?'Makes sense if it’s been working for you. The '+sh.name+' has a newer version now, the '+shortName(nx,brand)+'.':'Makes sense if it’s been working for you. Here’s the '+sh.name+' again.')+' When the new pair arrives, add it to your rotation and I’ll start its miles from zero.'}),msg('mo','opts',{items:[item],note:note,ok:!sp.price||!B||sp.price<=B,same:true})]},{stage:'mdone'});later(900,settle)}
 function showMine(force){
- var sh=S.cur,B=ME.budget||9999,all=L.CAT[sh.role].filter(function(c){return c.name!==sh.name}),inB=all.filter(function(c){return c.price<=B});
- if(!inB.length&&!force){var min=Math.min.apply(null,all.map(function(c){return c.price}));return say((sh.gap?'Race shoes start':'Shoes for '+sh.label.toLowerCase()+' start')+' around $'+min+', which is over your $'+B+'. Want to see them anyway?',{stage:'mover'})}
- var list=inB.length?inB:all,rn=myRunner(),ref=rn.shoes.filter(function(x){return x.name===sh.name})[0]||{},due=sh.miles>=400;PREF=sh.brand;
+ var sh=S.cur,B=ME.budget||9999,no=(ME.history||[]).filter(function(x){return x.why==='disliked'}).map(function(x){return x.name}),all=L.CAT[sh.role].filter(function(c){return c.name!==sh.name&&no.indexOf(c.name)<0}),inB=all.filter(function(c){return c.price<=B});
+ if(!inB.length&&!force){var min=Math.min.apply(null,all.map(function(c){return c.price}));return say((sh.gap?'Race shoes start':sh.spare?'Shoes for steady runs start':'Shoes for '+sh.label.toLowerCase()+' start')+' around $'+min+', which is over your $'+B+'. Want to see them anyway?',{stage:'mover'})}
+ var list=inB.length?inB:all,rn=myRunner(),ref=rn.shoes.filter(function(x){return x.name===sh.name})[0]||{},due=!sh.gap&&!sh.spare&&isDue(sh);PREF=sh.brand;
  var need=sh.gap?{type:sh.use,why:'The runner is training for the '+ME.race.name+' and has no race shoe in their rotation.'}
-  :{type:sh.use,why:due?sh.name+' is probably over 400 miles, by the runner’s own estimate.':'The runner wants to try something new for '+sh.use+' runs. Their '+sh.name+' still has life in it.',replaces:sh.name};
+  :sh.spare?{type:sh.use,why:'The runner puts most of their training miles on their race shoe, the '+sh.racer+'. They want a shoe for steady runs and workouts so the race shoe lasts until race day.'}
+  :{type:sh.use,why:due?(sh.logged?sh.name+' has '+sh.miles+' miles in the runner’s own log. Their shoes usually last about '+lim()+' miles.':sh.name+' is probably over 400 miles, by the runner’s own estimate.'):'The runner wants to try something new for '+sh.use+' runs. Their '+sh.name+' still has life in it.',replaces:sh.name};
+ if(no.length)need.why+=' They stopped wearing the '+no.join(' and the ')+' because they didn’t like it.';
  askPicks(need,list,function(d){
-  S.msgs=S.msgs.concat(optsMsgs(sh.role,sh.gap?'For the '+ME.race.name:due?'To replace your '+sh.name+', probably past 400 miles':'Something new for '+sh.label.toLowerCase(),list,d,
-   sh.gap?'Here are the ones I’d look at for the '+ME.race.name+'.':due?'Here are the ones I’d look at to replace your '+sh.name+'.':'Here are a few that would be a change from your '+sh.name+'.',
-   function(c){if(sh.gap)return c.brand&&c.brand===sh.brand?'Same brand as most of your rotation, built for race day.':'Built for race day, which is the one job your rotation doesn’t cover.';
+  S.msgs=S.msgs.concat(optsMsgs(sh.role,sh.gap?'For the '+ME.race.name:sh.spare?'For your steady runs and workouts':due?'To replace your '+sh.name+', '+dueShort(sh):'Something new for '+sh.label.toLowerCase(),list,d,
+   sh.gap?'Here are the ones I’d look at for the '+ME.race.name+'.':sh.spare?'Here are the ones I’d look at, so your '+sh.racer+' can wait for race day.':due?'Here are the ones I’d look at to replace your '+sh.name+'.':'Here are a few that would be a change from your '+sh.name+'.',
+   function(c){if(sh.spare)return c.brand&&c.brand===sh.brand?'Same brand as your '+sh.racer+', built for training days.':'Built for steady runs and workouts, so your '+sh.racer+' stays fresh.';if(sh.gap)return c.brand&&c.brand===sh.brand?'Same brand as most of your rotation, built for race day.':'Built for race day, which is the one job your rotation doesn’t cover.';
     return c.brand&&c.brand===sh.brand?'Same brand as your '+sh.name+', if you want to stay with what you know.':c.w&&ref.w?(c.w<ref.w?'Lighter than your '+sh.name+' for the same kind of run.':'More shoe underfoot than your '+sh.name+' for the same kind of run.'):'A different take on the same kind of run as your '+sh.name+'.'},
    !inB.length?'These are over your $'+B+' budget. You asked to see them anyway.':B>=9000?'You set no budget limit, so these come from the full list.':'All of these are within your $'+B+' budget.',!!inB.length));
   S.typing=false;set({stage:'mdone'});scroll();settle()},rn)}
@@ -583,6 +609,8 @@ function mflow(act,label){
  else if(act==='wentWell')say('Glad to hear it. Rest now. Your rotation is saved, and I’ll be here when you feel like running again.',{stage:'rest'});
  else if(act==='wentRough')say('Sorry to hear that. You still got to the start line and that counts. Rest now. Your rotation is saved, and I’ll be here when you feel like running again.',{stage:'rest'});
  else if(act==='another'){S.stage='mdone';openAdd()}
+ else if(act==='log'){S.stage=ME.shoes.length?'mdone':'add';openLog()}
+ else if(act==='spare')spare(S.spareOf);
  else if(act==='sample'){ME={shoes:SAMPLE.map(function(x){var o={added:Date.now()};for(var k in x)o[k]=x[k];return o})};saveMe();JUST=null;start()}
  else if(act==='home'){view='home';render();window.scrollTo(0,0)}
 }
@@ -595,6 +623,7 @@ function msend(t,q){
  if(st==='mbudget'){v=L.parseBudget(t);if(v)return mbudget(v,t);you(t);return say('A dollar amount works, like $180.')}
  if(st==='mover')return mflow(/\bno\b|not|later|nah/.test(q)?'later':'force',t);
  if(st==='rask')return mflow(/\bno\b|not|nah|nope/.test(q)?'raceNo':'raceYes',t);
+ if(st==='mspare')return mflow(/\bno\b|not|later|nah/.test(q)?'later':'spare',t);
  if(st==='rgap')return mflow(/\bno\b|not|nah|else|other/.test(q)?'gapNo':'gapYes',t);
  if(st==='rfit')return mflow(/\bno\b|not|nah|nope/.test(q)?'fitNo':'fitYes',t);
  if(st==='rafter')return mflow(/rough|bad|hard|hurt|dnf|didn|awful|terrible|\bnot\b/.test(q)?'wentRough':'wentWell',t);
@@ -613,12 +642,13 @@ function replies(){
  if(S.stage==='mover')return[['Show me anyway','m','force'],['Not now','m','later']];
  if(S.stage==='mdone')return[['Add another shoe','m','another']];
  if(S.stage==='rask')return[['Yes','m','raceYes'],['Not right now','m','raceNo']];
+ if(S.stage==='mspare')return[['Show me options','m','spare'],['Not now','m','later']];
  if(S.stage==='rgap')return[['Yes, show me','m','gapYes'],['No, I race in something else','m','gapNo']];
  if(S.stage==='rfit')return[['Yes, I’m set','m','fitYes'],['Not yet','m','fitNo']];
  if(S.stage==='rafter')return[['It went well','m','wentWell'],['It was rough','m','wentRough']];
  if(S.stage==='rform'||S.stage==='rest')return[];
  if(S.stage==='zip'||S.stage==='zipc')return[['Not now','m','zipNo']];
- if(S.stage==='add')return ME.shoes.length?[]:[['Try it with a sample rotation','m','sample']];
+ if(S.stage==='add')return ME.shoes.length?[]:[['Upload my running log','m','log'],['Try it with a sample rotation','m','sample']];
  if(S.stage==='wait')return[];
  return[];
 }
@@ -659,40 +689,165 @@ function render(){
 // Rotation: Mo speaks first, then the race, then the runner's shoes. Each shoe opens a chat about it.
 function storeBtn(brand,cls){return ME.zip?'<a class="'+cls+'" href="'+mapsURL(brand,place())+'" target="_blank" rel="noopener">Find a store</a>':'<button type="button" class="'+cls+'" data-store="'+esc(brand)+'">Find a store</button>'}
 function home(){
- var due=ME.shoes.filter(function(x){return x.miles>=400})[0],nx=due&&ME.next&&ME.next[due.name],t,a='',nd=ME.race?daysTo(ME.race.date):0;
- if(!ME.shoes.length){t='Hi, I’m Mo. Add a shoe you run in and I’ll keep an eye on it.';a='<button type="button" class="b1" data-act="addshoe">+ Add a shoe</button><button type="button" class="txt" data-act="sample">Try it with a sample rotation</button>'}
+ var due=ME.shoes.filter(isDue)[0],wn=ME.shoes.filter(function(x){return x.warn})[0],nx=due&&ME.next&&ME.next[due.name],t,a='',nd=ME.race?daysTo(ME.race.date):0;
+ if(!ME.shoes.length){t='Hi, I’m Mo. Add a shoe you run in and I’ll keep an eye on it.';a='<button type="button" class="b1" data-act="addshoe">+ Add a shoe</button><button type="button" class="b2" data-act="log">Upload a running log</button><button type="button" class="txt" data-act="sample">Try it with a sample rotation</button>'}
  else if(HUSH)t='No problem. I’ll keep an eye on your rotation.';
  else if(nx){t='Your '+nx.name+' is picked. Want to find a store where you can try it on?';a=storeBtn(nx.brand,'b1')+'<button type="button" class="b2" data-act="hush">Not now</button>'}
- else if(due){t='Your '+due.name+' is probably over 400 miles. Want to see some new options?';a='<button type="button" class="b1" data-act="suggest" data-name="'+esc(due.name)+'">Show me new options</button><button type="button" class="b2" data-act="hush">Not now</button>'}
+ else if(due){t=dueSay(due)+' Want to see some new options?';a='<button type="button" class="b1" data-act="suggest" data-name="'+esc(due.name)+'">Show me new options</button><button type="button" class="b2" data-act="hush">Not now</button>'}
+ else if(wn){t='Your '+wn.name+' has '+wn.miles+' miles, but '+warnSay(wn)+'. Race shoes wear out sooner, so a shoe for steady runs would save it for race day.';a='<button type="button" class="b1" data-act="spare" data-name="'+esc(wn.name)+'">Show me options</button><button type="button" class="b2" data-act="hush">Not now</button>'}
  else t='Nothing in your rotation looks due yet.'+(ME.race&&nd>1?' The '+ME.race.name+' is '+nd+' days away.':'');
  var ms=$('moSays'),sk=t+a;if(ms.dataset.k!==sk){ms.dataset.k=sk;ms.innerHTML='<p>'+esc(t)+'</p>'+(a?'<div class="acts">'+a+'</div>':'')}
- $('addTop').hidden=!ME.shoes.length;$('rotHint').textContent=ME.shoes.length?'Saved on this device. Tap a shoe to talk to Mo about it.':'Saved on this device';
- $('footAct').innerHTML=ME.shoes.length?'<button type="button" class="txt" data-act="forget">Clear my shoes</button>':'';
+ $('addTop').hidden=!ME.shoes.length;$('rotHint').textContent=ME.shoes.length?(ME.retireAt?'Your shoes usually last about '+ME.retireAt+' miles, from your log. ':'Saved on this device. ')+'Tap a shoe to talk to Mo about it.':'Saved on this device';
+ $('footNote').textContent=ME.shoes.some(function(x){return x.logged})?'Miles from your log are exact. Shoes you add by hand are estimates, so Mo says “probably.”':'Mo estimates mileage from what you tell it, so it says “probably.”';$('footAct').innerHTML=ME.shoes.length?'<button type="button" class="txt" data-act="forget">Clear my shoes</button>':'';
  var rl=$('raceLine'),rk=JSON.stringify(ME.race||0)+ME.shoes.length+today()+ME.noRaceShoe;
  if(rl.dataset.k!==rk){rl.dataset.k=rk;
   var rs=ME.shoes.filter(function(x){return x.role==='race'})[0];
   rl.className=ME.race?'racecard':'raceline';
   rl.innerHTML=ME.race?'<div class="rc-n"><b>'+(nd>0?nd:nd===0?'Today':'Done')+'</b>'+(nd>0?'<span>'+(nd===1?'day':'days')+' to go</span>':'')+'</div><div class="rc-t"><span class="rc-k">Your race</span><h3>'+esc(ME.race.name)+'</h3><span>'+raceDate(ME.race.date)+'</span><span class="rc-s'+(rs||ME.noRaceShoe?'':' miss')+'">'+(rs?'Race shoe: '+esc(rs.name):ME.noRaceShoe?'Racing in a shoe you already have':'No race shoe in your rotation yet')+'</span></div><button type="button" data-act="race">Change</button>'+(nd>0?'<div class="rc-pv"><span>Preview what Mo says</span><button type="button" data-pv="6w">6 weeks out</button><button type="button" data-pv="2w">2 weeks out</button><button type="button" data-pv="after">After the race</button></div>':''):ME.shoes.length?'<button type="button" data-act="race">Add a race</button>':''}
- var g=$('rotGrid'),k=JSON.stringify([ME.shoes,ME.next||0,JUST,ME.zip||0]);if(g.dataset.k===k)return;g.dataset.k=k;
+ var g=$('rotGrid'),k=JSON.stringify([ME.shoes,ME.next||0,JUST,ME.zip||0,lim()]);if(g.dataset.k===k)return;g.dataset.k=k;
  if(!ME.shoes.length){g.className='';g.innerHTML='<div class="empty"><b>No shoes yet</b><span>Your shoes show up here once you add them. Mo keeps an estimate of their miles.</span></div>';return}
  g.className='shelf';
- g.innerHTML=ME.shoes.map(function(x){var w=wear(x.miles),n=ME.next&&ME.next[x.name];
+ g.innerHTML=ME.shoes.map(function(x){var w=wear(x.miles,x.logged),n=ME.next&&ME.next[x.name];
   var nextBox=n?'<div class="next"><small>Next pair</small><b>'+esc(n.name)+(n.price?', $'+n.price:'')+'</b><span class="lk">'+(n.url?'<a href="'+esc(n.url)+'" target="_blank" rel="noopener">View shoe</a>':'')+(ME.zip?'<a href="'+mapsURL(n.brand,place())+'" target="_blank" rel="noopener">Find a store</a>':'<button type="button" class="lkb" data-store="'+esc(n.brand)+'">Find a store</button>')+'</span></div>':'';
-  return shoeHTML({cls:x.name===JUST?' just':'',pre:'<button type="button" class="talk" data-talk="'+esc(x.name)+'" aria-label="Talk to Mo about your '+esc(x.name)+'"></button>'+(x.name===JUST?'<span class="tag">Just added</span>':''),use:x.label,brand:x.brand,name:shortName(x.name,x.brand),mi:miText(x.miles),pct:w.pct,color:w.color,foot:(w.due?'<span class="due">Probably due</span>':w.line)+nextBox})}).join('')}
+  return shoeHTML({cls:x.name===JUST?' just':'',pre:'<button type="button" class="talk" data-talk="'+esc(x.name)+'" aria-label="Talk to Mo about your '+esc(x.name)+'"></button>'+(x.name===JUST?'<span class="tag">Just added</span>':''),use:x.label,brand:x.brand,name:shortName(x.name,x.brand),mi:miText(x.miles,x.logged),pct:w.pct,color:w.color,foot:(w.due?'<span class="due">'+(x.logged?'Due, by your own numbers':'Probably due')+'</span>':w.line)+(x.warn?'<span class="due">Race shoe, but '+warnSay(x)+'</span>':'')+nextBox})}).join('')}
 // Talking about one shoe: Mo picks up from what he knows about it.
 function talkAbout(nm){var sh=ME.shoes.filter(function(x){return x.name===nm})[0];if(!sh||S.typing)return;
  S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();S.cur=sh;S.confirm=false;view='chat';
  S.msgs.push(msg('mo','note',{text:'About your '+sh.name}));
- var t=!sh.role?'I don’t have track shoes in my catalog yet, so I can’t suggest a new pair for your '+sh.name+' right now.':sh.miles==null?'Without a mileage I’ll go by feel, so tell me when your '+sh.name+' starts to feel flat. Want to see what else is out there?':sh.miles>=400?'Your '+sh.name+' is probably over 400 miles, might want to change it soon. Want to see some new options?':'Your '+sh.name+' probably has '+(sh.miles>=200?'some':'plenty of')+' life left, around '+sh.miles+' miles by your estimate. Want to look at something new anyway?';
- say(t,{stage:sh.role?'mask':'mdone'})}
+ var t=!sh.role?'I don’t have track shoes in my catalog yet, so I can’t suggest a new pair for your '+sh.name+' right now.':sh.miles==null?'Without a mileage I’ll go by feel, so tell me when your '+sh.name+' starts to feel flat. Want to see what else is out there?':isDue(sh)?dueSay(sh)+' Want to see some new options?':sh.warn?'Your '+sh.name+' has '+sh.miles+' miles, but '+warnSay(sh)+'. Race shoes wear out sooner, so a shoe for steady runs would save it for race day. Want to see some?':sh.logged?'Your '+sh.name+' has '+sh.miles+' miles from your log, about '+(lim()-sh.miles)+' to go before your usual '+lim()+'. Want to look at something new anyway?':'Your '+sh.name+' probably has '+(sh.miles>=200?'some':'plenty of')+' life left, around '+sh.miles+' miles by your estimate. Want to look at something new anyway?';
+ if(sh.warn&&!isDue(sh))S.spareOf=sh.name;
+ say(t,{stage:!sh.role?'mdone':sh.warn&&!isDue(sh)?'mspare':'mask'})}
+// ----- A running log: the runner's own CSV, read once in this browser. Nothing is uploaded and nothing is tracked. -----
+var LG=null,DEF=400,MON='jan feb mar apr may jun jul aug sep oct nov dec'.split(' '),
+ RACER=/adios pro|metaspeed|alphafly|vaporfly|rocket ?x|cloudboom|endorphin (pro|elite)|fast-?r|sc elite|deviate nitro elite|hyperion elite|cielo x1|takumi sen|adizero pro/i,
+ WHY=[['using','Still using'],['worn','Worn out'],['disliked','Didn’t like it']];
+function lim(){return ME.retireAt||DEF}
+function isDue(x){return x.miles!=null&&x.miles>=lim()}
+function dueSay(x){return x.logged?'Your '+x.name+' is at '+x.miles+' miles, and your shoes usually last about '+lim()+'.':'Your '+x.name+' is probably over 400 miles, might want to change it soon.'}
+function dueShort(x){return x.logged?'now at '+x.miles+' miles':'probably past 400 miles'}
+function warnSay(x){return x.races?'only '+x.races+' of its '+x.runs+' runs were races':'none of its '+x.runs+' runs were races'}
+function csvRows(t){var R=[],row=[],f='',q=false,i,c;t=String(t).replace(/^﻿/,'');
+ for(i=0;i<t.length;i++){c=t[i];
+  if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+  else if(c==='"')q=true;else if(c===','){row.push(f);f=''}
+  else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;row.push(f);f='';if(row.length>1||row[0]!=='')R.push(row);row=[]}else f+=c}
+ if(f!==''||row.length){row.push(f);R.push(row)}return R}
+function hd(s){return String(s||'').replace(/\s+/g,' ').trim().toLowerCase()}
+function num(s){s=String(s==null?'':s).trim();if(/^\d+,\d+$/.test(s))s=s.replace(',','.');var v=parseFloat(s.replace(/,/g,''));return isFinite(v)?v:null}
+function ymd(y,m,d){return y>1990&&m>0&&m<13&&d>0&&d<32?y+'-'+('0'+m).slice(-2)+'-'+('0'+d).slice(-2):null}
+function day(s){s=String(s||'').trim();var m;
+ if((m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/)))return ymd(+m[1],+m[2],+m[3]);
+ if((m=s.match(/^([A-Za-z]{3})[a-z]*\.? (\d{1,2}),? (\d{4})/)))return ymd(+m[3],MON.indexOf(m[1].toLowerCase())+1,+m[2]);
+ if((m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/))){var y=+m[3];return ymd(y<100?y+2000:y,+m[1],+m[2])}
+ var d=new Date(s);return isNaN(d)?null:ymd(d.getFullYear(),d.getMonth()+1,d.getDate())}
+function secs(s){s=String(s||'').trim();if(!s)return null;if(/^\d+(\.\d+)?$/.test(s))return+s;var p=s.split(':').map(Number);if(p.some(isNaN))return null;return p.reduce(function(a,x){return a*60+x},0)}
+function effort(s){s=hd(s);return!s?null:/race|competition/.test(s)?'race':/workout|interval|tempo|track|speed|threshold|fartlek/.test(s)?'workout':/steady|long|moderate|progress/.test(s)?'steady':/easy|recover|base/.test(s)?'easy':null}
+function gear(s){return String(s||'').replace(/[\u{1F000}-\u{1FAFF}☀-➿️‍⃣]/gu,'').replace(/\s+/g,' ').trim()}
+function shortDay(d){return new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}
+function find(h,re,skip){for(var i=0;i<h.length;i++)if(re.test(h[i])&&!(skip&&skip.test(h[i])))return i;return-1}
+// Which file is which: a Strava export, a Shoes tab, or a run log with its own column names.
+function readLog(files){
+ var out=[],left=files.length;if(!left)return;LG.err='';
+ Array.prototype.forEach.call(files,function(f){var r=new FileReader();r.onload=function(){out.push({name:f.name,rows:csvRows(r.result)});if(!--left)sortLog(out)};r.onerror=function(){if(!--left)sortLog(out)};r.readAsText(f)})}
+function sortLog(out){
+ var runs=null,tab=null,odd=null;
+ out.forEach(function(o){if(!o.rows||o.rows.length<2)return;var h=o.rows[0].map(hd);
+  if(h.indexOf('activity gear')>-1&&h.indexOf('activity type')>-1){var s=fromStrava(o.rows);if(!runs||s.length>runs.length)runs=s;return}
+  if(find(h,/^shoe name/)>-1||(h.indexOf('status')>-1&&find(h,/shoe/)>-1&&find(h,/^date$/)<0)){tab=o.rows;return}
+  if(!odd||o.rows.length>odd.rows.length)odd=o});
+ if(odd&&!runs){var h=odd.rows[0].map(hd),m={date:find(h,/\bdate\b/,/added|week/),dist:find(h,/dist|mileage|^miles|\bkm\b/),shoe:find(h,/shoe|gear|sneaker/),eff:find(h,/^effort|^run type|^workout type|^type$/),time:find(h,/duration|moving time|^time/)},
+  u=m.dist>-1?(/\bkm\b|kilomet/.test(h[m.dist])?'km':/\bmi\b|mile/.test(h[m.dist])?'mi':null):null;m.unit=u||'mi';
+  LG.tab=tab;LG.odd=odd;LG.map=m;
+  if(m.date<0||m.dist<0||m.shoe<0||!u){LG.step='map';return renderLog()}
+  return review(fromCols(odd.rows,m),tab)}
+ if(!runs&&!tab){LG.err='Mo couldn’t find runs in that file. Choose a CSV with a date, a distance and a shoe for each run.';return renderLog()}
+ review(runs||[],tab)}
+function fromStrava(rows){var h=rows[0].map(hd);function ix(n,k){var c=0;for(var i=0;i<h.length;i++)if(h[i]===n&&c++===(k||0))return i;return-1}
+ var iD=ix('activity date'),iT=ix('activity type'),iG=ix('activity gear'),iM=ix('distance',1),iK=ix('distance'),iS=ix('moving time'),iC=ix('competition');
+ return rows.slice(1).filter(function(r){return/run/i.test(r[iT]||'')}).map(function(r){var mi=iM>-1&&num(r[iM])!=null?num(r[iM])/1609.344:(num(r[iK])||0)/1.609344,c=iC>-1?hd(r[iC]):'';
+  return{date:day(r[iD]),mi:mi,shoe:gear(r[iG]),sec:iS>-1?secs(r[iS]):null,eff:c&&c!=='0'&&c!=='false'?'race':null}}).filter(function(x){return x.date&&x.mi>0.05})}
+function fromCols(rows,m){var k=m.unit==='km'?1/1.609344:1;
+ return rows.slice(1).map(function(r){return{date:day(r[m.date]),mi:(num(r[m.dist])||0)*k,shoe:gear(r[m.shoe]),sec:m.time>-1?secs(r[m.time]):null,eff:m.eff>-1?effort(r[m.eff]):null}}).filter(function(x){return x.date&&x.mi>0.05})}
+// The runner's own pace says which runs were easy. Faster than usual counts as steady or a workout.
+function byPace(runs){var p=runs.filter(function(x){return x.sec&&x.mi>0.5}).map(function(x){return x.sec/x.mi}).sort(function(a,b){return a-b}),md=p.length?p[p.length>>1]:0;
+ runs.forEach(function(x){if(x.eff)return;var r=md&&x.sec&&x.mi>0.5?x.sec/x.mi/md:1;x.eff=r<.88?'workout':r<.95?'steady':'easy'})}
+function canon(base){var w=base.toLowerCase().replace(/\(.*?\)|#\S*/g,' ').split(/\s+/).filter(Boolean),hit=KNOWN.filter(function(nm){var l=' '+nm.toLowerCase()+' ';return w.length&&w.every(function(x){return l.indexOf(' '+x+' ')>-1})});return hit.length===1?hit[0]:base.replace(/\s*#\S*$/,'')}
+function review(runs,tab){
+ byPace(runs);var by={},order=[],none=0,noneMi=0,end='';
+ function get(k){if(!by[k]){by[k]={key:k,mi:0,runs:0,races:0,last:'',first:'',mix:{easy:0,steady:0,workout:0,race:0}};order.push(k)}return by[k]}
+ runs.forEach(function(r){if(r.date>end)end=r.date;if(!r.shoe){none++;noneMi+=r.mi;return}var b=get(r.shoe);b.mi+=r.mi;b.runs++;if(r.date>b.last)b.last=r.date;if(!b.first||r.date<b.first)b.first=r.date;b.mix[r.eff]+=r.mi;if(r.eff==='race')b.races++});
+ if(tab){var h=tab[0].map(hd),iN=find(h,/^shoe name|^shoe$|^name$/),iB=find(h,/^brand/),iM=find(h,/^model$/),iS=find(h,/^starting dist/),iSt=find(h,/^status/),iTy=find(h,/shoe type|^type/),iTo=find(h,/^total dist/),iR=find(h,/# runs|^runs$/);
+  if(iN<0)iN=0;
+  tab.slice(1).forEach(function(r){var k=gear(r[iN]);if(!k)return;var had=!!by[k],b=get(k),st=iS>-1?num(r[iS])||0:0;
+   if(!had){b.mi=iTo>-1&&num(r[iTo])!=null?num(r[iTo]):st;b.runs=iR>-1?num(r[iR])||0:0}else b.mi+=st;
+   b.brand=iB>-1?r[iB].trim():'';b.model=iM>-1?r[iM].trim():'';b.status=iSt>-1?hd(r[iSt]):'';b.track=iTy>-1&&/spike|track/i.test(r[iTy])})}
+ var seen={},list=order.map(function(k){var b=by[k],base=b.brand&&b.model?(b.model.toLowerCase().indexOf(b.brand.toLowerCase())===0?b.model:b.brand+' '+b.model):k;
+  b.name=canon(base);b.brand=b.brand||brandOf(b.name);b.mi=Math.round(b.mi);seen[b.name]=(seen[b.name]||0)+1;
+  var top=['easy','steady','workout','race'].sort(function(p,q){return b.mix[q]-b.mix[p]})[0];b.top=b.runs&&b.mix[top]?top:null;
+  b.role=b.track||/finesse|spike/i.test(b.name)?null:RACER.test(b.name)||(b.mi&&b.mix.race/b.mi>.5)?'race':b.mix.steady+b.mix.workout>b.mix.easy?'speed':'easy';
+  b.warn=b.role==='race'&&b.mi>=60&&b.runs>0&&b.mix.race/b.mi<.3;
+  b.why=b.status?(/retir|worn|done/.test(b.status)?'worn':'using'):b.last&&end&&(new Date(end)-new Date(b.last))/864e5>60?'worn':'using';
+  if(LG.preset&&LG.preset[b.name])b.why=LG.preset[b.name];
+  return b});
+ var n={};list.slice().sort(function(p,q){return p.first<q.first?-1:p.first>q.first?1:0}).forEach(function(b){if(seen[b.name]>1){n[b.name]=(n[b.name]||0)+1;b.name+=' #'+n[b.name]}});
+ if(!list.length){LG.err='Mo found runs in that file, but none had a shoe on them. Choose a log with a shoe column.';LG.step='pick';return renderLog()}
+ list.sort(function(p,q){return(p.why==='using'?0:1)-(q.why==='using'?0:1)||(q.last>p.last?1:q.last<p.last?-1:0)});
+ LG.list=list;LG.end=end;LG.count=runs.length;LG.none=none;LG.noneMi=Math.round(noneMi);LG.step='review';renderLog()}
+function personal(){var w=LG.list.filter(function(b){return b.why==='worn'&&b.mi>0});if(w.length<2)return{n:0,k:w.length};return{n:Math.round(w.reduce(function(a,b){return a+b.mi},0)/w.length/5)*5,k:w.length}}
+function openLog(){AF=null;LG={step:'pick'};$('addTitle').textContent='Upload your running log';$('addWrap').hidden=false;renderLog()}
+function renderLog(){var h='<div class="add log">';
+ if(LG.step==='pick'){
+  h+='<p class="lead">Mo reads a CSV of your runs and adds up the miles on each shoe. Your file stays in this browser. Mo reads it once and doesn’t track your runs.</p>'
+   +'<label class="go file">Choose a CSV file<input id="logFile" class="sr" type="file" accept=".csv,text/csv" multiple></label>'+(LG.err?'<p class="err" role="alert">'+esc(LG.err)+'</p>':'')
+   +'<div class="how"><details><summary>From Strava</summary><p>On strava.com, open Settings, then My Account, then Download or Delete Your Account, and request your archive. Strava emails you a zip file. Open it and choose activities.csv.</p></details>'
+   +'<details><summary>From a Google Sheet</summary><p>Open your log and choose File, then Download, then Comma separated values. If you keep a tab for your shoes, download it too and choose both files.</p></details></div>'
+   +'<div class="acts"><button type="button" class="txt" data-l="sample">No log handy? Try a sample log</button></div>'}
+ else if(LG.step==='map'){var hs=LG.odd.rows[0].map(function(x){return String(x).replace(/\s+/g,' ').trim()}),m=LG.map;
+  function sel(k,lab){return'<label>'+lab+'<select data-m="'+k+'"><option value="-1">Choose a column</option>'+hs.map(function(x,i){return'<option value="'+i+'"'+(m[k]===i?' selected':'')+'>'+esc(x||'Column '+(i+1))+'</option>'}).join('')+'</select></label>'}
+  h+='<p class="lead">Mo couldn’t tell which column is which. Point him to the date, the distance and the shoe for each run.</p><div class="map">'+sel('date','Date')+sel('dist','Distance')+sel('shoe','Shoe')+'</div>'
+   +'<fieldset><legend>Is the distance in miles or kilometers?</legend><div class="opts">'+[['mi','Miles'],['km','Kilometers']].map(function(u){return'<button type="button" data-l="unit" data-v="'+u[0]+'" aria-pressed="'+(m.unit===u[0])+'">'+u[1]+'</button>'}).join('')+'</div></fieldset>'
+   +'<div class="acts"><button type="button" class="go" data-l="mapped"'+(m.date>-1&&m.dist>-1&&m.shoe>-1?'':' disabled')+'>Continue</button><button type="button" class="txt" data-l="back">Choose another file</button></div>'}
+ else{var p=personal(),keep=LG.list.filter(function(b){return b.why==='using'}).length;
+  h+='<p class="lead">'+(LG.count?'Mo found '+LG.count+' runs on '+LG.list.length+' shoes, through '+shortDay(LG.end)+'.':'Mo found '+LG.list.length+' shoes.')+' Tell him which ones you still run in.</p>'
+   +'<div class="num">'+(p.n?'<b>'+p.n+'</b><span>miles is how long your shoes usually last, from '+p.k+' pairs you wore out. Mo uses this instead of the usual 400. Shoes you didn’t like don’t count.</span>':'<b>400</b><span>miles is a common rule of thumb. Mark two or more pairs as worn out and Mo works out your own number.</span>')+'</div>'
+   +'<ul class="lgl">'+LG.list.map(function(b,i){return'<li><div class="lgn"><b>'+esc(b.name)+'</b><span>'+b.mi+' mi'+(b.runs?', '+b.runs+(b.runs===1?' run':' runs'):'')+(b.last?', last run '+shortDay(b.last):'')+(b.top?'. Mostly '+{easy:'easy runs',steady:'steady runs',workout:'workouts',race:'races'}[b.top]:'')+'</span>'+(b.warn?'<span class="warn">Race shoe, but '+warnSay(b)+'</span>':'')+'</div>'
+    +'<div class="opts" role="group" aria-label="'+esc(b.name)+'">'+WHY.map(function(w){return'<button type="button" data-l="why" data-k="'+i+'" data-v="'+w[0]+'" aria-pressed="'+(b.why===w[0])+'">'+w[1]+'</button>'}).join('')+'</div></li>'}).join('')+'</ul>'
+   +(LG.none?'<p class="skip">'+LG.none+' runs had no shoe on them, '+LG.noneMi+' miles. Mo left those out.</p>':'')
+   +'<div class="acts"><button type="button" class="go" data-l="add"'+(keep?'':' disabled')+'>Add '+keep+' '+(keep===1?'shoe':'shoes')+' to my rotation</button><button type="button" class="txt" data-l="back">Choose another file</button></div>'}
+ $('addBody').innerHTML=h+'</div>'}
+function logAct(b){if(!LG)return;var k=b.dataset.l;
+ if(k==='sample'){LG.preset={'Hoka Mach 6':'disliked'};return review(sampleLog(),null)}
+ if(k==='back'){LG={step:'pick'};return renderLog()}
+ if(k==='unit'){LG.map.unit=b.dataset.v;return renderLog()}
+ if(k==='mapped')return review(fromCols(LG.odd.rows,LG.map),LG.tab);
+ if(k==='why'){LG.list[+b.dataset.k].why=b.dataset.v;return renderLog()}
+ if(k==='add'){var p=personal(),U=USES.map(function(u){return u[2]}),keep=LG.list.filter(function(x){return x.why==='using'});
+  var sh=keep.map(function(x){var u=USES[x.role?U.indexOf(x.role):3];return{name:x.name,brand:x.brand,label:u[0],use:u[1],role:x.role,miles:x.mi,logged:true,runs:x.runs,races:x.races,warn:x.warn,top:x.top,added:Date.now()}}),names=sh.map(function(x){return x.name});
+  ME.shoes=ME.shoes.filter(function(x){return names.indexOf(x.name)<0}).concat(sh);
+  ME.history=LG.list.filter(function(x){return x.why!=='using'}).map(function(x){return{name:x.name,miles:x.mi,why:x.why}});
+  if(p.n){ME.retireAt=p.n;ME.retireFrom=p.k}else{delete ME.retireAt;delete ME.retireFrom}
+  saveMe();JUST=null;HUSH=false;closeAdd();timers.forEach(clearTimeout);timers=[];S=fresh();view='home';render();window.scrollTo(0,0);toast(sh.length+(sh.length===1?' shoe':' shoes')+' added from your log')}}
+// A made up log for the demo. None of it is a real runner's data.
+function sampleLog(){var s=11,out=[];function rnd(){s=(s*9301+49297)%233280;return s/233280}
+ function add(day0,n){var d=new Date(day0+'T12:00:00');d.setDate(d.getDate()+n);return ymd(d.getFullYear(),d.getMonth()+1,d.getDate())}
+ [['Nike Pegasus 41','2025-02-03',220,70,372,[.75,.25,0]],['Saucony Ride 18','2025-06-02',220,62,338,[.7,.3,0]],['Hoka Mach 6','2025-10-06',70,14,84,[.4,.6,0]],
+  ['Nike Pegasus 42','2025-09-22',400,74,362,[.8,.2,0]],['Saucony Endorphin Elite 3','2026-04-06',204,30,168,[0,.45,.55]],['Hoka Mach 7','2026-08-03',88,18,96,[.3,.7,0]],['','2025-04-01',500,6,21,[1,0,0]]]
+ .forEach(function(p){var w=[],t=0,i;for(i=0;i<p[3];i++){w.push(.6+rnd()*.8);t+=w[i]}
+  for(i=0;i<p[3];i++){var r=rnd(),e=r<p[5][0]?'easy':r<p[5][0]+p[5][1]?'steady':'workout';out.push({date:add(p[1],Math.round(i*p[2]/(p[3]-1||1))),mi:p[4]*w[i]/t,shoe:p[0],eff:e})}});
+ out.filter(function(x){return x.shoe==='Saucony Endorphin Elite 3'}).slice(-12,-10).forEach(function(x){x.eff='race'});
+ return out}
+// A race shoe doing training miles: Mo suggests a shoe for those runs instead.
+function spare(nm){var r=ME.shoes.filter(function(x){return x.name===nm})[0];if(!r||S.typing)return;
+ S.cur={spare:true,racer:r.name,name:null,role:'speed',label:'Long and tempo',use:'long and tempo',miles:null,brand:r.brand};S.spareOf=null;
+ if(ME.budget==null)return say('What’s your budget for this one?',{stage:'mbudget'});showMine()}
 // Adding a shoe from Rotation happens in a sheet, then the runner is back on Rotation.
-function openAdd(){AF=newForm();view='home';$('addWrap').hidden=false;renderAdd();render();setTimeout(function(){var q=$('shoeQ2');if(q)q.focus()},40)}
-function closeAdd(){AF=null;$('addWrap').hidden=true}
+function openAdd(){AF=newForm();LG=null;view='home';$('addTitle').textContent='Add a shoe you run in';$('addWrap').hidden=false;renderAdd();render();setTimeout(function(){var q=$('shoeQ2');if(q)q.focus()},40)}
+function closeAdd(){AF=null;LG=null;$('addWrap').hidden=true}
 function renderAdd(){var f=AF,ok=f.name&&f.b!=null&&f.u!=null,h='<div class="add">';
  h+='<fieldset><legend>Which shoe do you run in?</legend>'+(f.name?'<div class="picked"><span>'+esc(f.name)+'</span><button type="button" data-s="clear">Change</button></div>':'<input id="shoeQ2" class="q" type="text" autocomplete="off" placeholder="Search, like Cloudsurfer Max" aria-label="Search for your shoe" value="'+esc(f.q)+'"><div class="res" id="shoeRes2">'+resHTML(f.q,'sshoe')+'</div>')+'</fieldset>';
  h+='<fieldset><legend>About how many miles are on it?</legend><div class="opts">'+BUCKETS.map(function(x,i){return'<button type="button" data-s="b" data-v="'+i+'" aria-pressed="'+(f.b===i)+'">'+x[0]+'</button>'}).join('')+'</div></fieldset>';
  h+='<fieldset><legend>What do you use it for?</legend><div class="opts">'+USES.map(function(x,i){return'<button type="button" data-s="u" data-v="'+i+'" aria-pressed="'+(f.u===i)+'">'+x[0]+'</button>'}).join('')+'</div></fieldset>';
- h+='<div class="acts"><button type="button" class="go" data-s="add"'+(ok?'':' disabled')+'>Add to my rotation</button><button type="button" class="txt" data-act="closeadd">Cancel</button></div></div>';
+ h+='<div class="acts"><button type="button" class="go" data-s="add"'+(ok?'':' disabled')+'>Add to my rotation</button><button type="button" class="txt" data-act="closeadd">Cancel</button></div><p class="alt">Have a running log? <button type="button" class="lkb" data-act="log">Upload it instead</button></p></div>';
  $('addBody').innerHTML=h}
 function sheetAct(b){var f=AF,k=b.dataset.s;if(!f)return;
  if(k==='clear'){f.name=null;f.q='';renderAdd();return setTimeout(function(){var q=$('shoeQ2');if(q)q.focus()},30)}
@@ -713,6 +868,8 @@ document.addEventListener('click',function(e){
  var b=e.target.closest('button');if(!b)return;
  if(b.dataset.f)return formAct(b);
  if(b.dataset.s)return sheetAct(b);
+ if(b.dataset.l)return logAct(b);
+ if(b.dataset.act==='log')return openLog();
  if(b.dataset.sshoe){if(AF){AF.name=b.dataset.sshoe;renderAdd()}return}
  if(b.dataset.shoe)return pickName(b.dataset.shoe);
  if(b.dataset.nav){if(S.typing&&b.dataset.nav==='chat'){view='chat';return render()}S.confirm=false;view=b.dataset.nav;render();if(view==='chat')scroll();else window.scrollTo(0,0);return}
@@ -722,6 +879,7 @@ document.addEventListener('click',function(e){
  if(b.dataset.race)return pickRace(b.dataset.race,b.dataset.date||'');
  if(b.dataset.act==='addshoe')return openAdd();
  if(b.dataset.act==='rotation'){S.confirm=false;view='home';render();return setTimeout(function(){$('rotation').scrollIntoView({behavior:window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})},60)}
+ if(b.dataset.act==='spare'){if(S.typing)return;S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();S.confirm=false;view='chat';you('What should I run my steady runs in?');spare(b.dataset.name);return scroll()}
  if(b.dataset.act==='suggest'){var sg=ME.shoes.filter(function(x){return x.name===b.dataset.name})[0];if(!sg||S.typing)return;
   S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();S.cur=sg;S.confirm=false;view='chat';
   you('What do you suggest for my '+sg.name+'?');if(ME.budget==null)say('What’s your budget for this one?',{stage:'mbudget'});else showMine();return scroll()}
@@ -730,7 +888,7 @@ document.addEventListener('click',function(e){
  if(b.dataset.pv){if(S.typing)return;return preview(b.dataset.pv)}
  if(b.dataset.store){view='chat';return askZip(b.dataset.store)}
  if(b.dataset.act==='zip'){view='chat';return askZip(null)}
- if(b.dataset.act==='forget'){ME={shoes:[]};saveMe();JUST=null;HUSH=false;return start()}
+ if(b.dataset.act==='forget'){ME={shoes:[]};LG=null;saveMe();JUST=null;HUSH=false;return start()}
  if(b.id==='goHome'){S.confirm=false;view='home';return render()}
  if(b.id==='restart'){if(chosenList().length)return set({confirm:true});return start('chat')}
  if(b.id==='yes')return start('chat');
@@ -745,7 +903,8 @@ $('addBody').addEventListener('input',function(e){if(e.target.id==='shoeQ2'&&AF)
 $('addBody').addEventListener('keydown',function(e){if(e.target.id==='shoeQ2'&&e.key==='Enter'){e.preventDefault();var first=$('shoeRes2').querySelector('button');if(first){AF.name=first.dataset.sshoe;renderAdd()}}});
 $('chat').addEventListener('input',function(e){if(e.target.id==='raceName'){S.rf.name=e.target.value;$('raceRes').innerHTML=raceRes(S.rf.name);return}if(e.target.id==='raceDate'){S.rf.date=e.target.value;var sv=$('raceSave');if(sv)sv.disabled=!S.rf.date;return}if(e.target.id==='shoeQ'){S.form.q=e.target.value;$('shoeRes').innerHTML=resHTML(S.form.q)}});
 $('chat').addEventListener('keydown',function(e){if(e.target.id==='raceName'&&e.key==='Enter'){e.preventDefault();var fr=$('raceRes').querySelector('button');if(fr)pickRace(fr.dataset.race,fr.dataset.date||'');return}if(e.target.id==='shoeQ'&&e.key==='Enter'){e.preventDefault();var first=$('shoeRes').querySelector('button');if(first)pickName(first.dataset.shoe)}});
-document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;if(AF){closeAdd();return}if(view==='chat'&&ME.shoes.length){S.confirm=false;view='home';render()}});
+$('addBody').addEventListener('change',function(e){if(!LG)return;if(e.target.id==='logFile')return readLog(e.target.files);if(e.target.dataset.m){LG.map[e.target.dataset.m]=+e.target.value;renderLog()}});
+document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;if(AF||LG){closeAdd();return}if(view==='chat'&&ME.shoes.length){S.confirm=false;view='home';render()}});
 $('form').addEventListener('submit',function(e){e.preventDefault();send()});
 
 start();
