@@ -388,8 +388,8 @@ function fresh(){var s={msgs:[{id:0,who:'mo',kind:'text',text:''}],stage:'add',c
  {s.form=newForm();ME=loadMe();
   if(!ME.shoes.length){s.msgs[0].text='Hi, I’m Mo. Tell me about a shoe you run in. It takes three taps, and I’ll save it to your rotation so I remember it next time.';s.msgs.push({id:-1,who:'mo',kind:'addshoe'});s.stage='add'}
   else{var due=ME.shoes.filter(isDue)[0];
-   if(due){s.cur=due;s.msgs[0].text=dueSay(due)+' Want to see some new options?';s.stage='mask';s.msgs.unshift({id:-2,who:'mo',kind:'img',src:'img/mo-shoe-due.jpg',alt:'Mo holding up an old running shoe'})}
-   else{var nr=ME.shoes.filter(isNear)[0];if(nr){s.cur=nr;s.msgs[0].text=nearSay(nr)+' Want to start looking at your next pair?';s.stage='mask'}
+   if(due){s.cur=due;s.msgs[0].text=dueSay(due)+' Want to see some options?';s.stage='mask';s.msgs.unshift({id:-2,who:'mo',kind:'img',src:'img/mo-shoe-due.jpg',alt:'Mo holding up an old running shoe'})}
+   else{var nr=ME.shoes.filter(isNear)[0];if(nr){s.cur=nr;s.msgs[0].text=nearSay(nr)+' Want to start looking at your next one?';s.stage='mask'}
    else{s.msgs[0].text='Nothing in your rotation looks due yet. Want to add another shoe?';s.stage='mdone'}}}}
  return s}
 function set(p){for(var k in p)S[k]=p[k];render()}
@@ -496,7 +496,7 @@ function shoeHTML(o){
 function wear(m,lg,track){var T=lim(),N=nearAt();
  if(track)return{pct:0,color:'#A3ADC2',line:m?m+' miles. Spikes wear differently, so Mo just counts':'Spikes wear differently, so Mo just counts the miles'};
  if(m==null)return{pct:0,color:'#A3ADC2',line:'No mileage yet, so Mo goes by feel'};
- if(lg)return m>=T?{pct:100,color:'#DC440D',due:true,line:'Past the '+T+' miles your shoes usually last'}:{pct:Math.max(4,Math.round(m/T*100)),color:m>=N?'#EBCE78':'#7ABA5C',near:m>=N,line:(T-m)+' miles left before your usual '+T};
+ if(lg)return m>=T?{pct:100,color:'#DC440D',due:true,line:'Past the '+T+' miles your shoes usually last'}:{pct:Math.max(4,Math.round(m/T*100)),color:m>=N?'#EBCE78':'#7ABA5C',near:m>=N,line:'About '+(T-m)+' miles left'};
  var est=(m>=400?'Over 400 miles':m>=200?'200 to 400 miles':'Under 200 miles')+', by your estimate';
  return m>=T?{pct:85,color:'#DC440D',due:true,line:est}:m>=N?{pct:75,color:'#EBCE78',near:true,line:est}:{pct:m>=200?60:25,color:'#7ABA5C',line:est}}
 function mineCard(name,b,u,last){
@@ -527,7 +527,7 @@ function makeShoe(f){return{name:f.name,brand:brandOf(f.name),label:USES[f.u][0]
 function afterAdd(sh){
  if(!sh.role){say('Added to your rotation. I don’t have track shoes in my catalog yet, so I’ll keep this one in your rotation for now.',{stage:'mdone'});return later(900,settle)}
  if(sh.miles==null)return say('Added to your rotation. Without a mileage I’ll go by feel, so tell me when your '+sh.name+' starts to feel flat. Want to see what else is out there?',{stage:'mask'});
- if(isDue(sh))return say('Added to your rotation. '+dueSay(sh)+' Want to see some new options?',{stage:'mask'});
+ if(isDue(sh))return say('Added to your rotation. '+dueSay(sh)+' Want to see some options?',{stage:'mask'});
  say('Added to your rotation. Your '+sh.name+' probably has '+(sh.miles>=200?'some':'plenty of')+' life left, so there’s no rush. Want to look at something new anyway?',{stage:'mask'})}
 function myRunner(){return{goal:ME.race?ME.race.name+' on '+raceDate(ME.race.date):undefined,budget:ME.budget&&ME.budget<9000?ME.budget:undefined,shoes:ME.shoes.map(function(x){var sp=SPEC[x.name]||{};return{name:x.name,brand:x.brand,use:x.use,miles:x.miles,w:sp.w,d:sp.d,weight:sp.w?sp.w+'g':undefined,drop:sp.d!=null?sp.d+'mm':undefined}})}}
 // Reorder: the runner wants the same shoe again. No model call, the facts are the runner's own.
@@ -696,12 +696,12 @@ function home(){
  if(!ME.shoes.length){t='Hi, I’m Mo. Add a shoe you run in and I’ll keep an eye on it.';a='<button type="button" class="b1" data-act="addshoe">+ Add a shoe</button><button type="button" class="b2" data-act="log">Upload a running log</button><button type="button" class="txt" data-act="sample">Try it with a sample rotation</button>'}
  else if(HUSH)t='No problem. I’ll keep an eye on your rotation.';
  else if(nx){t='Your '+nx.name+' is picked. Want to find a store where you can try it on?';a=storeBtn(nx.brand,'b1')+'<button type="button" class="b2" data-act="hush">Not now</button>'}
- else if(due){t=dueSay(due)+' Want to see some new options?';a='<button type="button" class="b1" data-act="suggest" data-name="'+esc(due.name)+'">Show me new options</button><button type="button" class="b2" data-act="hush">Not now</button>'}
- else if(nr){t=nearSay(nr)+' Want to start looking at your next pair?';a='<button type="button" class="b1" data-act="suggest" data-name="'+esc(nr.name)+'">Show me options</button><button type="button" class="b2" data-act="hush">Not now</button>'}
+ else if(due){t=dueSay(due)+' Want to see some options?';a='<button type="button" class="b1" data-act="suggest" data-name="'+esc(due.name)+'">Show me new options</button><button type="button" class="b2" data-act="hush">Not now</button>'}
+ else if(nr){t=nearSay(nr)+' Want to start looking at your next one?';a='<button type="button" class="b1" data-act="suggest" data-name="'+esc(nr.name)+'">Show me options</button><button type="button" class="b2" data-act="hush">Not now</button>'}
  else if(wn){t='Your '+wn.name+' has '+wn.miles+' miles, but '+warnSay(wn)+'. Race shoes wear out sooner, so a shoe for steady runs would save it for race day.';a='<button type="button" class="b1" data-act="spare" data-name="'+esc(wn.name)+'">Show me options</button><button type="button" class="b2" data-act="hush">Not now</button>'}
  else t='Nothing in your rotation looks due yet.'+(ME.race&&nd>1?' The '+ME.race.name+' is '+nd+' days away.':'');
  var ms=$('moSays'),sk=t+a;if(ms.dataset.k!==sk){ms.dataset.k=sk;ms.innerHTML='<p>'+esc(t)+'</p>'+(a?'<div class="acts">'+a+'</div>':'')}
- $('addTop').hidden=!ME.shoes.length;$('rotHint').textContent=ME.shoes.length?(ME.retireAt?'Your shoes usually last about '+ME.retireAt+' miles, from your log. ':'Saved on this device. ')+'Tap a shoe to talk to Mo about it.':'Saved on this device';
+ $('addTop').hidden=!ME.shoes.length;$('rotHint').textContent=ME.shoes.length?(ME.retireAt?'Mo uses your log to tell when a shoe is due. ':'Saved on this device. ')+'Tap a shoe to talk to Mo about it.':'Saved on this device';
  $('footNote').textContent=ME.shoes.some(function(x){return x.logged})?'Miles from your log are exact. Shoes you add by hand are estimates, so Mo says “probably.”':'Mo estimates mileage from what you tell it, so it says “probably.”';$('footAct').innerHTML=ME.shoes.length?'<button type="button" class="txt" data-act="forget">Clear my shoes</button>':'';
  var rl=$('raceLine'),rk=JSON.stringify(ME.race||0)+ME.shoes.length+today()+ME.noRaceShoe;
  if(rl.dataset.k!==rk){rl.dataset.k=rk;
@@ -717,7 +717,7 @@ function home(){
 // Talking about one shoe: Mo picks up from what he knows about it.
 function talkAbout(nm){var sh=ME.shoes.filter(function(x){return x.name===nm})[0];if(!sh||S.typing)return;
  S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();S.cur=sh;S.confirm=false;view='chat';
- var t=!sh.role?'I don’t have track shoes in my catalog yet, so I can’t suggest a new pair for your '+sh.name+' right now.':sh.miles==null?'Without a mileage I’ll go by feel, so tell me when your '+sh.name+' starts to feel flat. Want to see what else is out there?':isDue(sh)?dueSay(sh)+' Want to see some new options?':isNear(sh)?nearSay(sh)+' Want to start looking at your next pair?':sh.warn?'Your '+sh.name+' has '+sh.miles+' miles, but '+warnSay(sh)+'. Race shoes wear out sooner, so a shoe for steady runs would save it for race day. Want to see some?':sh.logged?'Your '+sh.name+' has '+sh.miles+' miles from your log, so about '+(lim()-sh.miles)+' left before your usual '+lim()+'. Want to look at something new anyway?':'Your '+sh.name+' probably has '+(sh.miles>=200?'some':'plenty of')+' life left, around '+sh.miles+' miles by your estimate. Want to look at something new anyway?';
+ var t=!sh.role?'I don’t have track shoes in my catalog yet, so I can’t suggest a new pair for your '+sh.name+' right now.':sh.miles==null?'Without a mileage I’ll go by feel, so tell me when your '+sh.name+' starts to feel flat. Want to see what else is out there?':isDue(sh)?dueSay(sh)+' Want to see some options?':isNear(sh)?nearSay(sh)+' Want to start looking at your next one?':sh.warn?'Your '+sh.name+' has '+sh.miles+' miles, but '+warnSay(sh)+'. Race shoes wear out sooner, so a shoe for steady runs would save it for race day. Want to see some?':sh.logged?'Your '+sh.name+' is at '+sh.miles+' miles, with about '+(lim()-sh.miles)+' left. Want to look at something new anyway?':'Your '+sh.name+' probably has '+(sh.miles>=200?'some':'plenty of')+' life left, around '+sh.miles+' miles by your estimate. Want to look at something new anyway?';
  if(sh.warn&&!isDue(sh))S.spareOf=sh.name;
  // If Mo just said this, don't say it again. Pick up where the chat is.
  var lm=S.msgs.filter(function(m){return m.who==='mo'&&m.kind==='text'}).pop();
@@ -733,8 +733,8 @@ function isDue(x){return x.miles!=null&&!!x.role&&x.miles>=lim()}
 // Getting close: past 85% of the runner's own number, so there is time to choose and buy the next pair.
 function nearAt(){return Math.round(lim()*.85)}
 function isNear(x){return x.miles!=null&&!!x.role&&!isDue(x)&&x.miles>=nearAt()}
-function nearSay(x){return x.logged?'Your '+x.name+' has '+x.miles+' miles, close to the '+lim()+' your shoes usually last.':'Your '+x.name+' is probably getting close to '+lim()+' miles.'}
-function dueSay(x){return x.logged?'Your '+x.name+' is at '+x.miles+' miles, and your shoes usually last about '+lim()+'.':'Your '+x.name+' is probably over 400 miles, might want to change it soon.'}
+function nearSay(x){return x.logged?'Your '+x.name+' is at '+x.miles+' miles, so it’s getting close to needing a new pair.':'Your '+x.name+' is probably getting close to '+lim()+' miles.'}
+function dueSay(x){return x.logged?'Your '+x.name+' is at '+x.miles+' miles, so it’s time for a new pair.':'Your '+x.name+' is probably over 400 miles, might want to change it soon.'}
 function dueShort(x){return x.logged?'now at '+x.miles+' miles':'probably past 400 miles'}
 function warnSay(x){return x.races?'only '+x.races+' of its '+x.runs+' runs were races':'none of its '+x.runs+' runs were races'}
 function csvRows(t){var R=[],row=[],f='',q=false,i,c;t=String(t).replace(/^﻿/,'');
