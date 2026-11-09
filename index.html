@@ -717,9 +717,12 @@ function home(){
 // Talking about one shoe: Mo picks up from what he knows about it.
 function talkAbout(nm){var sh=ME.shoes.filter(function(x){return x.name===nm})[0];if(!sh||S.typing)return;
  S.msgs=S.msgs.filter(function(m){return!(m.kind==='addshoe'&&!m.done)&&!m.forForm});S.form=newForm();S.cur=sh;S.confirm=false;view='chat';
- S.msgs.push(msg('mo','note',{text:'About your '+sh.name}));
  var t=!sh.role?'I don’t have track shoes in my catalog yet, so I can’t suggest a new pair for your '+sh.name+' right now.':sh.miles==null?'Without a mileage I’ll go by feel, so tell me when your '+sh.name+' starts to feel flat. Want to see what else is out there?':isDue(sh)?dueSay(sh)+' Want to see some new options?':isNear(sh)?nearSay(sh)+' Want to start looking at your next pair?':sh.warn?'Your '+sh.name+' has '+sh.miles+' miles, but '+warnSay(sh)+'. Race shoes wear out sooner, so a shoe for steady runs would save it for race day. Want to see some?':sh.logged?'Your '+sh.name+' has '+sh.miles+' miles from your log, so about '+(lim()-sh.miles)+' left before your usual '+lim()+'. Want to look at something new anyway?':'Your '+sh.name+' probably has '+(sh.miles>=200?'some':'plenty of')+' life left, around '+sh.miles+' miles by your estimate. Want to look at something new anyway?';
  if(sh.warn&&!isDue(sh))S.spareOf=sh.name;
+ // If Mo just said this, don't say it again. Pick up where the chat is.
+ var lm=S.msgs.filter(function(m){return m.who==='mo'&&m.kind==='text'}).pop();
+ if(lm&&lm.text===t){S.stage=!sh.role?'mdone':sh.warn&&!isDue(sh)?'mspare':'mask';render();return scroll()}
+ S.msgs.push(msg('mo','note',{text:'About your '+sh.name}));
  say(t,{stage:!sh.role?'mdone':sh.warn&&!isDue(sh)?'mspare':'mask'})}
 // ----- A running log: the runner's own CSV, read once in this browser. Nothing is uploaded and nothing is tracked. -----
 var LG=null,DEF=400,MON='jan feb mar apr may jun jul aug sep oct nov dec'.split(' '),
