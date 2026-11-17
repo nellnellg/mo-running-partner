@@ -878,7 +878,11 @@ var EMB={pipe:null,tried:false,cat:null},
 function allShoes(){var out=[];['easy','speed','race'].forEach(function(k){L.CAT[k].forEach(function(c){out.push({c:c,key:k})})});return out}
 function shoeText(c,k){return c.name+'. Feels '+(c.feel||'').toLowerCase()+'. '+c.why+' '+(ABOUT[c.name]||(k==='race'?'Built for race day, half and full marathons.':''))}
 function wantBudget(t){var m=t.match(/(?:under|below|less than|max(?:imum)?|up to|no more than|at most|cheaper than|within)\s*\$?\s*(\d{2,4})/i)||t.match(/\$\s*(\d{2,4})\s*(?:or less|max|tops|or under)?/i);return m?+m[1]:null}
-function looksLikeAsk(q){return /shoe|something|want|looking|need|recommend|suggest|\$\s*\d|under|budget/.test(q)||Object.keys(CONCEPT).some(function(k){return CONCEPT[k].test(q)})}
+var BRANDS=[['Nike',/\bnike\b/],['Adidas',/\badidas\b/],['ASICS',/\basics\b/],['Hoka',/\bhoka\b/],['New Balance',/\bnew balance\b|\bnb\b/],['Saucony',/\bsaucony\b/],['Puma',/\bpuma\b/],['On',/\bon running\b|\b(from|by|an?) on\b|\bon (shoe|brand)/],['Brooks',/\bbrooks\b/],['Mizuno',/\bmizuno\b/],['Altra',/\baltra\b/]];
+function wantBrand(q){for(var i=0;i<BRANDS.length;i++)if(BRANDS[i][1].test(q))return BRANDS[i][0];return null}
+var SMALL=/^(hi|hey|hello|hiya|yo|sup|good (morning|afternoon|evening)|how are you|what'?s up|thanks?( you)?|thx|ok(ay)?|cool|nice|great|lol)\b/;
+function smallTalk(q){q=q.replace(/[^a-z' ]/g,' ').trim();return SMALL.test(q)&&!concepts(q).length&&!wantBrand(q)&&!/shoe|\$|\d/.test(q)}
+function looksLikeAsk(q){return !!wantBrand(q)||/shoe|something|want|looking|need|recommend|suggest|\$\s*\d|under|budget/.test(q)||Object.keys(CONCEPT).some(function(k){return CONCEPT[k].test(q)})}
 function loadEmb(){
  if(EMB.tried)return Promise.resolve(EMB.pipe);EMB.tried=true;
  if(window.MoEmbed)return Promise.resolve(EMB.pipe=window.MoEmbed); // tests can stand in for the model
@@ -900,15 +904,19 @@ function rankShoes(t){
   return pool.map(function(x){var have=concepts(shoeText(x.c,x.key)),hit=wants.filter(function(w){return have.indexOf(w)>-1}).length;return{c:x.c,key:x.key,score:(wants.length?hit/wants.length:0)+bonus(x)}})
  }).then(function(r){return r.sort(function(a,b){return b.score-a.score})})}
 function describe(t){
- if(S.typing)return;var B=wantBudget(t),back=ME.shoes.length?'mdone':'start';you(t);S.typing=true;render();scroll();
+ if(S.typing)return;var q0=t.toLowerCase(),back=ME.shoes.length?'mdone':'start';
+ if(smallTalk(q0)){you(t);return say(/^(thanks?|thx)/.test(q0)?'Anytime. Tell me if you want to look at another shoe.':'Hi. Tell me what kind of shoe you’re after, like “soft for easy runs” or “a race shoe under $200”.',{stage:back})}
+ if(!looksLikeAsk(q0)){you(t);return say('I’m not sure what you’re after. Tell me how you want it to feel or what it’s for, like “soft for easy runs under $160”.',{stage:back})}
+ var B=wantBudget(t),W=wantBrand(q0);you(t);S.typing=true;render();scroll();
  rankShoes(t).then(function(r){
   var no=(ME.history||[]).filter(function(x){return x.why==='disliked'}).map(function(x){return x.name});
   r=r.filter(function(x){return no.indexOf(x.c.name)<0&&!ME.shoes.some(function(s){return s.name===x.c.name})});
+  var lead='';if(W){var mine=r.filter(function(x){return x.c.brand===W});if(mine.length)r=mine;else lead='I don’t have any '+W+' shoes in my catalog yet. '}
   var inB=B?r.filter(function(x){return x.c.price<=B}):r,top=inB.slice(0,2),over=B?r.filter(function(x){return x.c.price>B&&x.c.price<=B*1.15})[0]:null;
   if(over&&top.length&&over.score<top[top.length-1].score)over=null;
   var out=[];
-  if(!top.length){out.push(msg('mo','text',{text:'Nothing in my catalog fits under $'+B+'.'+(over?' The closest is the '+over.c.name+' at $'+over.c.price+'.':' Want to try a higher budget?')}))}
-  else{var d={message:top.length===1?'This one is the closest to what you described.':'These two are the closest to what you described.',picks:top.map(function(x){return{name:x.c.name,reason:x.c.why}})},
+  if(!top.length){out.push(msg('mo','text',{text:lead+'Nothing'+(W&&!lead?' from '+W:'')+' in my catalog fits under $'+B+'.'+(over?' The closest is the '+over.c.name+' at $'+over.c.price+'.':' Want to try a higher budget?')}))}
+  else{var d={message:lead?lead+(top.length===1?'This is the closest from another brand.':'These are the closest from other brands.'):(top.length===1?(W&&!lead?'This '+W+' shoe is':'This one is'):(W&&!lead?'These two '+W+' shoes are':'These two are'))+' the closest to what you described.',picks:top.map(function(x){return{name:x.c.name,reason:x.c.why}})},
     note=over?'Just over your budget: the '+over.c.name+' at $'+over.c.price+'.':B?'Both under your $'+B+'.':'List prices, no budget given.';
    if(B&&top.length===1&&!over)note='Under your $'+B+'.';
    PREF=null;out=optsMsgs(top[0].key,'Closest to “'+t.replace(/\s+/g,' ').trim().slice(0,60)+'”',top.map(function(x){return x.c}),d,'',function(c){return c.why},note,true)}
