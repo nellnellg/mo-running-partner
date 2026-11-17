@@ -386,7 +386,7 @@ return{CAT:CAT,STORES:STORES,parseBudget:parseBudget};
 var ORDER=['speed','easy','race'];
 function fresh(){var s={msgs:[{id:0,who:'mo',kind:'text',text:''}],stage:'add',chosen:{},typing:false,confirm:false,rf:{name:'',date:''}};
  {s.form=newForm();ME=loadMe();
-  if(!ME.shoes.length){s.msgs[0].text='Hi, I’m Mo. Tell me about a shoe you run in. It takes three taps, and I’ll save it to your rotation so I remember it next time.';s.msgs.push({id:-1,who:'mo',kind:'addshoe'});s.stage='add'}
+  if(!ME.shoes.length){s.msgs[0].text='Hi, I’m Mo. I help you choose your next running shoe.';s.msgs.push({id:-1,who:'mo',kind:'text',text:'Tell me what you’re after in your own words, or start with the shoes you already run in.'});s.stage='start'}
   else{var due=ME.shoes.filter(isDue)[0];
    if(due){s.cur=due;s.msgs[0].text=dueSay(due)+' Want to see some options?';s.stage='mask';s.msgs.unshift({id:-2,who:'mo',kind:'img',src:'img/mo-shoe-due.jpg',alt:'Mo holding up an old running shoe'})}
    else{var nr=ME.shoes.filter(isNear)[0];if(nr){s.cur=nr;s.msgs[0].text=nearSay(nr)+' Want to start looking at your next one?';s.stage='mask'}
@@ -600,6 +600,7 @@ function mflow(act,label){
  if(S.typing)return;you(label);
  if(act==='opts'){if(!S.cur||!S.cur.role)return say('I don’t have shoes for that kind of run in my catalog yet.',{stage:'mdone'});if(ME.budget==null)return say('What’s your budget for this one?',{stage:'mbudget'});showMine()}
  else if(act==='force')showMine(true);
+ else if(act==='addform'){S.form=newForm();mo(function(){return[msg('mo','text',{text:'Which shoe do you run in? It takes three taps, and I’ll save it to your rotation.'}),msg('mo','addshoe')]},{stage:'add'})}
  else if(act==='same')reorder();
  else if(act==='zipNo'){var bk=S.zipBack||'mdone';S.zipFor=null;S.pz=null;say('No problem. Tap Find a store whenever you want it.',{stage:bk})}
  else if(act==='later'){say('No problem. Your shoe is saved in this browser, so I’ll remember it next time.',{stage:'mdone'});later(900,settle)}
@@ -620,7 +621,10 @@ function mflow(act,label){
 function mbudget(v,label){if(S.typing)return;you(label);ME.budget=v||9999;saveMe();showMine()}
 function msend(t,q){
  var st=S.stage,v;
- if(st==='add'){if(!S.form.name)return pickName(t);return}
+ if(st==='start'){var hit=KNOWN.filter(function(nm){var l=' '+nm.toLowerCase()+' ';return q.split(/\s+/).filter(Boolean).every(function(w){return l.indexOf(' '+w)>-1})});
+  if(hit.length&&!looksLikeAsk(q)){you(t);S.form=newForm();S.form.name=hit[0];return mo(function(){return[msg('mo','text',{text:'Got it. Tell me a bit more about your '+hit[0]+'.'}),msg('mo','addshoe')]},{stage:'add'})}
+  return describe(t)}
+ if(st==='add'){if(!S.form.name&&looksLikeAsk(q))return describe(t);if(!S.form.name)return pickName(t);return}
  if(st==='mask'&&/same|again|reorder|re-order/.test(q))return mflow('same',t);
  if(st==='mask')return mflow(/\bno\b|not|later|nah/.test(q)?'later':'opts',t);
  if(st==='mbudget'){v=L.parseBudget(t);if(v)return mbudget(v,t);you(t);return say('A dollar amount works, like $180.')}
@@ -636,6 +640,7 @@ function msend(t,q){
   if(/\brace\b|marathon|\b5k\b|\b10k\b/.test(q)){you(t);return openRaceForm('Search for it and I’ll fill in the date when I know it.')}}
  if(/\brace\b|marathon|\b5k\b|\b10k\b/.test(q)&&st==='mdone'){you(t);return openRaceForm(ME.race?'Sure. Here’s your race.':'Search for it and I’ll fill in the date when I know it.')}
  if(st==='mdone'&&/add|another|new shoe/.test(q))return mflow('another',t);
+ if(st!=='wait'&&looksLikeAsk(q))return describe(t);
  you(t);say(st==='wait'?'One second, I’m not done yet.':'I can add another shoe to your rotation whenever you like.');
 }
 function replies(){
@@ -651,6 +656,7 @@ function replies(){
  if(S.stage==='rafter')return[['It went well','m','wentWell'],['It was rough','m','wentRough']];
  if(S.stage==='rform'||S.stage==='rest')return[];
  if(S.stage==='zip'||S.stage==='zipc')return[['Not now','m','zipNo']];
+ if(S.stage==='start')return[['Upload my running log','m','log'],['Add a shoe I run in','m','addform'],['Try a sample rotation','m','sample']];
  if(S.stage==='add')return ME.shoes.length?[]:[['Upload my running log','m','log'],['Try it with a sample rotation','m','sample']];
  if(S.stage==='wait')return[];
  return[];
@@ -687,7 +693,7 @@ function render(){
  $('sheetWrap').hidden=view!=='chat';document.body.style.overflow=view==='chat'?'hidden':'';
  var ck=String(S.confirm)+view;
  if(ck!==render.hdrKey){render.hdrKey=ck;$('shdr').innerHTML=S.confirm?'<span class="cq">Start over and clear your pick?</span><button class="ghost" id="yes" type="button">Yes, start over</button><button class="ghost" id="no" type="button">Cancel</button>':'<button class="ghost" id="restart" type="button">Start over</button>'}
- $('ask').placeholder={add:'Or type your shoe’s name…',mask:'Yes or not now…',mbudget:'Around $180…',rask:'Yes or not right now…',rgap:'Yes or no…',rform:'Type the race name…',mover:'Show me anyway, or not now…',mdone:'Message Mo'}[S.stage]||'Message Mo';
+ $('ask').placeholder={add:'Or type your shoe’s name…',mask:'Yes or not now…',mbudget:'Around $180…',rask:'Yes or not right now…',rgap:'Yes or no…',rform:'Type the race name…',mover:'Show me anyway, or not now…',mdone:'Like “bouncy, under $150”',start:'Like “bouncy, under $150”'}[S.stage]||'Message Mo';
 }
 // Rotation: Mo speaks first, then the race, then the runner's shoes. Each shoe opens a chat about it.
 function storeBtn(brand,cls){return ME.zip?'<a class="'+cls+'" href="'+mapsURL(brand,place())+'" target="_blank" rel="noopener">Find a store</a>':'<button type="button" class="'+cls+'" data-store="'+esc(brand)+'">Find a store</button>'}
@@ -851,6 +857,60 @@ function sampleLog(){var s=11,out=[];function rnd(){s=(s*9301+49297)%233280;retu
 function spare(nm){var r=ME.shoes.filter(function(x){return x.name===nm})[0];if(!r||S.typing)return;
  S.cur={spare:true,racer:r.name,name:null,role:'speed',label:'Long and tempo',use:'long and tempo',miles:null,brand:r.brand};S.spareOf=null;
  if(ME.budget==null)return say('What’s your budget for this one?',{stage:'mbudget'});showMine()}
+// ----- Describe what you want: the runner's own words, matched to the catalog by meaning. It all runs in this browser. -----
+// A small sentence model (all-MiniLM-L6-v2) turns the runner's words and each shoe's description into vectors, and Mo
+// ranks shoes by how close they are. Hard limits like "under $150" are read with plain rules first, because a meaning
+// model is bad at numbers. If the model can't load, Mo falls back to matching words that mean the same thing.
+var ABOUT={
+ 'Saucony Endorphin Speed 5':'Good for tempo runs, intervals and faster long runs at marathon pace.',
+ 'Adidas Adizero Evo SL':'Good for tempo runs, faster long runs and everyday miles.',
+ 'Adidas Adizero SL2':'Good for everyday runs and tempo. A budget pick.',
+ 'ASICS Superblast 2':'Good for long runs, easy days and tempo. Lots of cushion.',
+ 'New Balance Rebel v5':'Good for everyday runs, long runs and tempo. Light and fun.',
+ 'ASICS Novablast 6':'Good for easy runs, long runs and everyday miles.',
+ 'Hoka Clifton Pro':'Good for easy runs, recovery runs and long runs. Lots of cushion.',
+ 'New Balance 1080v15':'Good for everyday miles and long runs.',
+ 'Nike Vomero Plus':'Good for long runs and recovery runs. Maximum cushion.',
+ 'On Cloudmonster 3':'Good for everyday miles and long runs. Stable.'};
+var EMB={pipe:null,tried:false,cat:null},
+ CONCEPT={bouncy:/bounc|spring|energ|lively|fun\b|pop/,soft:/soft|cushion|plush|comfort|mellow|max(imum)? cushion/,light:/light|weightless/,fast:/fast|quick|speed|snappy|tempo|interval|race|pace|propul|plate|pr\b/,
+  firm:/firm|responsive|ground feel/,stable:/stable|support|steady/,long:/long run|long distance|marathon|mileage|miles/,easy:/easy|recover|daily|every ?day/,race:/race|marathon|half|plate|carbon/,cheap:/budget|cheap|afford|value/};
+function allShoes(){var out=[];['easy','speed','race'].forEach(function(k){L.CAT[k].forEach(function(c){out.push({c:c,key:k})})});return out}
+function shoeText(c,k){return c.name+'. Feels '+(c.feel||'').toLowerCase()+'. '+c.why+' '+(ABOUT[c.name]||(k==='race'?'Built for race day, half and full marathons.':''))}
+function wantBudget(t){var m=t.match(/(?:under|below|less than|max(?:imum)?|up to|no more than|at most|cheaper than|within)\s*\$?\s*(\d{2,4})/i)||t.match(/\$\s*(\d{2,4})\s*(?:or less|max|tops|or under)?/i);return m?+m[1]:null}
+function looksLikeAsk(q){return /shoe|something|want|looking|need|recommend|suggest|\$\s*\d|under|budget/.test(q)||Object.keys(CONCEPT).some(function(k){return CONCEPT[k].test(q)})}
+function loadEmb(){
+ if(EMB.tried)return Promise.resolve(EMB.pipe);EMB.tried=true;
+ if(window.MoEmbed)return Promise.resolve(EMB.pipe=window.MoEmbed); // tests can stand in for the model
+ var go=import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.2').then(function(T){return T.pipeline('feature-extraction','Xenova/all-MiniLM-L6-v2')})
+  .then(function(p){return EMB.pipe=function(texts){return p(texts,{pooling:'mean',normalize:true}).then(function(o){return o.tolist()})}});
+ var slow=new Promise(function(_,no){setTimeout(function(){no(new Error('slow'))},15000)});
+ return Promise.race([go,slow]).catch(function(e){console.warn('Mo is matching by words, the meaning model did not load:',e&&e.message);return null})}
+function dot(a,b){var s=0;for(var i=0;i<a.length;i++)s+=a[i]*b[i];return s}
+function concepts(t){t=t.toLowerCase();return Object.keys(CONCEPT).filter(function(k){return CONCEPT[k].test(t)})}
+function rankShoes(t){
+ var pool=allShoes(),q=t.toLowerCase(),wants=concepts(q);
+ function bonus(x){var b=0;if(/long/.test(q)&&x.key!=='race')b+=.03;if(CONCEPT.race.test(q)&&!/long/.test(q))b+=x.key==='race'?.08:0;if(/tempo|workout|interval|speed/.test(q))b+=x.key==='speed'?.06:0;if(/easy|recover/.test(q))b+=x.key==='easy'?.06:0;return b}
+ return loadEmb().then(function(E){
+  if(E){var texts=pool.map(function(x){return shoeText(x.c,x.key)});
+   return(EMB.cat?Promise.resolve(EMB.cat):E(texts).then(function(v){return EMB.cat=v})).then(function(cv){return E([t]).then(function(qv){
+    return pool.map(function(x,i){return{c:x.c,key:x.key,score:dot(qv[0],cv[i])+bonus(x)}})})})}
+  return pool.map(function(x){var have=concepts(shoeText(x.c,x.key)),hit=wants.filter(function(w){return have.indexOf(w)>-1}).length;return{c:x.c,key:x.key,score:(wants.length?hit/wants.length:0)+bonus(x)}})
+ }).then(function(r){return r.sort(function(a,b){return b.score-a.score})})}
+function describe(t){
+ if(S.typing)return;var B=wantBudget(t),back=ME.shoes.length?'mdone':'start';you(t);S.typing=true;render();scroll();
+ rankShoes(t).then(function(r){
+  var no=(ME.history||[]).filter(function(x){return x.why==='disliked'}).map(function(x){return x.name});
+  r=r.filter(function(x){return no.indexOf(x.c.name)<0&&!ME.shoes.some(function(s){return s.name===x.c.name})});
+  var inB=B?r.filter(function(x){return x.c.price<=B}):r,top=inB.slice(0,2),over=B?r.filter(function(x){return x.c.price>B&&x.c.price<=B*1.15})[0]:null;
+  if(over&&top.length&&over.score<top[top.length-1].score)over=null;
+  var out=[];
+  if(!top.length){out.push(msg('mo','text',{text:'Nothing in my catalog fits under $'+B+'.'+(over?' The closest is the '+over.c.name+' at $'+over.c.price+'.':' Want to try a higher budget?')}))}
+  else{var d={message:top.length===1?'This one is the closest to what you described.':'These two are the closest to what you described.',picks:top.map(function(x){return{name:x.c.name,reason:x.c.why}})},
+    note=over?'Just over your budget: the '+over.c.name+' at $'+over.c.price+'.':B?'Both under your $'+B+'.':'List prices, no budget given.';
+   if(B&&top.length===1&&!over)note='Under your $'+B+'.';
+   PREF=null;out=optsMsgs(top[0].key,'Closest to “'+t.replace(/\s+/g,' ').trim().slice(0,60)+'”',top.map(function(x){return x.c}),d,'',function(c){return c.why},note,true)}
+  S.msgs=S.msgs.concat(out);S.typing=false;set({stage:back});scroll()})}
 // Adding a shoe from Rotation happens in a sheet, then the runner is back on Rotation.
 function openAdd(){AF=newForm();LG=null;view='home';$('addTitle').textContent='Add a shoe you run in';$('addWrap').hidden=false;renderAdd();render();setTimeout(function(){var q=$('shoeQ2');if(q)q.focus()},40)}
 function closeAdd(){AF=null;LG=null;$('addWrap').hidden=true}
@@ -871,7 +931,7 @@ function send(){
  if(S.stage==='add'){$('ask').value='';return msend(t,q)}
  if(S.stage==='zip')return saveZip(t);
  if(S.stage==='zipc')return saveCountry(t);
- if(TOPIC.test(q)){if(S.stage==='rform'){S.msgs=S.msgs.filter(function(m){return!(m.kind==='raceform'&&!m.done)});S.msgs.forEach(function(m){if(m.forRace)m.forRace=false});S.stage='mdone'}you(t);return say(OFF)}
+ if(TOPIC.test(q)&&!/shoe|\$\s*\d|under|budget|bounc|cushion|soft|light|fast|plate/.test(q)){if(S.stage==='rform'){S.msgs=S.msgs.filter(function(m){return!(m.kind==='raceform'&&!m.done)});S.msgs.forEach(function(m){if(m.forRace)m.forRace=false});S.stage='mdone'}you(t);return say(OFF)}
  msend(t,q);
 }
 function start(v){timers.forEach(clearTimeout);timers=[];S=fresh();view=v||(ME.shoes.length?'home':'chat');render.planKey=null;render.hdrKey=null;render.mood=null;render();$('scroller').scrollTop=0;window.scrollTo(0,0)}
