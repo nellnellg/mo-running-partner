@@ -890,11 +890,13 @@ function dot(a,b){var s=0;for(var i=0;i<a.length;i++)s+=a[i]*b[i];return s}
 function concepts(t){t=t.toLowerCase();return Object.keys(CONCEPT).filter(function(k){return CONCEPT[k].test(t)})}
 function rankShoes(t){
  var pool=allShoes(),q=t.toLowerCase(),wants=concepts(q);
+ // The model reads the whole sentence. This makes sure the words the runner leaned on, like bouncy or soft, still count.
+ function shared(x){var have=concepts(shoeText(x.c,x.key));return wants.filter(function(w){return have.indexOf(w)>-1}).length}
  function bonus(x){var b=0;if(/long/.test(q)&&x.key!=='race')b+=.03;if(CONCEPT.race.test(q)&&!/long/.test(q))b+=x.key==='race'?.08:0;if(/tempo|workout|interval|speed/.test(q))b+=x.key==='speed'?.06:0;if(/easy|recover/.test(q))b+=x.key==='easy'?.06:0;return b}
  return loadEmb().then(function(E){
   if(E){var texts=pool.map(function(x){return shoeText(x.c,x.key)});
    return(EMB.cat?Promise.resolve(EMB.cat):E(texts).then(function(v){return EMB.cat=v})).then(function(cv){return E([t]).then(function(qv){
-    return pool.map(function(x,i){return{c:x.c,key:x.key,score:dot(qv[0],cv[i])+bonus(x)}})})})}
+    return pool.map(function(x,i){return{c:x.c,key:x.key,score:dot(qv[0],cv[i])+bonus(x)+.1*shared(x)}})})})}
   return pool.map(function(x){var have=concepts(shoeText(x.c,x.key)),hit=wants.filter(function(w){return have.indexOf(w)>-1}).length;return{c:x.c,key:x.key,score:(wants.length?hit/wants.length:0)+bonus(x)}})
  }).then(function(r){return r.sort(function(a,b){return b.score-a.score})})}
 function describe(t){
